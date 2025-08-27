@@ -15,7 +15,7 @@ This portfolio features:
 -   **Contact Information:** Easy ways to get in touch.
 -   **Responsive Design:** Adapts seamlessly to different screen sizes.
 
-## Visuals (Screenshots/Live Demo)
+## Visuals (Screenshots)
 
 
 -   **Screenshots:** (Consider adding screenshots here)
@@ -55,14 +55,8 @@ To run in a web browser:
 fvm flutter run -d web
 ```
 
-To run on desktop (if configured):
-
-```bash
-fvm flutter run -d macos # or windows, linux
-```
-
 ## Contact
 
-[Your Name/Alias] - [Your Professional Email Address]
+[Tristan] - [godoytristanh@gmail.com]
 
-Project Repository: [https://github.com/your-username/thgportfolio](https://github.com/your-username/thgportfolio)
+Project Repository: [https://github.com/popodepo123/thgportfolio](https://github.com/popodepo123/thgportfolio)
