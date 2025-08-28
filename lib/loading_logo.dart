@@ -14,33 +14,36 @@ class _LoadingLogoState extends State<LoadingLogo>
     with SingleTickerProviderStateMixin {
   AnimationController? animationController;
   late Widget logo;
+  bool _isAnimating = true;
+
   void start() async {
-    final int gap = widget.speedMs;
-    await Future.delayed(Duration(milliseconds: gap * 3));
-    if (!mounted) return;
-    setState(() {
-      logo = LoadingLogoH(
-        fullStickDurationMs: widget.speedMs,
-        size: widget.size,
-      );
-    });
-    await Future.delayed(Duration(milliseconds: gap * 3));
-    if (!mounted) return;
-    setState(() {
-      logo = LoadingLogoG(
-        size: widget.size,
-        fullStickDurationMs: widget.speedMs,
-      );
-    });
-    await Future.delayed(Duration(milliseconds: gap * 3 * 2));
-    if (!mounted) return;
-    setState(() {
-      logo = LoadingLogoT(
-        size: widget.size,
-        fullStickDurationMs: widget.speedMs,
-      );
-    });
-    start();
+    while (_isAnimating && mounted) {
+      final int gap = widget.speedMs;
+      await Future.delayed(Duration(milliseconds: gap * 3));
+      if (!mounted || !_isAnimating) return;
+      setState(() {
+        logo = LoadingLogoH(
+          fullStickDurationMs: widget.speedMs,
+          size: widget.size,
+        );
+      });
+      await Future.delayed(Duration(milliseconds: gap * 3));
+      if (!mounted || !_isAnimating) return;
+      setState(() {
+        logo = LoadingLogoG(
+          size: widget.size,
+          fullStickDurationMs: widget.speedMs,
+        );
+      });
+      await Future.delayed(Duration(milliseconds: gap * 3 * 2));
+      if (!mounted || !_isAnimating) return;
+      setState(() {
+        logo = LoadingLogoT(
+          size: widget.size,
+          fullStickDurationMs: widget.speedMs,
+        );
+      });
+    }
   }
 
   @override
@@ -64,6 +67,7 @@ class _LoadingLogoState extends State<LoadingLogo>
 
   @override
   void dispose() {
+    _isAnimating = false;
     animationController?.dispose();
     super.dispose();
   }
@@ -346,11 +350,19 @@ class AnimatedStick extends StatefulWidget {
 class _AnimatedStickState extends State<AnimatedStick>
     with SingleTickerProviderStateMixin {
   AnimationController? controller;
+  bool _isAnimating = true;
+
   void start(AnimationController controller) async {
+    if (!_isAnimating) return;
+
     await Future.delayed(widget.delay);
+    if (!mounted || !_isAnimating) return;
+
     controller.forward();
     controller.addListener(() {
-      setState(() {});
+      if (mounted && _isAnimating) {
+        setState(() {});
+      }
     });
   }
 
@@ -370,6 +382,7 @@ class _AnimatedStickState extends State<AnimatedStick>
 
   @override
   void dispose() {
+    _isAnimating = false;
     controller?.dispose();
     super.dispose();
   }
