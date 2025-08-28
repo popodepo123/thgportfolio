@@ -46,3 +46,9 @@ app.*.map.json
 
 /staging_keys.json
 /android/local.properties
+
+# Agent guidelines (generated file)
+/AGENTS.md
+
+# Web build artifacts
+/docs/
