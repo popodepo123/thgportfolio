@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Allow all crawlers to access all content
+# This is a portfolio site, so we want maximum visibility
+
+# Sitemap location
+Sitemap: https://popodepo123.github.io/thgportfolio/sitemap.xml
