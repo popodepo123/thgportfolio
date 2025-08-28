@@ -49,6 +49,3 @@ app.*.map.json
 
 # Agent guidelines (generated file)
 /AGENTS.md
-
-# Web build artifacts
-/docs/
