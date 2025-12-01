@@ -431,13 +431,6 @@ class CompiledApp {
       _1275: f => finalizeWrapper(f, function(x0) { return dartInstance.exports._1275(f,arguments.length,x0) }),
       _1276: (x0,x1,x2) => x0.addEventListener(x1,x2),
       _1287: (x0,x1,x2,x3) => x0.open(x1,x2,x3),
-      _1288: x0 => x0.decode(),
-      _1289: (x0,x1,x2,x3) => x0.open(x1,x2,x3),
-      _1290: (x0,x1,x2) => x0.setRequestHeader(x1,x2),
-      _1291: f => finalizeWrapper(f, function(x0) { return dartInstance.exports._1291(f,arguments.length,x0) }),
-      _1292: f => finalizeWrapper(f, function(x0) { return dartInstance.exports._1292(f,arguments.length,x0) }),
-      _1293: x0 => x0.send(),
-      _1294: () => new XMLHttpRequest(),
       _1295: Date.now,
       _1297: s => new Date(s * 1000).getTimezoneOffset() * 60,
       _1298: s => {
@@ -458,13 +451,6 @@ class CompiledApp {
       _1300: () => typeof dartUseDateNowForTicks !== "undefined",
       _1301: () => 1000 * performance.now(),
       _1302: () => Date.now(),
-      _1303: () => {
-        // On browsers return `globalThis.location.href`
-        if (globalThis.location != null) {
-          return globalThis.location.href;
-        }
-        return null;
-      },
       _1305: () => new WeakMap(),
       _1306: (map, o) => map.get(o),
       _1307: (map, o, v) => map.set(o, v),
@@ -703,16 +689,9 @@ class CompiledApp {
       _1540: (x0,x1) => { x0.innerText = x1 },
       _1541: x0 => x0.style,
       _1543: x0 => x0.sheet,
-      _1544: x0 => x0.src,
-      _1545: (x0,x1) => { x0.src = x1 },
-      _1546: x0 => x0.naturalWidth,
-      _1547: x0 => x0.naturalHeight,
       _1554: x0 => x0.offsetX,
       _1555: x0 => x0.offsetY,
       _1556: x0 => x0.button,
-      _1563: x0 => x0.status,
-      _1564: (x0,x1) => { x0.responseType = x1 },
-      _1566: x0 => x0.response,
       _3399: () => globalThis.window,
       _3461: x0 => x0.navigator,
       _3850: x0 => x0.userAgent,

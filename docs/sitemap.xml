@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <url>
+    <loc>https://popodepo123.github.io/thgportfolio/</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+
+    <!-- Portfolio sections as images for better SEO -->
+    <image:image>
+      <image:loc>https://popodepo123.github.io/thgportfolio/icons/Icon-512.png</image:loc>
+      <image:title>Tristan Harvey Godoy - Full Stack Developer Portfolio</image:title>
+      <image:caption>Professional portfolio showcasing development projects and skills</image:caption>
+    </image:image>
+
+  </url>
+
+</urlset>
