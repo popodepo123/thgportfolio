@@ -46,10 +46,16 @@ class SkillCategory {
 class Project {
   final String title;
   final String description;
+  final String? playstoreLink;
+  final String? appstoreLink;
+  final String? githubLink;
   final List<String> features;
   final List<ProjectImage>? images;
 
   const Project({
+    this.playstoreLink,
+    this.appstoreLink,
+    this.githubLink,
     required this.title,
     required this.description,
     required this.features,
@@ -57,16 +63,29 @@ class Project {
   });
 }
 
-class ProjectImage {
-  final String url;
+sealed class ProjectImage {
   final String title;
   final String description;
 
-  const ProjectImage({
-    required this.url,
-    required this.title,
-    required this.description,
+  const ProjectImage({required this.title, required this.description});
+}
+
+class ProjectImageFromAsset extends ProjectImage {
+  ProjectImageFromAsset({
+    required this.asset,
+    required super.title,
+    required super.description,
   });
+  final String asset;
+}
+
+class ProjectImageFromUrl extends ProjectImage {
+  ProjectImageFromUrl({
+    required this.url,
+    required super.title,
+    required super.description,
+  });
+  final String url;
 }
 
 class Experience {
@@ -115,7 +134,7 @@ final GlobalKey projectsSectionKey = GlobalKey();
 final GlobalKey experienceSectionKey = GlobalKey();
 final GlobalKey footerSectionKey = GlobalKey();
 
-const portfolio = PortfolioData(
+final portfolio = PortfolioData(
   name: 'Tristan Harvey Godoy',
   title: 'Mobile Application Developer',
   email: 'godoytristanh@gmail.com',
@@ -272,6 +291,8 @@ const portfolio = PortfolioData(
   ],
   projects: [
     Project(
+      playstoreLink:
+          "https://play.google.com/store/apps/details?id=com.u10ff.easyorder&amp%3Bhl=es_US",
       title: 'Multi-Store Management & Point-of-Sale System',
       description:
           'Developed a mobile application used for multi store management. A combination of point of sales and menu management system.',
@@ -283,69 +304,31 @@ const portfolio = PortfolioData(
         'MVVM code structure/architecture with riverpod for state management',
       ],
       images: [
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project1_1/200/300',
-          title: 'Login Screen',
-          description:
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        ProjectImageFromAsset(
+          asset: 'assets/images/eo1.webp',
+          title: '',
+          description: '',
         ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project1_2/200/300',
-          title: 'Dashboard View',
-          description:
-              'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        ProjectImageFromAsset(
+          asset: 'assets/images/eo2.webp',
+          title: '',
+          description: '',
         ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project1_3/200/300',
-          title: 'Product Catalog',
-          description:
-              'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+        ProjectImageFromAsset(
+          asset: 'assets/images/eo3.webp',
+          title: '',
+          description: '',
         ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project1_4/200/300',
-          title: 'POS Interface',
-          description:
-              'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-        ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project1_5/200/300',
-          title: 'Order Management',
-          description:
-              'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.',
-        ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project1_6/200/300',
-          title: 'Inventory Tracking',
-          description:
-              'Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.',
-        ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project1_7/200/300',
-          title: 'Reporting Analytics',
-          description:
-              'Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?',
-        ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project1_8/200/300',
-          title: 'User Profile',
-          description:
-              'Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?',
-        ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project1_9/200/300',
-          title: 'Settings Page',
-          description:
-              'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.',
-        ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project1_10/200/300',
-          title: 'Printer Setup',
-          description:
-              'Similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.',
+        ProjectImageFromAsset(
+          asset: 'assets/images/eo4.webp',
+          title: '',
+          description: '',
         ),
       ],
     ),
     Project(
+      playstoreLink:
+          "https://play.google.com/store/apps/details?id=com.evapp.evms",
       title: 'Electric Vehicle Charging Station Map',
       description:
           'Developed an electric vehicle charging station map. Includes navigation, account tiers, station comments with media and user based station detail corrections suggestions.',
@@ -357,75 +340,45 @@ const portfolio = PortfolioData(
         'Firebase Auth Integration',
         'Device Geolocation',
         'MVVM code structure/architecture with riverpod for state management',
+        'SWApay payment integration',
       ],
       images: [
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project2_1/200/300',
-          title: 'Map View with Stations',
-          description:
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        ProjectImageFromAsset(
+          asset: 'assets/images/ev1.webp',
+          title: '',
+          description: '',
         ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project2_2/200/300',
-          title: 'Station Details',
-          description:
-              'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        ProjectImageFromAsset(
+          asset: 'assets/images/ev2.webp',
+          title: '',
+          description: '',
         ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project2_3/200/300',
-          title: 'Navigation Route',
-          description:
-              'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
-        ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project2_4/200/300',
-          title: 'User Account Tiers',
-          description:
-              'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-        ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project2_5/200/300',
-          title: 'Comments Section',
-          description:
-              'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.',
-        ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project2_6/200/300',
-          title: 'Media Upload',
-          description:
-              'Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.',
-        ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project2_7/200/300',
-          title: 'Correction Suggestion Form',
-          description:
-              'Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?',
-        ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project2_8/200/300',
-          title: 'Search Functionality',
-          description:
-              'Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?',
-        ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project2_9/200/300',
-          title: 'Filter Options',
-          description:
-              'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.',
-        ),
-        ProjectImage(
-          url: 'https://picsum.photos/seed/project2_10/200/300',
-          title: 'Settings and Preferences',
-          description:
-              'Similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.',
+        ProjectImageFromAsset(
+          asset: 'assets/images/ev3.webp',
+          title: '',
+          description: '',
         ),
       ],
+    ),
+    Project(
+      githubLink: "https://github.com/popodepo123/dart_filetree",
+      title: 'Dart Filetree for Helix',
+      description:
+          'A terminal-based file tree picker built with Dart and nocterm for integration with editors like Helix.',
+      features: [
+        "Interactive file tree navigation in terminal using nocterm UI framework",
+        "File selection and operations with chooser file integration",
+        "Local storage using Hive for settings persistence",
+        "Cross-platform file system operations",
+        "Helix editor integration via zellij for seamless file opening",
+      ],
+      images: [],
     ),
   ],
   experiences: [
     Experience(
       role: 'Mobile Application Developer',
-      company: 'Freelance',
+      company: 'Freelance / Individual Contractor',
       period: 'July 2023 - PRESENT',
       description:
           'Spearheaded the end-to-end development of two distinct mobile applications, enhancing operational efficiency and user engagement. For Project 1, designed and implemented a comprehensive multi-store management and point-of-sale system, streamlining inventory and sales processes. For Project 2, engineered an electric vehicle charging station map with advanced features including navigation, tiered accounts, and user-driven data correction, significantly improving user experience and data accuracy. Actively engaged in continuous feature development and project improvement for both applications.',

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:thgportfolio/portfolio_data.dart';
 import 'package:thgportfolio/theme.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProjectsSection extends StatefulWidget {
   const ProjectsSection({super.key});
@@ -32,7 +34,83 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
-                    child: Text(project.title, style: textTheme.titleLarge),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      spacing: 5,
+                      children: [
+                        Text(project.title, style: textTheme.titleLarge),
+                        if (project.playstoreLink != null)
+                          IconButton(
+                            iconSize: 20,
+                            icon: FaIcon(FontAwesomeIcons.googlePlay),
+                            onPressed: () async {
+                              if (await canLaunchUrl(
+                                Uri.parse(project.playstoreLink!),
+                              )) {
+                                await launchUrl(
+                                  Uri.parse(project.playstoreLink!),
+                                );
+                              } else {
+                                // Handle error: could not launch URL
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Could not launch ${(project.playstoreLink!)}',
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        if (project.appstoreLink != null)
+                          IconButton(
+                            iconSize: 20,
+                            icon: FaIcon(FontAwesomeIcons.appStore),
+                            onPressed: () async {
+                              if (await canLaunchUrl(
+                                Uri.parse(project.appstoreLink!),
+                              )) {
+                                await launchUrl(
+                                  Uri.parse(project.appstoreLink!),
+                                );
+                              } else {
+                                // Handle error: could not launch URL
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Could not launch ${(project.appstoreLink!)}',
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        if (project.githubLink != null)
+                          IconButton(
+                            iconSize: 20,
+                            icon: FaIcon(FontAwesomeIcons.github),
+                            onPressed: () async {
+                              if (await canLaunchUrl(
+                                Uri.parse(project.githubLink!),
+                              )) {
+                                await launchUrl(Uri.parse(project.githubLink!));
+                              } else {
+                                // Handle error: could not launch URL
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Could not launch ${(project.githubLink!)}',
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                      ],
+                    ),
                   ),
                   Padding(
                     // Padding for the description
@@ -48,7 +126,8 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: project
-                            .images!.length, // Changed imageUrls to images
+                            .images!
+                            .length, // Changed imageUrls to images
                         itemBuilder: (context, imageIndex) {
                           return Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -60,13 +139,11 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                                     context: context,
                                     builder: (BuildContext context) {
                                       final PageController
-                                          galleryPageController =
-                                          PageController(
+                                      galleryPageController = PageController(
                                         initialPage: imageIndex,
                                       );
                                       final ValueNotifier<int>
-                                          currentPageNotifier =
-                                          ValueNotifier<int>(
+                                      currentPageNotifier = ValueNotifier<int>(
                                         imageIndex,
                                       );
 
@@ -86,11 +163,13 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                                         ),
                                         child: ConstrainedBox(
                                           constraints: BoxConstraints(
-                                            maxWidth: MediaQuery.of(
+                                            maxWidth:
+                                                MediaQuery.of(
                                                   context,
                                                 ).size.width *
                                                 0.9,
-                                            maxHeight: MediaQuery.of(
+                                            maxHeight:
+                                                MediaQuery.of(
                                                   context,
                                                 ).size.height *
                                                 0.9,
@@ -102,34 +181,40 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                                                     galleryPageController,
                                                 itemCount:
                                                     project.images!.length,
-                                                itemBuilder:
-                                                    (context, galleryIndex) {
-                                                  return Image.network(
-                                                    project
-                                                        .images![galleryIndex]
-                                                        .url,
-                                                    fit: BoxFit.contain,
-                                                    semanticLabel: project
-                                                        .images![galleryIndex]
-                                                        .title,
-                                                  );
+                                                itemBuilder: (context, galleryIndex) {
+                                                  final projectImage = project
+                                                      .images![galleryIndex];
+                                                  return switch (projectImage) {
+                                                    ProjectImageFromAsset() =>
+                                                      Image.asset(
+                                                        projectImage.asset,
+                                                        // fit: BoxFit.fill,
+                                                        semanticLabel:
+                                                            projectImage.title,
+                                                      ),
+                                                    ProjectImageFromUrl() =>
+                                                      Image.network(
+                                                        projectImage.url,
+                                                        // fit: BoxFit.fill,
+                                                        semanticLabel:
+                                                            projectImage.title,
+                                                      ),
+                                                  };
                                                 },
                                               ),
                                               Positioned(
                                                 bottom: 0,
                                                 left: 0,
                                                 right: 0,
-                                                child:
-                                                    ValueListenableBuilder<int>(
+                                                child: ValueListenableBuilder<int>(
                                                   valueListenable:
                                                       currentPageNotifier,
-                                                  builder: (context,
-                                                      currentPage, child) {
+                                                  builder: (context, currentPage, child) {
                                                     return Container(
                                                       padding:
                                                           const EdgeInsets.all(
-                                                        8.0,
-                                                      ),
+                                                            8.0,
+                                                          ),
                                                       color: Colors.black54,
                                                       child: Column(
                                                         mainAxisSize:
@@ -137,11 +222,9 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                                                         children: [
                                                           Text(
                                                             project
-                                                                .images![
-                                                                    currentPage]
+                                                                .images![currentPage]
                                                                 .title, // Display title
-                                                            style: Theme.of(
-                                                                    context)
+                                                            style: Theme.of(context)
                                                                 .textTheme
                                                                 .titleLarge
                                                                 ?.copyWith(
@@ -156,11 +239,9 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                                                           ),
                                                           Text(
                                                             project
-                                                                .images![
-                                                                    currentPage]
+                                                                .images![currentPage]
                                                                 .description, // Display description
-                                                            style: Theme.of(
-                                                                    context)
+                                                            style: Theme.of(context)
                                                                 .textTheme
                                                                 .bodyMedium
                                                                 ?.copyWith(
@@ -180,28 +261,23 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                                                 top: 8,
                                                 left: 0,
                                                 right: 0,
-                                                child:
-                                                    ValueListenableBuilder<int>(
+                                                child: ValueListenableBuilder<int>(
                                                   valueListenable:
                                                       currentPageNotifier,
-                                                  builder: (context,
-                                                      currentPage, child) {
+                                                  builder: (context, currentPage, child) {
                                                     return Center(
                                                       child: Container(
                                                         padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                          horizontal: 8,
-                                                          vertical: 4,
-                                                        ),
-                                                        decoration:
-                                                            BoxDecoration(
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 8,
+                                                              vertical: 4,
+                                                            ),
+                                                        decoration: BoxDecoration(
                                                           color: Colors.black54,
                                                           borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                            8,
-                                                          ),
+                                                              BorderRadius.circular(
+                                                                8,
+                                                              ),
                                                         ),
                                                         child: Text(
                                                           '${currentPage + 1} of ${project.images!.length}',
@@ -248,11 +324,8 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                                         100, // Adjusted width for smartphone aspect ratio
                                     height:
                                         180, // Adjusted height for smartphone aspect ratio
-                                    child: Image.network(
-                                      project.images![imageIndex].url,
-                                      fit: BoxFit.cover,
-                                      semanticLabel:
-                                          project.images![imageIndex].title,
+                                    child: buildImage(
+                                      project.images![imageIndex],
                                     ),
                                   ),
                                 ),
@@ -319,5 +392,20 @@ class _ProjectsSectionState extends State<ProjectsSection> {
         ],
       ),
     );
+  }
+
+  Image buildImage(ProjectImage image) {
+    return switch (image) {
+      ProjectImageFromAsset() => Image.asset(
+        image.asset,
+        fit: BoxFit.fill,
+        semanticLabel: image.title,
+      ),
+      ProjectImageFromUrl() => Image.network(
+        image.url,
+        fit: BoxFit.fill,
+        semanticLabel: image.title,
+      ),
+    };
   }
 }

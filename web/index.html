@@ -174,6 +174,21 @@
   </div>
 
   <script>
+    window.addEventListener('load', function(ev) {
+      // Download main.dart.js
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        },
+        onEntrypointLoaded: function(engineInitializer) {
+          engineInitializer.initializeEngine().then(function(appRunner) {
+            appRunner.runApp();
+          });
+        }
+      });
+    });
+  </script>
+  <script>
     // Function to hide loading screen with fade effect
     function hideLoadingScreen() {
       const loadingScreen = document.getElementById('loading-screen');
@@ -187,12 +202,9 @@
       }, 800);
     }
 
-    // Hide loading screen after Flutter starts loading (when flutter_bootstrap.js loads)
-    window.addEventListener('load', () => {
-      // Small delay to let Flutter initialize
-      setTimeout(() => {
-        hideLoadingScreen();
-      }, 1000);
+    // Wait for Flutter to be ready
+    document.addEventListener('flutter-first-frame', () => {
+      hideLoadingScreen();
     });
 
     // Fallback: hide loading screen after a reasonable timeout
@@ -202,7 +214,7 @@
       }
     }, 8000); // 8 second fallback
   </script>
-
+  
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
