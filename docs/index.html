@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -14,15 +15,17 @@
     This is a placeholder for base href that will be replaced by the value of
     the `--base-href` argument provided to `flutter build`.
   -->
-  <base href="/">
+  <base href="/thgportfolio/">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
 
   <!-- SEO Meta Tags -->
   <title>Tristan Harvey Godoy - Full Stack Developer Portfolio</title>
-  <meta name="description" content="Professional portfolio of Tristan Harvey Godoy - Full Stack Developer specializing in Flutter, Dart, React, and modern web technologies. View my projects, skills, and experience.">
-  <meta name="keywords" content="Tristan Harvey Godoy, Full Stack Developer, Flutter Developer, Dart, React, Web Development, Mobile Development, Portfolio, Software Engineer">
+  <meta name="description"
+    content="Professional portfolio of Tristan Harvey Godoy - Full Stack Developer specializing in Flutter, Dart, React, and modern web technologies. View my projects, skills, and experience.">
+  <meta name="keywords"
+    content="Tristan Harvey Godoy, Full Stack Developer, Flutter Developer, Dart, React, Web Development, Mobile Development, Portfolio, Software Engineer">
   <meta name="author" content="Tristan Harvey Godoy">
   <meta name="robots" content="index, follow">
   <meta name="language" content="English">
@@ -35,7 +38,8 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://popodepo123.github.io/thgportfolio/">
   <meta property="og:title" content="Tristan Harvey Godoy - Full Stack Developer Portfolio">
-  <meta property="og:description" content="Professional portfolio showcasing Flutter, React, and full-stack development projects.">
+  <meta property="og:description"
+    content="Professional portfolio showcasing Flutter, React, and full-stack development projects.">
   <meta property="og:image" content="https://popodepo123.github.io/thgportfolio/icons/Icon-512.png">
   <meta property="og:image:width" content="512">
   <meta property="og:image:height" content="512">
@@ -46,7 +50,8 @@
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://popodepo123.github.io/thgportfolio/">
   <meta property="twitter:title" content="Tristan Harvey Godoy - Full Stack Developer Portfolio">
-  <meta property="twitter:description" content="Professional portfolio showcasing Flutter, React, and full-stack development projects.">
+  <meta property="twitter:description"
+    content="Professional portfolio showcasing Flutter, React, and full-stack development projects.">
   <meta property="twitter:image" content="https://popodepo123.github.io/thgportfolio/icons/Icon-512.png">
 
   <!-- Mobile and Theme -->
@@ -63,7 +68,7 @@
   <link rel="apple-touch-icon" sizes="512x512" href="icons/Icon-512.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
 
@@ -154,15 +159,28 @@
     }
 
     @keyframes loading-dots {
-      0%, 20% { content: ''; }
-      40% { content: '.'; }
-      60% { content: '..'; }
-      80%, 100% { content: '...'; }
+
+      0%,
+      20% {
+        content: '';
+      }
+
+      40% {
+        content: '.';
+      }
+
+      60% {
+        content: '..';
+      }
+
+      80%,
+      100% {
+        content: '...';
+      }
     }
-
-
   </style>
 </head>
+
 <body>
   <!-- Loading Screen -->
   <div id="loading-screen">
@@ -174,14 +192,14 @@
   </div>
 
   <script>
-    window.addEventListener('load', function(ev) {
+    window.addEventListener('load', function (ev) {
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         },
-        onEntrypointLoaded: function(engineInitializer) {
-          engineInitializer.initializeEngine().then(function(appRunner) {
+        onEntrypointLoaded: function (engineInitializer) {
+          engineInitializer.initializeEngine().then(function (appRunner) {
             appRunner.runApp();
           });
         }
@@ -214,7 +232,8 @@
       }
     }, 8000); // 8 second fallback
   </script>
-  
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
+
 </html>
