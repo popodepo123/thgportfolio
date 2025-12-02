@@ -291,6 +291,8 @@ final portfolio = PortfolioData(
   ],
   projects: [
     Project(
+      appstoreLink:
+          'https://apps.apple.com/jp/app/easyorder-selfordersystem/id6446138891?l=en-US',
       playstoreLink:
           "https://play.google.com/store/apps/details?id=com.u10ff.easyorder&amp%3Bhl=es_US",
       title: 'Multi-Store Management & Point-of-Sale System',
@@ -327,6 +329,8 @@ final portfolio = PortfolioData(
       ],
     ),
     Project(
+      appstoreLink:
+          'https://apps.apple.com/jp/app/ev-navi/id6473770215?l=en-US',
       playstoreLink:
           "https://play.google.com/store/apps/details?id=com.evapp.evms",
       title: 'Electric Vehicle Charging Station Map',

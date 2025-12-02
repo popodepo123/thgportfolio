@@ -49,3 +49,6 @@ app.*.map.json
 
 # Agent guidelines (generated file)
 /AGENTS.md
+
+# FVM Version Cache
+.fvm/

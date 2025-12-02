@@ -14,6 +14,17 @@ class ProjectsSection extends StatefulWidget {
 class _ProjectsSectionState extends State<ProjectsSection> {
   final Map<int, bool> _expandedStates = {};
 
+  Future<void> trylaunchUrl(String link) async {
+    if (await canLaunchUrl(Uri.parse(link))) {
+      await launchUrl(Uri.parse(link));
+    } else {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not launch $link')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -34,81 +45,46 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 5,
+                    child: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      runAlignment: WrapAlignment.start,
                       children: [
                         Text(project.title, style: textTheme.titleLarge),
-                        if (project.playstoreLink != null)
-                          IconButton(
-                            iconSize: 20,
-                            icon: FaIcon(FontAwesomeIcons.googlePlay),
-                            onPressed: () async {
-                              if (await canLaunchUrl(
-                                Uri.parse(project.playstoreLink!),
-                              )) {
-                                await launchUrl(
-                                  Uri.parse(project.playstoreLink!),
-                                );
-                              } else {
-                                // Handle error: could not launch URL
-                                if (!context.mounted) return;
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Could not launch ${(project.playstoreLink!)}',
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                        if (project.appstoreLink != null)
-                          IconButton(
-                            iconSize: 20,
-                            icon: FaIcon(FontAwesomeIcons.appStore),
-                            onPressed: () async {
-                              if (await canLaunchUrl(
-                                Uri.parse(project.appstoreLink!),
-                              )) {
-                                await launchUrl(
-                                  Uri.parse(project.appstoreLink!),
-                                );
-                              } else {
-                                // Handle error: could not launch URL
-                                if (!context.mounted) return;
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Could not launch ${(project.appstoreLink!)}',
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                        if (project.githubLink != null)
-                          IconButton(
-                            iconSize: 20,
-                            icon: FaIcon(FontAwesomeIcons.github),
-                            onPressed: () async {
-                              if (await canLaunchUrl(
-                                Uri.parse(project.githubLink!),
-                              )) {
-                                await launchUrl(Uri.parse(project.githubLink!));
-                              } else {
-                                // Handle error: could not launch URL
-                                if (!context.mounted) return;
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Could not launch ${(project.githubLink!)}',
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
+                        SizedBox(width: 5),
+                        Row(
+                          children: [
+                            if (project.playstoreLink != null)
+                              IconButton(
+                                iconSize: 20,
+                                icon: FaIcon(FontAwesomeIcons.googlePlay),
+                                onPressed: () async {
+                                  final link = project.playstoreLink;
+                                  if (link == null) return;
+                                  trylaunchUrl(link);
+                                },
+                              ),
+                            if (project.appstoreLink != null)
+                              IconButton(
+                                iconSize: 20,
+                                icon: FaIcon(FontAwesomeIcons.appStore),
+                                onPressed: () async {
+                                  final link = project.appstoreLink;
+                                  if (link == null) return;
+                                  trylaunchUrl(link);
+                                },
+                              ),
+                            if (project.githubLink != null)
+                              IconButton(
+                                iconSize: 20,
+                                icon: FaIcon(FontAwesomeIcons.github),
+                                onPressed: () async {
+                                  final link = project.githubLink;
+                                  if (link == null) return;
+                                  trylaunchUrl(link);
+                                },
+                              ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
