@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 
-const primaryColor = Color(0xFFFFD600); // A strong, vibrant yellow
-const backgroundColor = Colors.black; // A deep, dark background
-const surfaceColor = Color(0xFF1E1E1E); // A slightly lighter dark for cards
-const onPrimaryColor = Colors.black;
-const onSurfaceColor = Colors.white;
+// Gruber Darker Palette
+const gruberBg = Color(0xFF181818);
+const gruberBgDarker = Color(0xFF101010);
+const gruberBgLighter = Color(0xFF282828);
+const gruberFg = Color(0xFFE4E4EF);
+const gruberYellow = Color(0xFFFFDD33);
+const gruberGreen = Color(0xFF73C936);
+const gruberBrown = Color(0xFFCC8C3C);
+const gruberQuartz = Color(0xFF95A99F); // Comments
+const gruberNiagara = Color(0xFF96A6C8); // Types
+const gruberWisteria = Color(0xFF9E95C7); // Variables
+const gruberRed = Color(0xFFF43841);
 
 final portfolioTheme = ThemeData(
   brightness: Brightness.dark,
@@ -12,84 +19,90 @@ final portfolioTheme = ThemeData(
 
   // Color Scheme
   colorScheme: const ColorScheme.dark(
-    primary: primaryColor,
-    surface: surfaceColor,
-    onPrimary: onPrimaryColor,
-    onSurface: onSurfaceColor,
-    tertiary: primaryColor,
+    primary: gruberYellow,
+    surface: gruberBg,
+    surfaceContainerHighest: gruberBgLighter,
+    onPrimary: Colors.black,
+    onSurface: gruberFg,
+    tertiary: gruberBrown,
+    secondary: gruberGreen,
+    error: gruberRed,
   ),
 
   // Scaffold Background
-  scaffoldBackgroundColor: backgroundColor,
+  scaffoldBackgroundColor: gruberBgDarker,
 
   // Text Theme
   textTheme: const TextTheme(
-    // For main headers like the name
     displayLarge: TextStyle(
       fontSize: 48,
       fontWeight: FontWeight.bold,
-      color: onSurfaceColor,
+      color: gruberFg,
     ),
-    // For section titles
     headlineMedium: TextStyle(
       fontSize: 28,
       fontWeight: FontWeight.w600,
-      color: primaryColor, // Use primary color for emphasis
+      color: gruberYellow,
     ),
-    // For project/job titles
     titleLarge: TextStyle(
       fontSize: 22,
       fontWeight: FontWeight.w600,
-      color: onSurfaceColor,
+      color: gruberFg,
     ),
-    // For body text/descriptions
     bodyMedium: TextStyle(
       fontSize: 16,
-      height: 1.5, // Improved readability
-      color: onSurfaceColor,
+      height: 1.5,
+      color: gruberFg,
     ),
-    // For skill chips/tags
     labelLarge: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w500,
-      color: onPrimaryColor,
+      color: Colors.black,
     ),
   ),
 
   // Card Theme
   cardTheme: CardThemeData(
-    elevation: 4,
-    color: surfaceColor,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    elevation: 0,
+    color: gruberBg,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+      side: const BorderSide(color: gruberBgLighter, width: 1),
+    ),
     margin: const EdgeInsets.symmetric(vertical: 10),
   ),
 
   // Chip Theme
   chipTheme: ChipThemeData(
-    // backgroundColor: primaryColor, // Removed to rely on AnimatedContainer
-    disabledColor: backgroundColor,
-    selectedColor: primaryColor,
-    secondarySelectedColor: primaryColor,
+    backgroundColor: gruberBgLighter,
+    disabledColor: gruberBgDarker,
+    selectedColor: gruberYellow,
+    secondarySelectedColor: gruberYellow,
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
     labelStyle: const TextStyle(
-      color: onPrimaryColor, // Reverted to original
+      color: gruberFg,
       fontWeight: FontWeight.w500,
     ),
-    secondaryLabelStyle: const TextStyle(),
     brightness: Brightness.dark,
+  ),
+
+  // Floating Action Button
+  floatingActionButtonTheme: const FloatingActionButtonThemeData(
+    backgroundColor: gruberYellow,
+    foregroundColor: Colors.black,
   ),
 
   // Divider Theme
   dividerTheme: const DividerThemeData(
-    color: surfaceColor,
+    color: gruberBgLighter,
     thickness: 1,
     space: 40,
   ),
 
   // Text Selection Theme
   textSelectionTheme: TextSelectionThemeData(
-    selectionColor: primaryColor.withAlpha((255 * 0.4).round()),
-    selectionHandleColor: primaryColor,
+    selectionColor: gruberYellow.withAlpha((255 * 0.3).round()),
+    selectionHandleColor: gruberYellow,
   ),
 );

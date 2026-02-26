@@ -352,7 +352,7 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                                     children: [
                                       const Text(
                                         '\u2022 ',
-                                        style: TextStyle(color: primaryColor),
+                                        style: TextStyle(color: gruberYellow),
                                       ),
                                       Expanded(
                                         child: Text(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:thgportfolio/gitlab_service.dart';
 import 'package:thgportfolio/portfolio_data.dart';
+import 'package:thgportfolio/theme.dart';
 
 const double _terminalFontSize = 14.0;
 const String _terminalFontFamily = 'Iosevka';
@@ -15,15 +17,15 @@ class DevView extends StatefulWidget {
 class _DevViewState extends State<DevView> {
   String _currentFile = 'README.md';
   bool _isPickerOpen = true;
+  bool _isLoading = false;
+  String? _remoteContent;
   final FocusNode _focusNode = FocusNode();
 
-  final List<String> _files = [
-    'README.md',
-    'SKILLS.sh',
-    'PROJECTS.json',
-    'EXPERIENCE.log',
-    'CONTACT.cfg',
-  ];
+  // Maps path -> its direct children
+  final Map<String, List<Map<String, dynamic>>> _childrenCache = {};
+  final Set<String> _expandedPaths = {};
+
+  final List<String> _localFiles = ['README.md', 'SKILLS.sh', 'PROJECTS.json', 'EXPERIENCE.log', 'CONTACT.cfg'];
 
   @override
   void initState() {
@@ -37,33 +39,75 @@ class _DevViewState extends State<DevView> {
     super.dispose();
   }
 
-  void _moveSelection(int direction) {
-    final currentIndex = _files.indexOf(_currentFile);
-    int nextIndex = currentIndex + direction;
-    if (nextIndex < 0) nextIndex = _files.length - 1;
-    if (nextIndex >= _files.length) nextIndex = 0;
+  String _getSlug(Project p) => p.title.toLowerCase().replaceAll(' ', '_').replaceAll('(', '').replaceAll(')', '');
+
+  Future<void> _togglePath(String path, {Project? project, String? remoteRelativePath}) async {
+    if (_expandedPaths.contains(path)) {
+      setState(() => _expandedPaths.remove(path));
+    } else {
+      setState(() {
+        _expandedPaths.add(path);
+      });
+
+      // Load children if not in cache
+      if (!_childrenCache.containsKey(path)) {
+        setState(() => _isLoading = true);
+        
+        final gitlabUrl = project?.gitlabLink ?? _findGitlabUrlForPath(path);
+        if (gitlabUrl != null) {
+          final tree = await GitLabService.fetchTree(gitlabUrl, path: remoteRelativePath ?? _extractRemotePath(path));
+          setState(() {
+            _childrenCache[path] = tree;
+            _isLoading = false;
+          });
+        }
+      }
+    }
+  }
+
+  String? _findGitlabUrlForPath(String path) {
+    for (var p in portfolio.projects) {
+      if (path.startsWith(_getSlug(p))) return p.gitlabLink;
+    }
+    return null;
+  }
+
+  String _extractRemotePath(String path) {
+    // path format: "slug/folder/sub" -> "folder/sub"
+    final parts = path.split('/');
+    if (parts.length <= 1) return '';
+    return parts.sublist(1).join('/');
+  }
+
+  Future<void> _handleFileSelection(String file, {String? gitlabUrl, String? remotePath}) async {
     setState(() {
-      _currentFile = _files[nextIndex];
+      _currentFile = file;
+      _remoteContent = null;
     });
+
+    if (gitlabUrl != null && remotePath != null) {
+      setState(() => _isLoading = true);
+      final content = await GitLabService.fetchRawFile(gitlabUrl, filePath: remotePath);
+      if (mounted && _currentFile == file) {
+        setState(() {
+          _remoteContent = content;
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return CallbackShortcuts(
       bindings: {
-        const SingleActivator(LogicalKeyboardKey.keyJ): () => _moveSelection(1),
-        const SingleActivator(LogicalKeyboardKey.keyK): () => _moveSelection(-1),
-        const SingleActivator(LogicalKeyboardKey.space): () {
-          setState(() {
-            _isPickerOpen = !_isPickerOpen;
-          });
-        },
+        const SingleActivator(LogicalKeyboardKey.space): () => setState(() => _isPickerOpen = !_isPickerOpen),
       },
       child: Focus(
         focusNode: _focusNode,
         autofocus: true,
         child: Container(
-          color: const Color(0xFF1B1B23),
+          color: gruberBg,
           child: Column(
             children: [
               Expanded(
@@ -71,13 +115,17 @@ class _DevViewState extends State<DevView> {
                   children: [
                     if (_isPickerOpen)
                       _HelixPicker(
-                        files: _files,
+                        localFiles: _localFiles,
                         selectedFile: _currentFile,
-                        onFileSelected: (f) => setState(() => _currentFile = f),
+                        expandedPaths: _expandedPaths,
+                        childrenCache: _childrenCache,
+                        onFileSelected: _handleFileSelection,
+                        onPathToggle: _togglePath,
                       ),
                     Expanded(
                       child: _HelixBuffer(
                         fileName: _currentFile,
+                        isLoading: _isLoading,
                         lines: _getBufferLines(_currentFile),
                       ),
                     ),
@@ -93,6 +141,12 @@ class _DevViewState extends State<DevView> {
   }
 
   List<LineData> _getBufferLines(String buffer) {
+    if (_isLoading && _remoteContent == null) {
+      return [LineData(span: const TextSpan(text: '// Communicating with GitLab API...', style: TextStyle(color: gruberQuartz)))];
+    }
+    if (_remoteContent != null) {
+      return _remoteContent!.split('\n').map((l) => LineData(span: TextSpan(text: l, style: TextStyle(color: _getRemoteStyle(buffer))))).toList();
+    }
     return switch (buffer) {
       'README.md' => _MarkdownContent.getLines(),
       'SKILLS.sh' => _ShellContent.getLines(),
@@ -102,6 +156,13 @@ class _DevViewState extends State<DevView> {
       _ => [LineData(span: const TextSpan(text: 'Error: Buffer not found'))],
     };
   }
+
+  Color _getRemoteStyle(String fileName) {
+    if (fileName.endsWith('.dart')) return gruberGreen;
+    if (fileName.endsWith('.yaml') || fileName.endsWith('.json')) return gruberNiagara;
+    if (fileName.endsWith('.md')) return gruberFg;
+    return gruberFg.withOpacity(0.8);
+  }
 }
 
 class LineData {
@@ -110,55 +171,103 @@ class LineData {
 }
 
 class _HelixPicker extends StatelessWidget {
-  final List<String> files;
+  final List<String> localFiles;
   final String selectedFile;
-  final Function(String) onFileSelected;
+  final Set<String> expandedPaths;
+  final Map<String, List<Map<String, dynamic>>> childrenCache;
+  final Function(String, {String? gitlabUrl, String? remotePath}) onFileSelected;
+  final Function(String, {Project? project, String? remoteRelativePath}) onPathToggle;
 
-  const _HelixPicker({required this.files, required this.selectedFile, required this.onFileSelected});
+  const _HelixPicker({
+    required this.localFiles,
+    required this.selectedFile,
+    required this.expandedPaths,
+    required this.childrenCache,
+    required this.onFileSelected,
+    required this.onPathToggle,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 250,
-      decoration: const BoxDecoration(
-        color: Color(0xFF24242E),
-        border: Border(right: BorderSide(color: Color(0xFF3B3B4D), width: 1)),
-      ),
+      width: 280,
+      decoration: const BoxDecoration(color: gruberBgDarker, border: Border(right: BorderSide(color: gruberBgLighter, width: 1))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            color: const Color(0xFF3B3B4D),
-            child: const Row(
+            color: gruberBgLighter,
+            child: const Row(children: [Icon(Icons.folder_open, size: 16, color: gruberQuartz), SizedBox(width: 8), Text('explorer', style: TextStyle(color: gruberFg, fontFamily: _terminalFontFamily, fontSize: 13))]),
+          ),
+          Expanded(
+            child: ListView(
               children: [
-                Icon(Icons.search, size: 16, color: Colors.white70),
-                SizedBox(width: 8),
-                Text('file-picker', style: TextStyle(color: Colors.white, fontFamily: _terminalFontFamily, fontSize: 13)),
+                const Padding(padding: EdgeInsets.fromLTRB(16, 12, 16, 4), child: Text('SYSTEM', style: TextStyle(color: gruberQuartz, fontSize: 10, fontWeight: FontWeight.bold))),
+                ...localFiles.map((f) => _buildItem(f, f == selectedFile, Icons.description_outlined, () => onFileSelected(f), 0)),
+                
+                const Padding(padding: EdgeInsets.fromLTRB(16, 20, 16, 4), child: Text('PUBLIC PROJECTS', style: TextStyle(color: gruberQuartz, fontSize: 10, fontWeight: FontWeight.bold))),
+                ...portfolio.projects.where((p) => p.gitlabLink != null).map((p) {
+                  final slug = p.title.toLowerCase().replaceAll(' ', '_').replaceAll('(', '').replaceAll(')', '');
+                  return _buildLazyTree(p, slug, '', 0);
+                }),
               ],
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: files.length,
-              itemBuilder: (context, index) {
-                final file = files[index];
-                final isSelected = selectedFile == file;
-                return MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () => onFileSelected(file),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      color: isSelected ? const Color(0xFF3E3E52) : Colors.transparent,
-                      child: Text(file, style: TextStyle(color: isSelected ? Colors.white : Colors.white70, fontFamily: _terminalFontFamily, fontSize: 14)),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLazyTree(Project p, String fullPath, String remoteRelativePath, int depth) {
+    final isExpanded = expandedPaths.contains(fullPath);
+    final children = childrenCache[fullPath] ?? [];
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildItem(
+          depth == 0 ? p.title : fullPath.split('/').last,
+          false,
+          isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+          () => onPathToggle(fullPath, project: depth == 0 ? p : null, remoteRelativePath: remoteRelativePath),
+          depth,
+          color: depth == 0 ? gruberYellow : gruberNiagara,
+        ),
+        if (isExpanded)
+          ...children.map((node) {
+            final name = node['name'] as String;
+            final type = node['type'] as String;
+            final nodePath = node['path'] as String; // Path from repo root
+            final nodeFullPath = '${fullPath.split('/').first}/$nodePath';
+            
+            if (type == 'tree') {
+              return _buildLazyTree(p, nodeFullPath, nodePath, depth + 1);
+            } else {
+              final isSelected = selectedFile == nodeFullPath;
+              return _buildItem(name, isSelected, Icons.code, () => onFileSelected(nodeFullPath, gitlabUrl: p.gitlabLink, remotePath: nodePath), depth + 1);
+            }
+          }),
+      ],
+    );
+  }
+
+  Widget _buildItem(String text, bool isSelected, IconData icon, VoidCallback onTap, int depth, {Color? color}) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.fromLTRB(16.0 + (depth * 12), 6, 16, 6),
+          color: isSelected ? gruberBgLighter : Colors.transparent,
+          child: Row(
+            children: [
+              Icon(icon, size: 14, color: isSelected ? gruberYellow : (color ?? gruberQuartz)),
+              const SizedBox(width: 8),
+              Expanded(child: Text(text, style: TextStyle(color: isSelected ? gruberYellow : (color ?? gruberFg.withOpacity(0.7)), fontFamily: _terminalFontFamily, fontSize: 13), overflow: TextOverflow.ellipsis)),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -167,8 +276,8 @@ class _HelixPicker extends StatelessWidget {
 class _HelixBuffer extends StatelessWidget {
   final String fileName;
   final List<LineData> lines;
-
-  const _HelixBuffer({required this.fileName, required this.lines});
+  final bool isLoading;
+  const _HelixBuffer({required this.fileName, required this.lines, this.isLoading = false});
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +286,10 @@ class _HelixBuffer extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: Text(fileName, style: const TextStyle(color: Colors.white24, fontFamily: _terminalFontFamily, fontSize: 12)),
+          child: Row(children: [
+            Text(fileName, style: const TextStyle(color: gruberQuartz, fontFamily: _terminalFontFamily, fontSize: 12)),
+            if (isLoading) ...[const SizedBox(width: 8), const SizedBox(width: 10, height: 10, child: CircularProgressIndicator(strokeWidth: 2, color: gruberYellow))],
+          ]),
         ),
         Expanded(
           child: SelectionArea(
@@ -190,24 +302,10 @@ class _HelixBuffer extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SelectionContainer.disabled(
-                      child: SizedBox(
-                        width: 40,
-                        child: Text(
-                          (i + 1).toString().padLeft(3),
-                          style: const TextStyle(color: Colors.white10, fontFamily: _terminalFontFamily, fontSize: 13),
-                        ),
-                      ),
+                      child: SizedBox(width: 40, child: Text((i + 1).toString().padLeft(3), style: const TextStyle(color: gruberBgLighter, fontFamily: _terminalFontFamily, fontSize: 13))),
                     ),
                     const SizedBox(width: 12),
-                    Expanded(
-                      child: Text.rich(
-                        line.span,
-                        maxLines: 1,
-                        softWrap: false,
-                        overflow: TextOverflow.clip,
-                        style: const TextStyle(fontFamily: _terminalFontFamily, fontSize: _terminalFontSize),
-                      ),
-                    ),
+                    Expanded(child: Text.rich(line.span, maxLines: 1, softWrap: false, overflow: TextOverflow.clip, style: const TextStyle(fontFamily: _terminalFontFamily, fontSize: _terminalFontSize, color: gruberFg))),
                   ],
                 );
               },
@@ -222,57 +320,33 @@ class _HelixBuffer extends StatelessWidget {
 class _HelixStatusArea extends StatelessWidget {
   final String currentFile;
   const _HelixStatusArea({required this.currentFile});
-
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Container(
-          height: 24,
-          color: const Color(0xFF2D2D3A),
-          child: Row(
-            children: [
-              const _StatusBlock(text: ' NOR ', bgColor: Color(0xFF7B5EA7), textColor: Colors.white),
-              _StatusBlock(text: ' ~/projects/thgportfolio/$currentFile ', bgColor: const Color(0xFF3B3B4D), textColor: Colors.white),
-              const Spacer(),
-              const _StatusBlock(text: ' 1 sel ', bgColor: Color(0xFF3B3B4D), textColor: Colors.white70),
-              const _StatusBlock(text: ' 1:1 ', bgColor: Color(0xFF3B3B4D), textColor: Colors.white),
-              const _StatusBlock(text: ' UTF-8 ', bgColor: Color(0xFF3B3B4D), textColor: Colors.white70),
-              const _StatusBlock(text: ' DART ', bgColor: Color(0xFF7B5EA7), textColor: Colors.white),
-            ],
-          ),
+          height: 24, color: gruberBgLighter,
+          child: Row(children: [
+            const _StatusBlock(text: ' NOR ', bgColor: gruberYellow, textColor: Colors.black),
+            _StatusBlock(text: ' ~/projects/$currentFile ', bgColor: gruberBg, textColor: gruberFg),
+            const Spacer(),
+            const _StatusBlock(text: ' 1 sel ', bgColor: gruberBg, textColor: gruberQuartz),
+            const _StatusBlock(text: ' 1:1 ', bgColor: gruberBg, textColor: gruberFg),
+            const _StatusBlock(text: ' DART ', bgColor: gruberYellow, textColor: Colors.black),
+          ]),
         ),
-        Container(
-          height: 24,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          color: const Color(0xFF1B1B23),
-          child: const Row(
-            children: [
-              Text(':', style: TextStyle(color: Colors.white, fontFamily: _terminalFontFamily, fontWeight: FontWeight.bold)),
-              SizedBox(width: 8),
-              _BlinkingCursor(),
-            ],
-          ),
-        ),
+        Container(height: 24, padding: const EdgeInsets.symmetric(horizontal: 12), color: gruberBgDarker, child: const Row(children: [Text(':', style: TextStyle(color: gruberFg, fontFamily: _terminalFontFamily, fontWeight: FontWeight.bold)), SizedBox(width: 8), _BlinkingCursor()])),
       ],
     );
   }
 }
 
 class _StatusBlock extends StatelessWidget {
-  final String text;
-  final Color bgColor;
-  final Color textColor;
+  final String text; final Color bgColor; final Color textColor;
   const _StatusBlock({required this.text, required this.bgColor, required this.textColor});
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: bgColor,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      alignment: Alignment.center,
-      child: Text(text, style: TextStyle(color: textColor, fontFamily: _terminalFontFamily, fontSize: 12, fontWeight: FontWeight.w500)),
-    );
+    return Container(color: bgColor, padding: const EdgeInsets.symmetric(horizontal: 8), alignment: Alignment.center, child: Text(text, style: TextStyle(color: textColor, fontFamily: _terminalFontFamily, fontSize: 12, fontWeight: FontWeight.bold)));
   }
 }
 
@@ -285,19 +359,11 @@ class _BlinkingCursor extends StatefulWidget {
 class _BlinkingCursorState extends State<_BlinkingCursor> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 500))..repeat(reverse: true);
-  }
+  void initState() { super.initState(); _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 500))..repeat(reverse: true); }
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  void dispose() { _controller.dispose(); super.dispose(); }
   @override
-  Widget build(BuildContext context) {
-    return FadeTransition(opacity: _controller, child: Container(width: 8, height: 16, color: Colors.white70));
-  }
+  Widget build(BuildContext context) { return FadeTransition(opacity: _controller, child: Container(width: 8, height: 16, color: gruberYellow)); }
 }
 
 // --- Content Data Providers ---
@@ -305,31 +371,28 @@ class _BlinkingCursorState extends State<_BlinkingCursor> with SingleTickerProvi
 class _MarkdownContent {
   static List<LineData> getLines() {
     final List<LineData> lines = [];
-    lines.add(LineData(span: const TextSpan(text: '# README.md', style: TextStyle(color: Color(0xFF6362CE), fontWeight: FontWeight.bold))));
+    lines.add(LineData(span: const TextSpan(text: '# README.md', style: TextStyle(color: gruberNiagara, fontWeight: FontWeight.bold))));
     lines.add(LineData(span: const TextSpan(text: '')));
-    lines.add(LineData(span: TextSpan(text: '## ${portfolio.name}', style: const TextStyle(color: Colors.cyanAccent))));
-    lines.add(LineData(span: TextSpan(text: '> ${portfolio.title}', style: const TextStyle(color: Colors.orangeAccent))));
+    lines.add(LineData(span: TextSpan(text: '## ${portfolio.name}', style: const TextStyle(color: gruberYellow))));
+    lines.add(LineData(span: TextSpan(text: '> ${portfolio.title}', style: const TextStyle(color: gruberBrown))));
     lines.add(LineData(span: const TextSpan(text: '')));
-    
-    final summaryWords = portfolio.summary.split(' ');
+    final words = portfolio.summary.split(' ');
     String current = '';
-    for (var word in summaryWords) {
-      if ((current + word).length > 60) {
-        lines.add(LineData(span: TextSpan(text: current.trim(), style: const TextStyle(color: Colors.white54, fontStyle: FontStyle.italic))));
-        current = word + ' ';
-      } else { current += word + ' '; }
+    for (var w in words) {
+      if ((current + w).length > 60) { lines.add(LineData(span: TextSpan(text: current.trim(), style: const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic)))); current = w + ' '; }
+      else { current += w + ' '; }
     }
-    if (current.isNotEmpty) lines.add(LineData(span: TextSpan(text: current.trim(), style: const TextStyle(color: Colors.white54, fontStyle: FontStyle.italic))));
+    if (current.isNotEmpty) lines.add(LineData(span: TextSpan(text: current.trim(), style: const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic))));
     return lines;
   }
 }
 
 class _ShellContent {
   static List<LineData> getLines() {
-    final List<LineData> lines = [LineData(span: const TextSpan(text: '#!/bin/bash', style: TextStyle(color: Colors.white24))), LineData(span: const TextSpan(text: ''))];
+    final List<LineData> lines = [LineData(span: const TextSpan(text: '#!/bin/bash', style: TextStyle(color: gruberQuartz))), LineData(span: const TextSpan(text: ''))];
     for (var cat in portfolio.skills) {
-      lines.add(LineData(span: TextSpan(text: 'echo "Loading ${cat.categoryName}..."', style: const TextStyle(color: Colors.greenAccent))));
-      for (var s in cat.skills) lines.add(LineData(span: TextSpan(text: '  add_skill "${s.name}"', style: const TextStyle(color: Colors.white54))));
+      lines.add(LineData(span: TextSpan(text: 'echo "Loading ${cat.categoryName}..."', style: const TextStyle(color: gruberGreen))));
+      for (var s in cat.skills) lines.add(LineData(span: TextSpan(text: '  add_skill "${s.name}"', style: const TextStyle(color: gruberFg))));
       lines.add(LineData(span: const TextSpan(text: '')));
     }
     return lines;
@@ -339,76 +402,40 @@ class _ShellContent {
 class _JsonContent {
   static List<LineData> getLines() {
     final List<LineData> lines = [];
-    lines.add(LineData(span: const TextSpan(text: '{', style: TextStyle(color: Colors.yellowAccent))));
-    lines.add(LineData(span: const TextSpan(text: '  "projects": [', style: TextStyle(color: Colors.white))));
-
+    lines.add(LineData(span: const TextSpan(text: '{', style: TextStyle(color: gruberYellow))));
+    lines.add(LineData(span: const TextSpan(text: '  "projects": [', style: TextStyle(color: gruberFg))));
     for (var i = 0; i < portfolio.projects.length; i++) {
       final p = portfolio.projects[i];
-      lines.add(LineData(span: const TextSpan(text: '    {', style: TextStyle(color: Colors.white38))));
-      
-      _addRichField(lines, 'title', p.title, color: Colors.greenAccent);
-      _addRichField(lines, 'description', p.description, color: Colors.white70);
-      if (p.githubLink != null) _addRichField(lines, 'github', p.githubLink!, color: Colors.cyanAccent);
-      if (p.gitlabLink != null) _addRichField(lines, 'gitlab', p.gitlabLink!, color: Colors.cyanAccent);
-      
-      lines.add(LineData(span: const TextSpan(children: [
-        TextSpan(text: '      "features"', style: TextStyle(color: Colors.white)),
-        TextSpan(text: '    : [', style: TextStyle(color: Colors.white70)),
-      ])));
-      
-      for (var f in p.features) {
-        lines.add(LineData(span: TextSpan(text: '        "$f"${f == p.features.last ? "" : ","}', style: const TextStyle(color: Colors.orangeAccent))));
-      }
-      lines.add(LineData(span: const TextSpan(text: '      ]', style: TextStyle(color: Colors.white70))));
-      lines.add(LineData(span: TextSpan(text: '    }${i == portfolio.projects.length - 1 ? "" : ","}', style: const TextStyle(color: Colors.white38))));
+      lines.add(LineData(span: const TextSpan(text: '    {', style: TextStyle(color: gruberQuartz))));
+      _addRichField(lines, 'title', p.title, color: gruberGreen);
+      _addRichField(lines, 'description', p.description, color: gruberFg);
+      if (p.githubLink != null) _addRichField(lines, 'github', p.githubLink!, color: gruberNiagara);
+      if (p.gitlabLink != null) _addRichField(lines, 'gitlab', p.gitlabLink!, color: gruberNiagara);
+      lines.add(LineData(span: const TextSpan(children: [TextSpan(text: '      "features"', style: TextStyle(color: gruberFg)), TextSpan(text: '    : [', style: TextStyle(color: gruberQuartz))])));
+      for (var f in p.features) lines.add(LineData(span: TextSpan(text: '        "$f"${f == p.features.last ? "" : ","}', style: const TextStyle(color: gruberBrown))));
+      lines.add(LineData(span: const TextSpan(text: '      ]', style: TextStyle(color: gruberQuartz))));
+      lines.add(LineData(span: TextSpan(text: '    }${i == portfolio.projects.length - 1 ? "" : ","}', style: const TextStyle(color: gruberQuartz))));
     }
-    lines.add(LineData(span: const TextSpan(text: '  ]', style: TextStyle(color: Colors.white))));
-    lines.add(LineData(span: const TextSpan(text: '}', style: TextStyle(color: Colors.yellowAccent))));
+    lines.add(LineData(span: const TextSpan(text: '  ]', style: TextStyle(color: gruberFg))));
+    lines.add(LineData(span: const TextSpan(text: '}', style: TextStyle(color: gruberYellow))));
     return lines;
   }
-
   static void _addRichField(List<LineData> lines, String key, String value, {required Color color}) {
     const int keyWidth = 12;
-    final String keyPart = '"$key"'.padRight(keyWidth);
-    final String prefix = '      ';
-    
+    final String k = '"$key"'.padRight(keyWidth);
+    final String p = '      ';
     final words = value.split(' ');
     String current = '';
     bool first = true;
-
-    for (var word in words) {
-      if ((current + word).length > 60) {
-        if (first) {
-          lines.add(LineData(span: TextSpan(children: [
-            TextSpan(text: '$prefix$keyPart', style: const TextStyle(color: Colors.white)),
-            const TextSpan(text: ' : "', style: TextStyle(color: Colors.white70)),
-            TextSpan(text: current.trim(), style: TextStyle(color: color)),
-          ])));
-          first = false;
-        } else {
-          lines.add(LineData(span: TextSpan(children: [
-            TextSpan(text: ' ' * (prefix.length + keyWidth + 4)),
-            TextSpan(text: current.trim(), style: TextStyle(color: color)),
-          ])));
-        }
-        current = word + ' ';
+    for (var w in words) {
+      if ((current + w).length > 60) {
+        if (first) { lines.add(LineData(span: TextSpan(children: [TextSpan(text: '$p$k', style: const TextStyle(color: gruberFg)), const TextSpan(text: ' : "', style: TextStyle(color: gruberQuartz)), TextSpan(text: current.trim(), style: TextStyle(color: color))]))); first = false; }
+        else { lines.add(LineData(span: TextSpan(children: [TextSpan(text: ' ' * (p.length + keyWidth + 4)), TextSpan(text: current.trim(), style: TextStyle(color: color))]))); }
+        current = w + ' ';
       } else { current += word + ' '; }
     }
-    
-    if (first) {
-      lines.add(LineData(span: TextSpan(children: [
-        TextSpan(text: '$prefix$keyPart', style: const TextStyle(color: Colors.white)),
-        const TextSpan(text: ' : "', style: TextStyle(color: Colors.white70)),
-        TextSpan(text: current.trim(), style: TextStyle(color: color)),
-        const TextSpan(text: '",', style: TextStyle(color: Colors.white70)),
-      ])));
-    } else {
-      lines.add(LineData(span: TextSpan(children: [
-        TextSpan(text: ' ' * (prefix.length + keyWidth + 4)),
-        TextSpan(text: current.trim(), style: TextStyle(color: color)),
-        const TextSpan(text: '",', style: TextStyle(color: Colors.white70)),
-      ])));
-    }
+    if (first) { lines.add(LineData(span: TextSpan(children: [TextSpan(text: '$p$k', style: const TextStyle(color: gruberFg)), const TextSpan(text: ' : "', style: TextStyle(color: gruberQuartz)), TextSpan(text: current.trim(), style: TextStyle(color: color)), const TextSpan(text: '",', style: TextStyle(color: gruberQuartz))]))); }
+    else { lines.add(LineData(span: TextSpan(children: [TextSpan(text: ' ' * (p.length + keyWidth + 4)), TextSpan(text: current.trim(), style: TextStyle(color: color)), const TextSpan(text: '",', style: TextStyle(color: gruberQuartz))]))); }
   }
 }
 
@@ -416,9 +443,16 @@ class _LogContent {
   static List<LineData> getLines() {
     final List<LineData> lines = [];
     for (var e in portfolio.experiences) {
-      lines.add(LineData(span: TextSpan(text: '[${e.period}] INFO: Joined ${e.company}', style: const TextStyle(color: Colors.white38))));
-      lines.add(LineData(span: TextSpan(text: '  Role: ${e.role}', style: const TextStyle(color: Colors.white))));
-      lines.add(LineData(span: TextSpan(text: '  Task: ${e.description.substring(0, 50)}...', style: const TextStyle(color: Colors.white54))));
+      lines.add(LineData(span: TextSpan(children: [const TextSpan(text: '● ', style: TextStyle(color: gruberNiagara)), TextSpan(text: e.period, style: const TextStyle(color: gruberQuartz)), const TextSpan(text: ' - ', style: TextStyle(color: gruberQuartz)), TextSpan(text: e.role, style: const TextStyle(color: gruberGreen, fontWeight: FontWeight.bold))])));
+      lines.add(LineData(span: TextSpan(children: [const TextSpan(text: '  Status: ', style: TextStyle(color: gruberQuartz)), const TextSpan(text: 'ACTIVE ', style: TextStyle(color: gruberNiagara)), const TextSpan(text: '@ ', style: TextStyle(color: gruberQuartz)), TextSpan(text: e.company, style: const TextStyle(color: gruberYellow))])));
+      lines.add(LineData(span: const TextSpan(text: '  Details:', style: TextStyle(color: gruberQuartz))));
+      final words = e.description.split(' ');
+      String current = '    ';
+      for (var w in words) {
+        if ((current + w).length > 70) { lines.add(LineData(span: TextSpan(text: current.trimRight(), style: const TextStyle(color: gruberFg)))); current = '    ' + w + ' '; }
+        else { current += word + ' '; }
+      }
+      if (current.trim().isNotEmpty) lines.add(LineData(span: TextSpan(text: current.trimRight(), style: const TextStyle(color: gruberFg))));
       lines.add(LineData(span: const TextSpan(text: '')));
     }
     return lines;
@@ -428,13 +462,13 @@ class _LogContent {
 class _ConfigContent {
   static List<LineData> getLines() {
     return [
-      LineData(span: const TextSpan(text: '[contact]', style: TextStyle(color: Colors.purpleAccent))),
-      LineData(span: TextSpan(text: 'email = "${portfolio.email}"', style: const TextStyle(color: Colors.white70))),
-      if (portfolio.githubUrl != null) LineData(span: TextSpan(text: 'github = "${portfolio.githubUrl}"', style: const TextStyle(color: Colors.white70))),
-      if (portfolio.gitlabUrl != null) LineData(span: TextSpan(text: 'gitlab = "${portfolio.gitlabUrl}"', style: const TextStyle(color: Colors.white70))),
+      LineData(span: const TextSpan(text: '[contact]', style: TextStyle(color: gruberWisteria))),
+      LineData(span: TextSpan(text: 'email = "${portfolio.email}"', style: const TextStyle(color: gruberFg))),
+      if (portfolio.githubUrl != null) LineData(span: TextSpan(text: 'github = "${portfolio.githubUrl}"', style: const TextStyle(color: gruberFg))),
+      if (portfolio.gitlabUrl != null) LineData(span: TextSpan(text: 'gitlab = "${portfolio.gitlabUrl}"', style: const TextStyle(color: gruberFg))),
       LineData(span: const TextSpan(text: '')),
-      LineData(span: const TextSpan(text: '[status]', style: TextStyle(color: Colors.purpleAccent))),
-      LineData(span: const TextSpan(text: 'available = true', style: TextStyle(color: Colors.greenAccent))),
+      const LineData(span: TextSpan(text: '[status]', style: TextStyle(color: gruberWisteria))),
+      const LineData(span: TextSpan(text: 'available = true', style: TextStyle(color: gruberGreen))),
     ];
   }
 }
