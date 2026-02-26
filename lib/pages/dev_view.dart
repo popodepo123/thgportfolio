@@ -41,6 +41,7 @@ class _DevViewState extends ConsumerState<DevView> {
   final FocusNode _focusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
   int _currentScrollLine = 1;
+  bool _relativeLineNumbers = false;
 
   // Command & Search Mode
   bool _isCommandMode = false;
@@ -256,6 +257,10 @@ class _DevViewState extends ConsumerState<DevView> {
       setState(() => _isPreviewMode = !_isPreviewMode);
     } else if (trimmed == 'close' || trimmed == 'c') {
       _closeBuffer(_activeBufferIndex);
+    } else if (trimmed == 'set rnu' || trimmed == 'set relativenumber') {
+      setState(() => _relativeLineNumbers = true);
+    } else if (trimmed == 'set nornu' || trimmed == 'set norelativenumber') {
+      setState(() => _relativeLineNumbers = false);
     }
     
     setState(() {
@@ -408,6 +413,8 @@ class _DevViewState extends ConsumerState<DevView> {
                                                     isLoading: _isLoading,
                                                     lines: _getBufferLines(_currentFile),
                                                     scrollController: _scrollController,
+                                                    relativeLineNumbers: _relativeLineNumbers,
+                                                    currentLine: _currentScrollLine,
                                                   ),
                                         if (_currentFile.endsWith('.md'))
                                           Positioned(
@@ -809,12 +816,16 @@ class _HelixBuffer extends StatelessWidget {
   final List<LineData> lines;
   final bool isLoading;
   final ScrollController? scrollController;
+  final bool relativeLineNumbers;
+  final int currentLine;
   
   const _HelixBuffer({
     required this.fileName,
     required this.lines,
     this.isLoading = false,
     this.scrollController,
+    this.relativeLineNumbers = false,
+    this.currentLine = 1,
   });
 
   @override
@@ -843,11 +854,25 @@ class _HelixBuffer extends StatelessWidget {
                 itemCount: lines.length,
                 itemBuilder: (context, i) {
                   final line = lines[i];
+                  final actualLineNum = i + 1;
+                  
+                  String displayNum = '$actualLineNum';
+                  Color numColor = gruberBgLighter;
+                  
+                  if (relativeLineNumbers) {
+                     if (actualLineNum == currentLine) {
+                        displayNum = '$actualLineNum';
+                        numColor = gruberYellow;
+                     } else {
+                        displayNum = '${(actualLineNum - currentLine).abs()}';
+                     }
+                  }
+
                   return Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SelectionContainer.disabled(
-                        child: SizedBox(width: 40, child: Text('${i + 1}'.padLeft(3), style: const TextStyle(color: gruberBgLighter, fontFamily: _terminalFontFamily, fontSize: 13))),
+                        child: SizedBox(width: 40, child: Text(displayNum.padLeft(3), style: TextStyle(color: numColor, fontFamily: _terminalFontFamily, fontSize: 13))),
                       ),
                       const SizedBox(width: 12),
                       Expanded(child: Text.rich(line.span, maxLines: 1, softWrap: false, overflow: TextOverflow.clip, style: const TextStyle(fontFamily: _terminalFontFamily, fontSize: _terminalFontSize, color: gruberFg))),
