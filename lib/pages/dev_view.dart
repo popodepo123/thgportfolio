@@ -223,9 +223,7 @@ class _DevViewState extends ConsumerState<DevView> {
     final int? lineNumber = int.tryParse(trimmed);
 
     if (lineNumber != null) {
-       // Go to line command
        if (_scrollController.hasClients) {
-          // Zero-indexed, approx 20px per line
           final double targetPos = ((lineNumber - 1) * 20.0).clamp(0, _scrollController.position.maxScrollExtent);
           _scrollController.animateTo(
             targetPos,
@@ -240,10 +238,14 @@ class _DevViewState extends ConsumerState<DevView> {
       if (_localFiles.contains(file)) {
         _handleFileSelection(file);
       }
-    } else if (trimmed == 'tree') {
+    } else if (trimmed == 'tree' || trimmed == 'ls') {
       setState(() => _isPickerOpen = !_isPickerOpen);
     } else if (trimmed == 'crt') {
       setState(() => _isCRTEnabled = !_isCRTEnabled);
+    } else if (trimmed == 'md' && _currentFile.endsWith('.md')) {
+      setState(() => _isPreviewMode = !_isPreviewMode);
+    } else if (trimmed == 'close' || trimmed == 'c') {
+      _closeBuffer(_activeBufferIndex);
     }
     
     setState(() {
