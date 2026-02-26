@@ -882,12 +882,22 @@ class _HelixStatusArea extends StatelessWidget {
     final String lang = _getLangLabel(currentFile);
     final String sizeStr = stats.size > 1024 ? '${(stats.size / 1024).toStringAsFixed(1)}kb' : '${stats.size}b';
 
+    String modeText = ' NOR ';
+    Color modeColor = gruberYellow;
+    if (isCommandMode) {
+      modeText = ' CMD ';
+      modeColor = gruberWisteria;
+    } else if (isSearchMode) {
+      modeText = ' SRC ';
+      modeColor = gruberNiagara;
+    }
+
     return Column(
       children: [
         Container(
           height: 24, color: gruberBgLighter,
           child: Row(children: [
-            const _StatusBlock(text: ' NOR ', bgColor: gruberYellow, textColor: Colors.black),
+            _StatusBlock(text: modeText, bgColor: modeColor, textColor: Colors.black),
             _StatusBlock(text: ' $displayPath ', bgColor: gruberBg, textColor: gruberFg),
             const Spacer(),
             _StatusBlock(text: ' ${stats.words} words ', bgColor: gruberBg, textColor: gruberQuartz),
