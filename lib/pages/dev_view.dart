@@ -18,6 +18,9 @@ class DevView extends StatefulWidget {
 
 class _DevViewState extends State<DevView> {
   String _currentFile = 'README.md';
+  final List<String> _openBuffers = ['README.md'];
+  int _activeBufferIndex = 0;
+
   bool _isPickerOpen = true;
   bool _isLoading = false;
   bool _isImage = false;
@@ -86,6 +89,10 @@ class _DevViewState extends State<DevView> {
     final isImg = file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg') || file.endsWith('.webp') || file.endsWith('.gif');
     
     setState(() {
+      if (!_openBuffers.contains(file)) {
+        _openBuffers.add(file);
+      }
+      _activeBufferIndex = _openBuffers.indexOf(file);
       _currentFile = file;
       _remoteContent = null;
       _imageUrl = null;
@@ -128,6 +135,23 @@ class _DevViewState extends State<DevView> {
     }
   }
 
+  void _closeBuffer(int index) {
+    setState(() {
+      final String closedFile = _openBuffers.removeAt(index);
+      if (_openBuffers.isEmpty) {
+        _openBuffers.add('README.md');
+      }
+      if (_activeBufferIndex >= _openBuffers.length) {
+        _activeBufferIndex = _openBuffers.length - 1;
+      }
+      _currentFile = _openBuffers[_activeBufferIndex];
+      // If the closed file was the current one, we might need to refresh content
+      if (_currentFile != closedFile) {
+        _handleFileSelection(_currentFile);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return CallbackShortcuts(
@@ -158,24 +182,36 @@ class _DevViewState extends State<DevView> {
                             onPathToggle: _togglePath,
                           ),
                         Expanded(
-                          child: Stack(
+                          child: Column(
                             children: [
-                              _isImage && _imageUrl != null
-                                  ? _buildImageBuffer()
-                                  : (_isPreviewMode && _currentFile.endsWith('.md'))
-                                      ? _buildMarkdownPreview()
-                                      : _HelixBuffer(
-                                          fileName: _currentFile,
-                                          isLoading: _isLoading,
-                                          lines: _getBufferLines(_currentFile),
-                                          scrollController: _scrollController,
-                                        ),
-                              if (_currentFile.endsWith('.md'))
-                                Positioned(
-                                  top: 16,
-                                  right: 16,
-                                  child: _buildPreviewToggle(),
+                              _HelixTabBar(
+                                openBuffers: _openBuffers,
+                                activeIndex: _activeBufferIndex,
+                                onTabSelected: (idx) => _handleFileSelection(_openBuffers[idx]),
+                                onTabClosed: _closeBuffer,
+                              ),
+                              Expanded(
+                                child: Stack(
+                                  children: [
+                                    _isImage && _imageUrl != null
+                                        ? _buildImageBuffer()
+                                        : (_isPreviewMode && _currentFile.endsWith('.md'))
+                                            ? _buildMarkdownPreview()
+                                            : _HelixBuffer(
+                                                fileName: _currentFile,
+                                                isLoading: _isLoading,
+                                                lines: _getBufferLines(_currentFile),
+                                                scrollController: _scrollController,
+                                              ),
+                                    if (_currentFile.endsWith('.md'))
+                                      Positioned(
+                                        top: 16,
+                                        right: 16,
+                                        child: _buildPreviewToggle(),
+                                      ),
+                                  ],
                                 ),
+                              ),
                             ],
                           ),
                         ),
@@ -337,6 +373,71 @@ class _DevViewState extends State<DevView> {
 class LineData {
   final TextSpan span;
   LineData({required this.span});
+}
+
+class _HelixTabBar extends StatelessWidget {
+  final List<String> openBuffers;
+  final int activeIndex;
+  final Function(int) onTabSelected;
+  final Function(int) onTabClosed;
+
+  const _HelixTabBar({
+    required this.openBuffers,
+    required this.activeIndex,
+    required this.onTabSelected,
+    required this.onTabClosed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 32,
+      color: gruberBgDarker,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: openBuffers.length,
+        itemBuilder: (context, i) {
+          final isSelected = i == activeIndex;
+          final fileName = openBuffers[i].split('/').last;
+          
+          return MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => onTabSelected(i),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: isSelected ? gruberBg : gruberBgDarker,
+                  border: Border(
+                    top: BorderSide(color: isSelected ? gruberYellow : Colors.transparent, width: 2),
+                    right: const BorderSide(color: gruberBgLighter, width: 1),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      fileName,
+                      style: TextStyle(
+                        color: isSelected ? gruberFg : gruberQuartz,
+                        fontFamily: _terminalFontFamily,
+                        fontSize: 12,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () => onTabClosed(i),
+                      child: Icon(Icons.close, size: 12, color: isSelected ? gruberRed : gruberQuartz),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 class _HelixPicker extends StatelessWidget {
