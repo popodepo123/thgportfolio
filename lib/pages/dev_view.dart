@@ -181,6 +181,26 @@ class _DevViewState extends ConsumerState<DevView> {
     });
   }
 
+  _BufferStats _getStats() {
+    String content = '';
+    if (_remoteContent != null) {
+      content = _remoteContent!;
+    } else {
+      content = _getMarkdownString(_currentFile);
+    }
+    
+    if (content.isEmpty && _remoteContent == null) {
+       // local content provider fallback (sh/json/log)
+       // This is a simplified proxy for this TUI
+       content = _getBufferLines(_currentFile).map((l) => l.span.toPlainText()).join('\n');
+    }
+
+    final lines = content.split('\n').length;
+    final words = content.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length;
+    final size = content.length; // Approximate bytes
+    return _BufferStats(lines: lines, words: words, size: size);
+  }
+
   @override
   Widget build(BuildContext context) {
     return CallbackShortcuts(
@@ -269,6 +289,7 @@ class _DevViewState extends ConsumerState<DevView> {
                     commandController: _commandController,
                     commandFocusNode: _commandFocusNode,
                     onCommandSubmit: _executeCommand,
+                    stats: _getStats(),
                   ),
                 ],
               );
@@ -424,6 +445,13 @@ class _DevViewState extends ConsumerState<DevView> {
 class LineData {
   final TextSpan span;
   LineData({required this.span});
+}
+
+class _BufferStats {
+  final int lines;
+  final int words;
+  final int size;
+  _BufferStats({required this.lines, required this.words, required this.size});
 }
 
 class _HelixTabBar extends StatelessWidget {
@@ -653,6 +681,7 @@ class _HelixStatusArea extends StatelessWidget {
   final TextEditingController commandController;
   final FocusNode commandFocusNode;
   final Function(String) onCommandSubmit;
+  final _BufferStats stats;
   
   const _HelixStatusArea({
     required this.currentFile,
@@ -661,6 +690,7 @@ class _HelixStatusArea extends StatelessWidget {
     required this.commandController,
     required this.commandFocusNode,
     required this.onCommandSubmit,
+    required this.stats,
   });
   
   @override
@@ -668,6 +698,7 @@ class _HelixStatusArea extends StatelessWidget {
     final bool isLocal = localFiles.contains(currentFile);
     final String displayPath = isLocal ? '~/system/$currentFile' : '~/projects/$currentFile';
     final String lang = _getLangLabel(currentFile);
+    final String sizeStr = stats.size > 1024 ? '${(stats.size / 1024).toStringAsFixed(1)}kb' : '${stats.size}b';
 
     return Column(
       children: [
@@ -677,8 +708,9 @@ class _HelixStatusArea extends StatelessWidget {
             const _StatusBlock(text: ' NOR ', bgColor: gruberYellow, textColor: Colors.black),
             _StatusBlock(text: ' $displayPath ', bgColor: gruberBg, textColor: gruberFg),
             const Spacer(),
-            const _StatusBlock(text: ' 1 sel ', bgColor: gruberBg, textColor: gruberQuartz),
-            const _StatusBlock(text: ' 1:1 ', bgColor: gruberBg, textColor: gruberFg),
+            _StatusBlock(text: ' ${stats.words} words ', bgColor: gruberBg, textColor: gruberQuartz),
+            _StatusBlock(text: ' $sizeStr ', bgColor: gruberBg, textColor: gruberNiagara),
+            _StatusBlock(text: ' ${stats.lines} lines ', bgColor: gruberBg, textColor: gruberFg),
             _StatusBlock(text: ' $lang ', bgColor: gruberYellow, textColor: Colors.black),
           ]),
         ),
