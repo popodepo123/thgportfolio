@@ -45,6 +45,7 @@ class _DevViewState extends ConsumerState<DevView> {
   bool _relativeLineNumbers = false;
   bool _wrapText = false;
   bool _cursorLine = true;
+  bool _isMatrixMode = false;
 
   // Visual Mode
   bool _isVisualMode = false;
@@ -276,6 +277,8 @@ class _DevViewState extends ConsumerState<DevView> {
       setState(() => _cursorLine = true);
     } else if (trimmed == 'set nocul' || trimmed == 'set nocursorline') {
       setState(() => _cursorLine = false);
+    } else if (trimmed == 'matrix') {
+      setState(() => _isMatrixMode = !_isMatrixMode);
     }
     
     setState(() {
@@ -460,18 +463,39 @@ class _DevViewState extends ConsumerState<DevView> {
                                             ? _buildImageBuffer()
                                             : (_isPreviewMode && _currentFile.endsWith('.md'))
                                                 ? _buildMarkdownPreview()
-                                                : _HelixBuffer(
-                                                    fileName: _currentFile,
-                                                    isLoading: _isLoading,
-                                                    lines: _getBufferLines(_currentFile),
-                                                    scrollController: _scrollController,
-                                                    relativeLineNumbers: _relativeLineNumbers,
-                                                    currentLine: _currentScrollLine,
-                                                    wrapText: _wrapText,
-                                                    highlightCursorLine: _cursorLine,
-                                                    isVisualMode: _isVisualMode,
-                                                    visualAnchorLine: _visualAnchorLine,
-                                                  ),
+                                                : (_isMatrixMode 
+                                                    ? ColorFiltered(
+                                                        colorFilter: const ColorFilter.matrix(<double>[
+                                                          0, 0, 0, 0, 0,
+                                                          0.2126, 0.7152, 0.0722, 0, 0,
+                                                          0, 0, 0, 0, 0,
+                                                          0, 0, 0, 1, 0,
+                                                        ]),
+                                                        child: _HelixBuffer(
+                                                          fileName: _currentFile,
+                                                          isLoading: _isLoading,
+                                                          lines: _getBufferLines(_currentFile),
+                                                          scrollController: _scrollController,
+                                                          relativeLineNumbers: _relativeLineNumbers,
+                                                          currentLine: _currentScrollLine,
+                                                          wrapText: _wrapText,
+                                                          highlightCursorLine: _cursorLine,
+                                                          isVisualMode: _isVisualMode,
+                                                          visualAnchorLine: _visualAnchorLine,
+                                                        ),
+                                                      )
+                                                    : _HelixBuffer(
+                                                        fileName: _currentFile,
+                                                        isLoading: _isLoading,
+                                                        lines: _getBufferLines(_currentFile),
+                                                        scrollController: _scrollController,
+                                                        relativeLineNumbers: _relativeLineNumbers,
+                                                        currentLine: _currentScrollLine,
+                                                        wrapText: _wrapText,
+                                                        highlightCursorLine: _cursorLine,
+                                                        isVisualMode: _isVisualMode,
+                                                        visualAnchorLine: _visualAnchorLine,
+                                                      )),
                                         if (_currentFile.endsWith('.md'))
                                           Positioned(
                                             top: 16,
