@@ -299,6 +299,30 @@ class _DevViewState extends ConsumerState<DevView> {
             });
             return KeyEventResult.handled;
           }
+          
+          // Vim-style navigation when in normal mode
+          if (!_isCommandMode && !_isSearchMode && event is KeyDownEvent && _scrollController.hasClients) {
+            const double scrollAmount = 40.0; // Approx two lines
+            
+            if (event.logicalKey == LogicalKeyboardKey.keyJ || event.logicalKey == LogicalKeyboardKey.arrowDown) {
+              final newPos = (_scrollController.offset + scrollAmount).clamp(0.0, _scrollController.position.maxScrollExtent);
+              _scrollController.jumpTo(newPos);
+              return KeyEventResult.handled;
+            } else if (event.logicalKey == LogicalKeyboardKey.keyK || event.logicalKey == LogicalKeyboardKey.arrowUp) {
+              final newPos = (_scrollController.offset - scrollAmount).clamp(0.0, _scrollController.position.maxScrollExtent);
+              _scrollController.jumpTo(newPos);
+              return KeyEventResult.handled;
+            } else if (event.logicalKey == LogicalKeyboardKey.keyG) {
+               if (HardwareKeyboard.instance.isShiftPressed) {
+                 // G (Bottom)
+                 _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+               } else {
+                 // g (Top)
+                 _scrollController.jumpTo(0.0);
+               }
+               return KeyEventResult.handled;
+            }
+          }
           return KeyEventResult.ignored;
         },
         child: Stack(
