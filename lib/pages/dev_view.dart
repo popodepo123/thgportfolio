@@ -803,23 +803,30 @@ class _HelixBuffer extends StatelessWidget {
         ),
         Expanded(
           child: SelectionArea(
-            child: ListView.builder(
+            child: RawScrollbar(
               controller: scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              itemCount: lines.length,
-              itemBuilder: (context, i) {
-                final line = lines[i];
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SelectionContainer.disabled(
-                      child: SizedBox(width: 40, child: Text('${i + 1}'.padLeft(3), style: const TextStyle(color: gruberBgLighter, fontFamily: _terminalFontFamily, fontSize: 13))),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(child: Text.rich(line.span, maxLines: 1, softWrap: false, overflow: TextOverflow.clip, style: const TextStyle(fontFamily: _terminalFontFamily, fontSize: _terminalFontSize, color: gruberFg))),
-                  ],
-                );
-              },
+              thumbColor: gruberBgLighter,
+              radius: Radius.zero,
+              thickness: 10,
+              thumbVisibility: true,
+              child: ListView.builder(
+                controller: scrollController,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                itemCount: lines.length,
+                itemBuilder: (context, i) {
+                  final line = lines[i];
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SelectionContainer.disabled(
+                        child: SizedBox(width: 40, child: Text('${i + 1}'.padLeft(3), style: const TextStyle(color: gruberBgLighter, fontFamily: _terminalFontFamily, fontSize: 13))),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text.rich(line.span, maxLines: 1, softWrap: false, overflow: TextOverflow.clip, style: const TextStyle(fontFamily: _terminalFontFamily, fontSize: _terminalFontSize, color: gruberFg))),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),
