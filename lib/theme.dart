@@ -8,6 +8,7 @@ const gruberFg = Color(0xFFE4E4EF);
 const gruberYellow = Color(0xFFFFDD33);
 const gruberGreen = Color(0xFF73C936);
 const gruberBrown = Color(0xFFCC8C3C);
+const gruberOrange = Color(0xFFFF8833);
 const gruberQuartz = Color(0xFF95A99F); // Comments
 const gruberNiagara = Color(0xFF96A6C8); // Types
 const gruberWisteria = Color(0xFF9E95C7); // Variables

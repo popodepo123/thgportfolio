@@ -109,12 +109,9 @@ class _DevViewState extends State<DevView> {
             _isLoading = false;
           });
 
-          // Auto-scroll if line specified
           if (scrollToLine != null && _scrollController.hasClients) {
-            // Wait for list to render
             Future.delayed(const Duration(milliseconds: 100), () {
               if (mounted) {
-                // Approximate line height is 20px
                 final double position = (scrollToLine * 20.0).clamp(0, _scrollController.position.maxScrollExtent);
                 _scrollController.animateTo(
                   position,
@@ -286,10 +283,9 @@ class _DevViewState extends State<DevView> {
       return [LineData(span: const TextSpan(text: '// Communicating with Contribution API...', style: TextStyle(color: gruberQuartz)))];
     }
     if (_remoteContent != null) {
-      if (buffer.endsWith('.dart')) {
-        return _DartHighlighter.highlight(
-          _remoteContent!,
-          onSymbolClick: (symbol) async {
+      final ext = buffer.split('.').last.toLowerCase();
+      return switch (ext) {
+        'dart' => _DartHighlighter.highlight(_remoteContent!, onSymbolClick: (symbol) async {
             debugPrint('JTD: Tapped symbol $symbol in $buffer');
             final gitlabUrl = _findGitlabUrlForPath(buffer);
             if (gitlabUrl != null) {
@@ -297,21 +293,24 @@ class _DevViewState extends State<DevView> {
               final remoteBufferPath = _extractRemotePath(buffer);
               final match = await ContributionService.searchSymbol(gitlabUrl, symbol, currentFilePath: remoteBufferPath);
               if (match != null) {
-                debugPrint('JTD: Navigating to ${match.path} at line ${match.lineIndex}');
                 final project = portfolio.projects.firstWhere((p) => p.gitlabLink == gitlabUrl);
                 final slug = _getSlug(project);
                 _handleFileSelection('$slug/${match.path}', gitlabUrl: gitlabUrl, remotePath: match.path, scrollToLine: match.lineIndex);
               } else {
-                debugPrint('JTD: Symbol not found in repo');
                 setState(() => _isLoading = false);
               }
-            } else {
-              debugPrint('JTD: No GitLab URL found for $buffer');
             }
-          },
-        );
-      }
-      return _remoteContent!.split('\n').map((l) => LineData(span: TextSpan(text: l, style: TextStyle(color: _getRemoteStyle(buffer))))).toList();
+          }),
+        'rs' => _RustHighlighter.highlight(_remoteContent!),
+        'js' || 'ts' => _JavascriptHighlighter.highlight(_remoteContent!),
+        'html' || 'htm' => _HtmlHighlighter.highlight(_remoteContent!),
+        'css' => _CssHighlighter.highlight(_remoteContent!),
+        'sh' || 'bash' => _BashHighlighter.highlight(_remoteContent!),
+        'yaml' || 'yml' => _YamlHighlighter.highlight(_remoteContent!),
+        'toml' => _TomlHighlighter.highlight(_remoteContent!),
+        'bat' || 'cmd' => _BatchHighlighter.highlight(_remoteContent!),
+        _ => _remoteContent!.split('\n').map((l) => LineData(span: TextSpan(text: l, style: TextStyle(color: _getRemoteStyle(buffer))))).toList(),
+      };
     }
     return switch (buffer) {
       'README.md' => _MarkdownContent.getLines(),
@@ -325,8 +324,12 @@ class _DevViewState extends State<DevView> {
 
   Color _getRemoteStyle(String fileName) {
     if (fileName.endsWith('.dart')) return gruberGreen;
-    if (fileName.endsWith('.yaml') || fileName.endsWith('.json')) return gruberNiagara;
-    if (fileName.endsWith('.md')) return gruberFg;
+    if (fileName.endsWith('.rs')) return gruberOrange;
+    if (fileName.endsWith('.js') || fileName.endsWith('.ts')) return gruberYellow;
+    if (fileName.endsWith('.html')) return gruberOrange;
+    if (fileName.endsWith('.css')) return gruberNiagara;
+    if (fileName.endsWith('.sh') || fileName.endsWith('.bash')) return gruberGreen;
+    if (fileName.endsWith('.yaml') || fileName.endsWith('.json') || fileName.endsWith('.toml')) return gruberNiagara;
     return gruberFg.withValues(alpha: 0.8);
   }
 }
@@ -341,7 +344,7 @@ class _HelixPicker extends StatelessWidget {
   final String selectedFile;
   final Set<String> expandedPaths;
   final Map<String, List<Map<String, dynamic>>> childrenCache;
-  final Function(String, {String? gitlabUrl, String? remotePath}) onFileSelected;
+  final Function(String, {String? gitlabUrl, String? remotePath, int? scrollToLine}) onFileSelected;
   final Function(String, {Project? project, String? remoteRelativePath}) onPathToggle;
 
   const _HelixPicker({
@@ -501,6 +504,7 @@ class _HelixStatusArea extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isLocal = localFiles.contains(currentFile);
     final String displayPath = isLocal ? '~/system/$currentFile' : '~/projects/$currentFile';
+    final String lang = _getLangLabel(currentFile);
 
     return Column(
       children: [
@@ -512,12 +516,30 @@ class _HelixStatusArea extends StatelessWidget {
             const Spacer(),
             const _StatusBlock(text: ' 1 sel ', bgColor: gruberBg, textColor: gruberQuartz),
             const _StatusBlock(text: ' 1:1 ', bgColor: gruberBg, textColor: gruberFg),
-            const _StatusBlock(text: ' DART ', bgColor: gruberYellow, textColor: Colors.black),
+            _StatusBlock(text: ' $lang ', bgColor: gruberYellow, textColor: Colors.black),
           ]),
         ),
         Container(height: 24, padding: const EdgeInsets.symmetric(horizontal: 12), color: gruberBgDarker, child: const Row(children: [Text(':', style: TextStyle(color: gruberFg, fontFamily: _terminalFontFamily, fontWeight: FontWeight.bold)), SizedBox(width: 8), _BlinkingCursor()])),
       ],
     );
+  }
+
+  String _getLangLabel(String file) {
+    final ext = file.split('.').last.toLowerCase();
+    return switch (ext) {
+      'dart' => 'DART',
+      'rs' => 'RUST',
+      'js' || 'ts' => 'JS',
+      'html' || 'htm' => 'HTML',
+      'css' => 'CSS',
+      'sh' || 'bash' => 'SH',
+      'yaml' || 'yml' => 'YAML',
+      'toml' => 'TOML',
+      'bat' || 'cmd' => 'BAT',
+      'md' => 'MD',
+      'json' => 'JSON',
+      _ => 'TXT',
+    };
   }
 }
 
@@ -678,78 +700,189 @@ class _ConfigContent {
   }
 }
 
-class _DartHighlighter {
-  static final keywords = {
-    'abstract', 'as', 'assert', 'async', 'await', 'break', 'case', 'catch', 'class', 'const', 'continue',
-    'covariant', 'default', 'deferred', 'do', 'dynamic', 'else', 'enum', 'export', 'extends', 'extension',
-    'external', 'factory', 'false', 'final', 'finally', 'for', 'function', 'get', 'hide', 'if', 'implements',
-    'import', 'in', 'interface', 'is', 'late', 'library', 'mixin', 'new', 'null', 'on', 'operator', 'part',
-    'rethrow', 'return', 'set', 'show', 'static', 'super', 'switch', 'sync', 'this', 'throw', 'true', 'try',
-    'typedef', 'var', 'void', 'while', 'with', 'yield'
-  };
-
-  static List<LineData> highlight(String code, {Function(String)? onSymbolClick}) {
+class _GenericHighlighter {
+  static List<LineData> highlight(String code, Set<String> keywords, {Color keywordColor = gruberYellow, String commentPrefix = '//'}) {
     final List<LineData> lines = [];
     final rawLines = code.split('\n');
-
     for (var line in rawLines) {
       final List<TextSpan> spans = [];
-      int commentIndex = line.indexOf('//');
+      int commentIndex = line.indexOf(commentPrefix);
       String textToHighlight = commentIndex != -1 ? line.substring(0, commentIndex) : line;
       String commentPart = commentIndex != -1 ? line.substring(commentIndex) : '';
-
       final tokens = _tokenize(textToHighlight);
       for (var token in tokens) {
         final text = token.text;
         final trimmed = text.trim();
-        final isType = RegExp(r'^[A-Z]\w*$').hasMatch(trimmed);
-        
-        spans.add(TextSpan(
-          text: text,
-          style: _getStyleForToken(token, isClickable: isType && onSymbolClick != null),
-          recognizer: (isType && onSymbolClick != null) 
-              ? (TapGestureRecognizer()..onTap = () {
-                  debugPrint('Tapped symbol: $trimmed');
-                  onSymbolClick(trimmed);
-                })
-              : null,
-        ));
+        Color color = gruberFg;
+        FontWeight weight = FontWeight.normal;
+        if (trimmed.startsWith("'") || trimmed.startsWith('"')) {
+          color = gruberGreen;
+        } else if (keywords.contains(trimmed)) {
+          color = keywordColor;
+          weight = FontWeight.bold;
+        } else if (RegExp(r'^\d+$').hasMatch(trimmed)) {
+          color = gruberBrown;
+        } else if (RegExp(r'^[A-Z]\w*$').hasMatch(trimmed)) {
+          color = gruberNiagara;
+        }
+        spans.add(TextSpan(text: text, style: TextStyle(color: color, fontWeight: weight)));
       }
-
       if (commentPart.isNotEmpty) {
         spans.add(TextSpan(text: commentPart, style: const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic)));
       }
-
       lines.add(LineData(span: TextSpan(children: spans)));
     }
     return lines;
   }
-
   static List<_Token> _tokenize(String text) {
     final List<_Token> tokens = [];
     final pattern = RegExp('("[^"]*"|\'[^\']*\'|\\b[a-zA-Z_]\\w*\\b|\\d+|[^\\s\\w]+|\\s+)');
     final matches = pattern.allMatches(text);
-    for (var match in matches) {
-      tokens.add(_Token(match.group(0)!));
-    }
+    for (var match in matches) { tokens.add(_Token(match.group(0)!)); }
     return tokens;
   }
+}
 
-  static TextStyle _getStyleForToken(_Token token, {bool isClickable = false}) {
-    final t = token.text.trim();
-    if (t.isEmpty) return const TextStyle();
-    if (t.startsWith("'") || t.startsWith('"')) return const TextStyle(color: gruberGreen);
-    if (keywords.contains(t)) return const TextStyle(color: gruberYellow, fontWeight: FontWeight.bold);
-    if (RegExp(r'^[A-Z]\w*$').hasMatch(t)) {
-      return TextStyle(
-        color: gruberNiagara,
-        decoration: isClickable ? TextDecoration.underline : null,
-        decorationColor: gruberNiagara.withValues(alpha: 0.5),
-      );
+class _DartHighlighter {
+  static final keywords = {'abstract', 'as', 'assert', 'async', 'await', 'break', 'case', 'catch', 'class', 'const', 'continue', 'covariant', 'default', 'deferred', 'do', 'dynamic', 'else', 'enum', 'export', 'extends', 'extension', 'external', 'factory', 'false', 'final', 'finally', 'for', 'function', 'get', 'hide', 'if', 'implements', 'import', 'in', 'interface', 'is', 'late', 'library', 'mixin', 'new', 'null', 'on', 'operator', 'part', 'rethrow', 'return', 'set', 'show', 'static', 'super', 'switch', 'sync', 'this', 'throw', 'true', 'try', 'typedef', 'var', 'void', 'while', 'with', 'yield'};
+  static List<LineData> highlight(String code, {Function(String)? onSymbolClick}) {
+    final List<LineData> lines = [];
+    for (var line in code.split('\n')) {
+      final List<TextSpan> spans = [];
+      int commentIndex = line.indexOf('//');
+      String text = commentIndex != -1 ? line.substring(0, commentIndex) : line;
+      String comment = commentIndex != -1 ? line.substring(commentIndex) : '';
+      for (var token in _GenericHighlighter._tokenize(text)) {
+        final t = token.text;
+        final isType = RegExp(r'^[A-Z]\w*$').hasMatch(t.trim());
+        spans.add(TextSpan(
+          text: t,
+          style: _getStyle(t, isType, onSymbolClick != null),
+          recognizer: (isType && onSymbolClick != null) ? (TapGestureRecognizer()..onTap = () => onSymbolClick(t.trim())) : null,
+        ));
+      }
+      if (comment.isNotEmpty) spans.add(TextSpan(text: comment, style: const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic)));
+      lines.add(LineData(span: TextSpan(children: spans)));
     }
-    if (RegExp(r'^\d+$').hasMatch(t)) return const TextStyle(color: gruberBrown);
+    return lines;
+  }
+  static TextStyle _getStyle(String t, bool isType, bool clickable) {
+    final trimmed = t.trim();
+    if (keywords.contains(trimmed)) return const TextStyle(color: gruberYellow, fontWeight: FontWeight.bold);
+    if (isType) return TextStyle(color: gruberNiagara, decoration: clickable ? TextDecoration.underline : null, decorationColor: gruberNiagara.withValues(alpha: 0.5));
+    if (trimmed.startsWith("'") || trimmed.startsWith('"')) return const TextStyle(color: gruberGreen);
+    if (RegExp(r'^\d+$').hasMatch(trimmed)) return const TextStyle(color: gruberBrown);
     return const TextStyle(color: gruberFg);
   }
+}
+
+class _RustHighlighter {
+  static final keywords = {'as', 'async', 'await', 'break', 'const', 'continue', 'crate', 'dyn', 'else', 'enum', 'extern', 'false', 'fn', 'for', 'if', 'impl', 'import', 'in', 'let', 'loop', 'match', 'mod', 'move', 'mut', 'pub', 'ref', 'return', 'self', 'Self', 'static', 'struct', 'super', 'trait', 'true', 'type', 'union', 'unsafe', 'use', 'where', 'while'};
+  static List<LineData> highlight(String code) => _GenericHighlighter.highlight(code, keywords, keywordColor: gruberOrange);
+}
+
+class _JavascriptHighlighter {
+  static final keywords = {'break', 'case', 'catch', 'class', 'const', 'continue', 'debugger', 'default', 'delete', 'do', 'else', 'export', 'extends', 'finally', 'for', 'function', 'if', 'import', 'in', 'instanceof', 'new', 'return', 'super', 'switch', 'this', 'throw', 'try', 'typeof', 'var', 'void', 'while', 'with', 'yield', 'let', 'static', 'async', 'await', 'of'};
+  static List<LineData> highlight(String code) => _GenericHighlighter.highlight(code, keywords, keywordColor: gruberYellow);
+}
+
+class _BashHighlighter {
+  static final keywords = {'if', 'then', 'else', 'elif', 'fi', 'case', 'esac', 'for', 'while', 'until', 'do', 'done', 'in', 'function', 'return', 'local', 'export', 'alias', 'echo', 'exit', 'break', 'continue'};
+  static List<LineData> highlight(String code) => _GenericHighlighter.highlight(code, keywords, keywordColor: gruberGreen, commentPrefix: '#');
+}
+
+class _YamlHighlighter {
+  static List<LineData> highlight(String code) {
+    final List<LineData> lines = [];
+    for (var line in code.split('\n')) {
+      final List<TextSpan> spans = [];
+      if (line.trim().startsWith('#')) {
+        spans.add(TextSpan(text: line, style: const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic)));
+      } else if (line.contains(':')) {
+        final parts = line.split(':');
+        spans.add(TextSpan(text: parts[0], style: const TextStyle(color: gruberYellow, fontWeight: FontWeight.bold)));
+        spans.add(const TextSpan(text: ':', style: TextStyle(color: gruberQuartz)));
+        spans.add(TextSpan(text: parts.sublist(1).join(':'), style: const TextStyle(color: gruberFg)));
+      } else {
+        spans.add(TextSpan(text: line, style: const TextStyle(color: gruberFg)));
+      }
+      lines.add(LineData(span: TextSpan(children: spans)));
+    }
+    return lines;
+  }
+}
+
+class _TomlHighlighter {
+  static List<LineData> highlight(String code) {
+    final List<LineData> lines = [];
+    for (var line in code.split('\n')) {
+      final List<TextSpan> spans = [];
+      final trimmed = line.trim();
+      if (trimmed.startsWith('#')) {
+        spans.add(TextSpan(text: line, style: const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic)));
+      } else if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+        spans.add(TextSpan(text: line, style: const TextStyle(color: gruberWisteria, fontWeight: FontWeight.bold)));
+      } else if (line.contains('=')) {
+        final parts = line.split('=');
+        spans.add(TextSpan(text: parts[0], style: const TextStyle(color: gruberYellow)));
+        spans.add(const TextSpan(text: ' = ', style: TextStyle(color: gruberQuartz)));
+        spans.add(TextSpan(text: parts.sublist(1).join('='), style: const TextStyle(color: gruberGreen)));
+      } else {
+        spans.add(TextSpan(text: line, style: const TextStyle(color: gruberFg)));
+      }
+      lines.add(LineData(span: TextSpan(children: spans)));
+    }
+    return lines;
+  }
+}
+
+class _HtmlHighlighter {
+  static List<LineData> highlight(String code) {
+    final List<LineData> lines = [];
+    for (var line in code.split('\n')) {
+      final List<TextSpan> spans = [];
+      final pattern = RegExp(r'(<[^>]+>)|([^<]+)');
+      final matches = pattern.allMatches(line);
+      for (var m in matches) {
+        final text = m.group(0)!;
+        if (text.startsWith('<')) {
+          spans.add(TextSpan(text: text, style: const TextStyle(color: gruberOrange, fontWeight: FontWeight.bold)));
+        } else {
+          spans.add(TextSpan(text: text, style: const TextStyle(color: gruberFg)));
+        }
+      }
+      lines.add(LineData(span: TextSpan(children: spans)));
+    }
+    return lines;
+  }
+}
+
+class _CssHighlighter {
+  static List<LineData> highlight(String code) {
+    final List<LineData> lines = [];
+    for (var line in code.split('\n')) {
+      final List<TextSpan> spans = [];
+      if (line.contains('{')) {
+        final parts = line.split('{');
+        spans.add(TextSpan(text: parts[0], style: const TextStyle(color: gruberYellow, fontWeight: FontWeight.bold)));
+        spans.add(const TextSpan(text: ' {', style: TextStyle(color: gruberQuartz)));
+      } else if (line.contains(':')) {
+        final parts = line.split(':');
+        spans.add(TextSpan(text: parts[0], style: const TextStyle(color: gruberNiagara)));
+        spans.add(const TextSpan(text: ': ', style: TextStyle(color: gruberQuartz)));
+        spans.add(TextSpan(text: parts.sublist(1).join(':'), style: const TextStyle(color: gruberGreen)));
+      } else {
+        spans.add(TextSpan(text: line, style: const TextStyle(color: gruberFg)));
+      }
+      lines.add(LineData(span: TextSpan(children: spans)));
+    }
+    return lines;
+  }
+}
+
+class _BatchHighlighter {
+  static final keywords = {'echo', 'set', 'if', 'else', 'goto', 'pause', 'exit', 'call', 'rem', 'for', 'in', 'do'};
+  static List<LineData> highlight(String code) => _GenericHighlighter.highlight(code, keywords, keywordColor: gruberYellow, commentPrefix: 'rem');
 }
 
 class _Token {
