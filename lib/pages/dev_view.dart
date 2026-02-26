@@ -27,6 +27,7 @@ class _DevViewState extends ConsumerState<DevView> {
   bool _isLoading = false;
   bool _isImage = false;
   bool _isPreviewMode = false;
+  bool _isCRTEnabled = true; // Surprise! Enabled by default
   String? _remoteContent;
   String? _imageUrl;
   
@@ -172,6 +173,8 @@ class _DevViewState extends ConsumerState<DevView> {
       }
     } else if (trimmed == 'tree') {
       setState(() => _isPickerOpen = !_isPickerOpen);
+    } else if (trimmed == 'crt') {
+      setState(() => _isCRTEnabled = !_isCRTEnabled);
     }
     
     setState(() {
@@ -190,14 +193,12 @@ class _DevViewState extends ConsumerState<DevView> {
     }
     
     if (content.isEmpty && _remoteContent == null) {
-       // local content provider fallback (sh/json/log)
-       // This is a simplified proxy for this TUI
        content = _getBufferLines(_currentFile).map((l) => l.span.toPlainText()).join('\n');
     }
 
     final lines = content.split('\n').length;
     final words = content.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length;
-    final size = content.length; // Approximate bytes
+    final size = content.length;
     return _BufferStats(lines: lines, words: words, size: size);
   }
 
@@ -225,76 +226,81 @@ class _DevViewState extends ConsumerState<DevView> {
           }
           return KeyEventResult.ignored;
         },
-        child: Container(
-          color: gruberBg,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final bool shouldShowPicker = _isPickerOpen && constraints.maxWidth >= 800;
-              
-              return Column(
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        if (shouldShowPicker)
-                          _HelixPicker(
-                            localFiles: _localFiles,
-                            selectedFile: _currentFile,
-                            expandedPaths: _expandedPaths,
-                            childrenCache: _childrenCache,
-                            onFileSelected: _handleFileSelection,
-                            onPathToggle: _togglePath,
-                          ),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              _HelixTabBar(
-                                openBuffers: _openBuffers,
-                                activeIndex: _activeBufferIndex,
-                                onTabSelected: (idx) => _handleFileSelection(_openBuffers[idx]),
-                                onTabClosed: _closeBuffer,
+        child: Stack(
+          children: [
+            Container(
+              color: gruberBg,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final bool shouldShowPicker = _isPickerOpen && constraints.maxWidth >= 800;
+                  
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: Row(
+                          children: [
+                            if (shouldShowPicker)
+                              _HelixPicker(
+                                localFiles: _localFiles,
+                                selectedFile: _currentFile,
+                                expandedPaths: _expandedPaths,
+                                childrenCache: _childrenCache,
+                                onFileSelected: _handleFileSelection,
+                                onPathToggle: _togglePath,
                               ),
-                              Expanded(
-                                child: Stack(
-                                  children: [
-                                    _isImage && _imageUrl != null
-                                        ? _buildImageBuffer()
-                                        : (_isPreviewMode && _currentFile.endsWith('.md'))
-                                            ? _buildMarkdownPreview()
-                                            : _HelixBuffer(
-                                                fileName: _currentFile,
-                                                isLoading: _isLoading,
-                                                lines: _getBufferLines(_currentFile),
-                                                scrollController: _scrollController,
-                                              ),
-                                    if (_currentFile.endsWith('.md'))
-                                      Positioned(
-                                        top: 16,
-                                        right: 16,
-                                        child: _buildPreviewToggle(),
-                                      ),
-                                  ],
-                                ),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  _HelixTabBar(
+                                    openBuffers: _openBuffers,
+                                    activeIndex: _activeBufferIndex,
+                                    onTabSelected: (idx) => _handleFileSelection(_openBuffers[idx]),
+                                    onTabClosed: _closeBuffer,
+                                  ),
+                                  Expanded(
+                                    child: Stack(
+                                      children: [
+                                        _isImage && _imageUrl != null
+                                            ? _buildImageBuffer()
+                                            : (_isPreviewMode && _currentFile.endsWith('.md'))
+                                                ? _buildMarkdownPreview()
+                                                : _HelixBuffer(
+                                                    fileName: _currentFile,
+                                                    isLoading: _isLoading,
+                                                    lines: _getBufferLines(_currentFile),
+                                                    scrollController: _scrollController,
+                                                  ),
+                                        if (_currentFile.endsWith('.md'))
+                                          Positioned(
+                                            top: 16,
+                                            right: 16,
+                                            child: _buildPreviewToggle(),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  _HelixStatusArea(
-                    currentFile: _currentFile,
-                    localFiles: _localFiles,
-                    isCommandMode: _isCommandMode,
-                    commandController: _commandController,
-                    commandFocusNode: _commandFocusNode,
-                    onCommandSubmit: _executeCommand,
-                    stats: _getStats(),
-                  ),
-                ],
-              );
-            },
-          ),
+                      ),
+                      _HelixStatusArea(
+                        currentFile: _currentFile,
+                        localFiles: _localFiles,
+                        isCommandMode: _isCommandMode,
+                        commandController: _commandController,
+                        commandFocusNode: _commandFocusNode,
+                        onCommandSubmit: _executeCommand,
+                        stats: _getStats(),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            if (_isCRTEnabled) const IgnorePointer(child: _CRTOverlay()),
+          ],
         ),
       ),
     );
@@ -787,6 +793,52 @@ class _BlinkingCursorState extends State<_BlinkingCursor> with SingleTickerProvi
   void dispose() { _controller.dispose(); super.dispose(); }
   @override
   Widget build(BuildContext context) { return FadeTransition(opacity: _controller, child: Container(width: 8, height: 16, color: gruberYellow)); }
+}
+
+class _CRTOverlay extends StatefulWidget {
+  const _CRTOverlay();
+  @override
+  State<_CRTOverlay> createState() => _CRTOverlayState();
+}
+
+class _CRTOverlayState extends State<_CRTOverlay> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 100))..repeat(reverse: true);
+  }
+  @override
+  void dispose() { _controller.dispose(); super.dispose(); }
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.transparent,
+                Colors.black.withValues(alpha: 0.02 + (_controller.value * 0.01)),
+                Colors.transparent,
+              ],
+              stops: const [0.0, 0.5, 1.0],
+              tileMode: TileMode.repeated,
+              transform: const GradientRotation(0),
+            ),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.005 * _controller.value),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 // --- Content Data Providers ---
