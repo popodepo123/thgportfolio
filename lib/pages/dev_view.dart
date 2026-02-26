@@ -220,7 +220,20 @@ class _DevViewState extends ConsumerState<DevView> {
     }
 
     final trimmed = input.trim();
-    if (trimmed == 'q') {
+    final int? lineNumber = int.tryParse(trimmed);
+
+    if (lineNumber != null) {
+       // Go to line command
+       if (_scrollController.hasClients) {
+          // Zero-indexed, approx 20px per line
+          final double targetPos = ((lineNumber - 1) * 20.0).clamp(0, _scrollController.position.maxScrollExtent);
+          _scrollController.animateTo(
+            targetPos,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+       }
+    } else if (trimmed == 'q') {
       ref.read(viewModeProvider.notifier).setProView();
     } else if (trimmed.startsWith('open ')) {
       final file = trimmed.substring(5).trim();
