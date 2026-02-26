@@ -46,6 +46,7 @@ class _DevViewState extends ConsumerState<DevView> {
   bool _wrapText = false;
   bool _cursorLine = true;
   bool _isMatrixMode = false;
+  bool _isZenMode = false;
 
   // Visual Mode
   bool _isVisualMode = false;
@@ -279,6 +280,8 @@ class _DevViewState extends ConsumerState<DevView> {
       setState(() => _cursorLine = false);
     } else if (trimmed == 'matrix') {
       setState(() => _isMatrixMode = !_isMatrixMode);
+    } else if (trimmed == 'zen') {
+      setState(() => _isZenMode = !_isZenMode);
     }
     
     setState(() {
@@ -352,6 +355,9 @@ class _DevViewState extends ConsumerState<DevView> {
                  _isVisualMode = false;
                  _visualAnchorLine = -1;
                });
+               return KeyEventResult.handled;
+             } else if (_isZenMode) {
+               setState(() => _isZenMode = false);
                return KeyEventResult.handled;
              }
           }
@@ -431,7 +437,7 @@ class _DevViewState extends ConsumerState<DevView> {
               color: gruberBg,
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final bool shouldShowPicker = _isPickerOpen && constraints.maxWidth >= 800;
+                  final bool shouldShowPicker = !_isZenMode && _isPickerOpen && constraints.maxWidth >= 800;
                   
                   return Column(
                     children: [
@@ -450,12 +456,13 @@ class _DevViewState extends ConsumerState<DevView> {
                             Expanded(
                               child: Column(
                                 children: [
-                                  _HelixTabBar(
-                                    openBuffers: _openBuffers,
-                                    activeIndex: _activeBufferIndex,
-                                    onTabSelected: (idx) => _handleFileSelection(_openBuffers[idx]),
-                                    onTabClosed: _closeBuffer,
-                                  ),
+                                  if (!_isZenMode)
+                                    _HelixTabBar(
+                                      openBuffers: _openBuffers,
+                                      activeIndex: _activeBufferIndex,
+                                      onTabSelected: (idx) => _handleFileSelection(_openBuffers[idx]),
+                                      onTabClosed: _closeBuffer,
+                                    ),
                                   Expanded(
                                     child: Stack(
                                       children: [
@@ -511,23 +518,24 @@ class _DevViewState extends ConsumerState<DevView> {
                           ],
                         ),
                       ),
-                      _HelixStatusArea(
-                        currentFile: _currentFile,
-                        localFiles: _localFiles,
-                        isCommandMode: _isCommandMode,
-                        isSearchMode: _isSearchMode,
-                        isVisualMode: _isVisualMode,
-                        commandController: _commandController,
-                        commandFocusNode: _commandFocusNode,
-                        onCommandSubmit: _executeCommand,
-                        onSearchChanged: (val) {
-                          if (_isSearchMode) {
-                            setState(() => _searchQuery = val);
-                          }
-                        },
-                        stats: _getStats(),
-                        currentLine: _currentScrollLine,
-                      ),
+                      if (!_isZenMode)
+                        _HelixStatusArea(
+                          currentFile: _currentFile,
+                          localFiles: _localFiles,
+                          isCommandMode: _isCommandMode,
+                          isSearchMode: _isSearchMode,
+                          isVisualMode: _isVisualMode,
+                          commandController: _commandController,
+                          commandFocusNode: _commandFocusNode,
+                          onCommandSubmit: _executeCommand,
+                          onSearchChanged: (val) {
+                            if (_isSearchMode) {
+                              setState(() => _searchQuery = val);
+                            }
+                          },
+                          stats: _getStats(),
+                          currentLine: _currentScrollLine,
+                        ),
                     ],
                   );
                 },
