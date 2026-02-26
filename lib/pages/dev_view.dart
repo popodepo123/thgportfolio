@@ -40,6 +40,7 @@ class _DevViewState extends ConsumerState<DevView> {
   
   final FocusNode _focusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
+  int _currentScrollLine = 1;
 
   // Command & Search Mode
   bool _isCommandMode = false;
@@ -58,6 +59,15 @@ class _DevViewState extends ConsumerState<DevView> {
     super.initState();
     _focusNode.requestFocus();
     _startTypewriter(_getMarkdownString('README.md'));
+    
+    _scrollController.addListener(() {
+      if (_scrollController.hasClients) {
+        final line = (_scrollController.offset / 20.0).floor() + 1;
+        if (line != _currentScrollLine && line > 0) {
+          setState(() => _currentScrollLine = line);
+        }
+      }
+    });
   }
 
   @override
@@ -428,6 +438,7 @@ class _DevViewState extends ConsumerState<DevView> {
                           }
                         },
                         stats: _getStats(),
+                        currentLine: _currentScrollLine,
                       ),
                     ],
                   );
@@ -862,6 +873,7 @@ class _HelixStatusArea extends StatelessWidget {
   final Function(String) onCommandSubmit;
   final Function(String) onSearchChanged;
   final _BufferStats stats;
+  final int currentLine;
   
   const _HelixStatusArea({
     required this.currentFile,
@@ -873,6 +885,7 @@ class _HelixStatusArea extends StatelessWidget {
     required this.onCommandSubmit,
     required this.onSearchChanged,
     required this.stats,
+    required this.currentLine,
   });
   
   @override
@@ -903,6 +916,7 @@ class _HelixStatusArea extends StatelessWidget {
             _StatusBlock(text: ' ${stats.words} words ', bgColor: gruberBg, textColor: gruberQuartz),
             _StatusBlock(text: ' $sizeStr ', bgColor: gruberBg, textColor: gruberNiagara),
             _StatusBlock(text: ' ${stats.lines} lines ', bgColor: gruberBg, textColor: gruberFg),
+            _StatusBlock(text: ' $currentLine:1 ', bgColor: gruberBg, textColor: gruberFg),
             _StatusBlock(text: ' $lang ', bgColor: gruberYellow, textColor: Colors.black),
           ]),
         ),
