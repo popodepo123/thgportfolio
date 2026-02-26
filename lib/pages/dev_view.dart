@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -24,6 +25,7 @@ class _DevViewState extends State<DevView> {
   String? _remoteContent;
   String? _imageUrl;
   final FocusNode _focusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
 
   final Map<String, List<Map<String, dynamic>>> _childrenCache = {};
   final Set<String> _expandedPaths = {};
@@ -39,6 +41,7 @@ class _DevViewState extends State<DevView> {
   @override
   void dispose() {
     _focusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -79,7 +82,7 @@ class _DevViewState extends State<DevView> {
     return parts.sublist(1).join('/');
   }
 
-  Future<void> _handleFileSelection(String file, {String? gitlabUrl, String? remotePath}) async {
+  Future<void> _handleFileSelection(String file, {String? gitlabUrl, String? remotePath, int? scrollToLine}) async {
     final isImg = file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg') || file.endsWith('.webp') || file.endsWith('.gif');
     
     setState(() {
@@ -105,6 +108,24 @@ class _DevViewState extends State<DevView> {
             _remoteContent = content;
             _isLoading = false;
           });
+
+          // Auto-scroll if line specified
+          if (scrollToLine != null && _scrollController.hasClients) {
+            // Wait for list to render
+            Future.delayed(const Duration(milliseconds: 100), () {
+              if (mounted) {
+                // Approximate line height is 20px
+                final double position = (scrollToLine * 20.0).clamp(0, _scrollController.position.maxScrollExtent);
+                _scrollController.animateTo(
+                  position,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeOut,
+                );
+              }
+            });
+          } else if (_scrollController.hasClients) {
+            _scrollController.jumpTo(0);
+          }
         }
       }
     }
@@ -150,6 +171,7 @@ class _DevViewState extends State<DevView> {
                                           fileName: _currentFile,
                                           isLoading: _isLoading,
                                           lines: _getBufferLines(_currentFile),
+                                          scrollController: _scrollController,
                                         ),
                               if (_currentFile.endsWith('.md'))
                                 Positioned(
@@ -265,7 +287,29 @@ class _DevViewState extends State<DevView> {
     }
     if (_remoteContent != null) {
       if (buffer.endsWith('.dart')) {
-        return _DartHighlighter.highlight(_remoteContent!);
+        return _DartHighlighter.highlight(
+          _remoteContent!,
+          onSymbolClick: (symbol) async {
+            debugPrint('JTD: Tapped symbol $symbol in $buffer');
+            final gitlabUrl = _findGitlabUrlForPath(buffer);
+            if (gitlabUrl != null) {
+              setState(() => _isLoading = true);
+              final remoteBufferPath = _extractRemotePath(buffer);
+              final match = await ContributionService.searchSymbol(gitlabUrl, symbol, currentFilePath: remoteBufferPath);
+              if (match != null) {
+                debugPrint('JTD: Navigating to ${match.path} at line ${match.lineIndex}');
+                final project = portfolio.projects.firstWhere((p) => p.gitlabLink == gitlabUrl);
+                final slug = _getSlug(project);
+                _handleFileSelection('$slug/${match.path}', gitlabUrl: gitlabUrl, remotePath: match.path, scrollToLine: match.lineIndex);
+              } else {
+                debugPrint('JTD: Symbol not found in repo');
+                setState(() => _isLoading = false);
+              }
+            } else {
+              debugPrint('JTD: No GitLab URL found for $buffer');
+            }
+          },
+        );
       }
       return _remoteContent!.split('\n').map((l) => LineData(span: TextSpan(text: l, style: TextStyle(color: _getRemoteStyle(buffer))))).toList();
     }
@@ -399,7 +443,14 @@ class _HelixBuffer extends StatelessWidget {
   final String fileName;
   final List<LineData> lines;
   final bool isLoading;
-  const _HelixBuffer({required this.fileName, required this.lines, this.isLoading = false});
+  final ScrollController? scrollController;
+  
+  const _HelixBuffer({
+    required this.fileName,
+    required this.lines,
+    this.isLoading = false,
+    this.scrollController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -416,6 +467,7 @@ class _HelixBuffer extends StatelessWidget {
         Expanded(
           child: SelectionArea(
             child: ListView.builder(
+              controller: scrollController,
               padding: const EdgeInsets.symmetric(horizontal: 8),
               itemCount: lines.length,
               itemBuilder: (context, i) {
@@ -636,7 +688,7 @@ class _DartHighlighter {
     'typedef', 'var', 'void', 'while', 'with', 'yield'
   };
 
-  static List<LineData> highlight(String code) {
+  static List<LineData> highlight(String code, {Function(String)? onSymbolClick}) {
     final List<LineData> lines = [];
     final rawLines = code.split('\n');
 
@@ -648,7 +700,20 @@ class _DartHighlighter {
 
       final tokens = _tokenize(textToHighlight);
       for (var token in tokens) {
-        spans.add(TextSpan(text: token.text, style: _getStyleForToken(token)));
+        final text = token.text;
+        final trimmed = text.trim();
+        final isType = RegExp(r'^[A-Z]\w*$').hasMatch(trimmed);
+        
+        spans.add(TextSpan(
+          text: text,
+          style: _getStyleForToken(token, isClickable: isType && onSymbolClick != null),
+          recognizer: (isType && onSymbolClick != null) 
+              ? (TapGestureRecognizer()..onTap = () {
+                  debugPrint('Tapped symbol: $trimmed');
+                  onSymbolClick(trimmed);
+                })
+              : null,
+        ));
       }
 
       if (commentPart.isNotEmpty) {
@@ -662,10 +727,7 @@ class _DartHighlighter {
 
   static List<_Token> _tokenize(String text) {
     final List<_Token> tokens = [];
-    final pattern = RegExp(
-      '("[^"]*"|\'[^\']*\'|\\b[a-zA-Z_]\\w*\\b|\\d+|[^\\s\\w]+|\\s+)',
-    );
-
+    final pattern = RegExp('("[^"]*"|\'[^\']*\'|\\b[a-zA-Z_]\\w*\\b|\\d+|[^\\s\\w]+|\\s+)');
     final matches = pattern.allMatches(text);
     for (var match in matches) {
       tokens.add(_Token(match.group(0)!));
@@ -673,12 +735,18 @@ class _DartHighlighter {
     return tokens;
   }
 
-  static TextStyle _getStyleForToken(_Token token) {
+  static TextStyle _getStyleForToken(_Token token, {bool isClickable = false}) {
     final t = token.text.trim();
     if (t.isEmpty) return const TextStyle();
     if (t.startsWith("'") || t.startsWith('"')) return const TextStyle(color: gruberGreen);
     if (keywords.contains(t)) return const TextStyle(color: gruberYellow, fontWeight: FontWeight.bold);
-    if (RegExp(r'^[A-Z]\w*$').hasMatch(t)) return const TextStyle(color: gruberNiagara);
+    if (RegExp(r'^[A-Z]\w*$').hasMatch(t)) {
+      return TextStyle(
+        color: gruberNiagara,
+        decoration: isClickable ? TextDecoration.underline : null,
+        decorationColor: gruberNiagara.withValues(alpha: 0.5),
+      );
+    }
     if (RegExp(r'^\d+$').hasMatch(t)) return const TextStyle(color: gruberBrown);
     return const TextStyle(color: gruberFg);
   }
