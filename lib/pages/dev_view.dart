@@ -314,26 +314,41 @@ class _DevViewState extends ConsumerState<DevView> {
           }
           
           // Vim-style navigation when in normal mode
-          if (!_isCommandMode && !_isSearchMode && event is KeyDownEvent && _scrollController.hasClients) {
-            const double scrollAmount = 40.0; // Approx two lines
-            
-            if (event.logicalKey == LogicalKeyboardKey.keyJ || event.logicalKey == LogicalKeyboardKey.arrowDown) {
-              final newPos = (_scrollController.offset + scrollAmount).clamp(0.0, _scrollController.position.maxScrollExtent);
-              _scrollController.jumpTo(newPos);
-              return KeyEventResult.handled;
-            } else if (event.logicalKey == LogicalKeyboardKey.keyK || event.logicalKey == LogicalKeyboardKey.arrowUp) {
-              final newPos = (_scrollController.offset - scrollAmount).clamp(0.0, _scrollController.position.maxScrollExtent);
-              _scrollController.jumpTo(newPos);
-              return KeyEventResult.handled;
-            } else if (event.logicalKey == LogicalKeyboardKey.keyG) {
-               if (HardwareKeyboard.instance.isShiftPressed) {
-                 // G (Bottom)
-                 _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-               } else {
-                 // g (Top)
-                 _scrollController.jumpTo(0.0);
-               }
-               return KeyEventResult.handled;
+          if (!_isCommandMode && !_isSearchMode && event is KeyDownEvent) {
+             // Buffer switching (Shift+H / Shift+L)
+             if (HardwareKeyboard.instance.isShiftPressed) {
+                if (event.logicalKey == LogicalKeyboardKey.keyH && _openBuffers.length > 1) {
+                   final newIndex = (_activeBufferIndex - 1) < 0 ? _openBuffers.length - 1 : (_activeBufferIndex - 1);
+                   _handleFileSelection(_openBuffers[newIndex]);
+                   return KeyEventResult.handled;
+                } else if (event.logicalKey == LogicalKeyboardKey.keyL && _openBuffers.length > 1) {
+                   final newIndex = (_activeBufferIndex + 1) % _openBuffers.length;
+                   _handleFileSelection(_openBuffers[newIndex]);
+                   return KeyEventResult.handled;
+                }
+             }
+
+            if (_scrollController.hasClients) {
+              const double scrollAmount = 40.0; // Approx two lines
+              
+              if (event.logicalKey == LogicalKeyboardKey.keyJ || event.logicalKey == LogicalKeyboardKey.arrowDown) {
+                final newPos = (_scrollController.offset + scrollAmount).clamp(0.0, _scrollController.position.maxScrollExtent);
+                _scrollController.jumpTo(newPos);
+                return KeyEventResult.handled;
+              } else if (event.logicalKey == LogicalKeyboardKey.keyK || event.logicalKey == LogicalKeyboardKey.arrowUp) {
+                final newPos = (_scrollController.offset - scrollAmount).clamp(0.0, _scrollController.position.maxScrollExtent);
+                _scrollController.jumpTo(newPos);
+                return KeyEventResult.handled;
+              } else if (event.logicalKey == LogicalKeyboardKey.keyG) {
+                 if (HardwareKeyboard.instance.isShiftPressed) {
+                   // G (Bottom)
+                   _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+                 } else {
+                   // g (Top)
+                   _scrollController.jumpTo(0.0);
+                 }
+                 return KeyEventResult.handled;
+              }
             }
           }
           return KeyEventResult.ignored;
