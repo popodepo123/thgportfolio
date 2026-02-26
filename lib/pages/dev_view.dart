@@ -5,18 +5,20 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:thgportfolio/contribution_service.dart';
 import 'package:thgportfolio/portfolio_data.dart';
 import 'package:thgportfolio/theme.dart';
+import 'package:thgportfolio/view_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const double _terminalFontSize = 14.0;
 const String _terminalFontFamily = 'Iosevka';
 
-class DevView extends StatefulWidget {
+class DevView extends ConsumerStatefulWidget {
   const DevView({super.key});
 
   @override
-  State<DevView> createState() => _DevViewState();
+  ConsumerState<DevView> createState() => _DevViewState();
 }
 
-class _DevViewState extends State<DevView> {
+class _DevViewState extends ConsumerState<DevView> {
   String _currentFile = 'README.md';
   final List<String> _openBuffers = ['README.md'];
   int _activeBufferIndex = 0;
@@ -27,8 +29,14 @@ class _DevViewState extends State<DevView> {
   bool _isPreviewMode = false;
   String? _remoteContent;
   String? _imageUrl;
+  
   final FocusNode _focusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
+
+  // Command Mode
+  bool _isCommandMode = false;
+  final TextEditingController _commandController = TextEditingController();
+  final FocusNode _commandFocusNode = FocusNode();
 
   final Map<String, List<Map<String, dynamic>>> _childrenCache = {};
   final Set<String> _expandedPaths = {};
@@ -45,6 +53,8 @@ class _DevViewState extends State<DevView> {
   void dispose() {
     _focusNode.dispose();
     _scrollController.dispose();
+    _commandController.dispose();
+    _commandFocusNode.dispose();
     super.dispose();
   }
 
@@ -145,10 +155,29 @@ class _DevViewState extends State<DevView> {
         _activeBufferIndex = _openBuffers.length - 1;
       }
       _currentFile = _openBuffers[_activeBufferIndex];
-      // If the closed file was the current one, we might need to refresh content
       if (_currentFile != closedFile) {
         _handleFileSelection(_currentFile);
       }
+    });
+  }
+
+  void _executeCommand(String cmd) {
+    final trimmed = cmd.trim();
+    if (trimmed == 'q') {
+      ref.read(viewModeProvider.notifier).setProView();
+    } else if (trimmed.startsWith('open ')) {
+      final file = trimmed.substring(5).trim();
+      if (_localFiles.contains(file)) {
+        _handleFileSelection(file);
+      }
+    } else if (trimmed == 'tree') {
+      setState(() => _isPickerOpen = !_isPickerOpen);
+    }
+    
+    setState(() {
+      _isCommandMode = false;
+      _commandController.clear();
+      _focusNode.requestFocus();
     });
   }
 
@@ -157,10 +186,25 @@ class _DevViewState extends State<DevView> {
     return CallbackShortcuts(
       bindings: {
         const SingleActivator(LogicalKeyboardKey.space): () => setState(() => _isPickerOpen = !_isPickerOpen),
+        const SingleActivator(LogicalKeyboardKey.semicolon, shift: true): () {
+          setState(() => _isCommandMode = true);
+          _commandFocusNode.requestFocus();
+        },
       },
       child: Focus(
         focusNode: _focusNode,
         autofocus: true,
+        onKeyEvent: (node, event) {
+          if (_isCommandMode && event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+            setState(() {
+              _isCommandMode = false;
+              _commandController.clear();
+              _focusNode.requestFocus();
+            });
+            return KeyEventResult.handled;
+          }
+          return KeyEventResult.ignored;
+        },
         child: Container(
           color: gruberBg,
           child: LayoutBuilder(
@@ -218,7 +262,14 @@ class _DevViewState extends State<DevView> {
                       ],
                     ),
                   ),
-                  _HelixStatusArea(currentFile: _currentFile, localFiles: _localFiles),
+                  _HelixStatusArea(
+                    currentFile: _currentFile,
+                    localFiles: _localFiles,
+                    isCommandMode: _isCommandMode,
+                    commandController: _commandController,
+                    commandFocusNode: _commandFocusNode,
+                    onCommandSubmit: _executeCommand,
+                  ),
                 ],
               );
             },
@@ -598,8 +649,19 @@ class _HelixBuffer extends StatelessWidget {
 class _HelixStatusArea extends StatelessWidget {
   final String currentFile;
   final List<String> localFiles;
+  final bool isCommandMode;
+  final TextEditingController commandController;
+  final FocusNode commandFocusNode;
+  final Function(String) onCommandSubmit;
   
-  const _HelixStatusArea({required this.currentFile, required this.localFiles});
+  const _HelixStatusArea({
+    required this.currentFile,
+    required this.localFiles,
+    required this.isCommandMode,
+    required this.commandController,
+    required this.commandFocusNode,
+    required this.onCommandSubmit,
+  });
   
   @override
   Widget build(BuildContext context) {
@@ -620,7 +682,33 @@ class _HelixStatusArea extends StatelessWidget {
             _StatusBlock(text: ' $lang ', bgColor: gruberYellow, textColor: Colors.black),
           ]),
         ),
-        Container(height: 24, padding: const EdgeInsets.symmetric(horizontal: 12), color: gruberBgDarker, child: const Row(children: [Text(':', style: TextStyle(color: gruberFg, fontFamily: _terminalFontFamily, fontWeight: FontWeight.bold)), SizedBox(width: 8), _BlinkingCursor()])),
+        Container(
+          height: 24,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          color: gruberBgDarker,
+          child: Row(
+            children: [
+              Text(
+                isCommandMode ? ':' : ':',
+                style: const TextStyle(color: gruberFg, fontFamily: _terminalFontFamily, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 8),
+              if (isCommandMode)
+                Expanded(
+                  child: TextField(
+                    controller: commandController,
+                    focusNode: commandFocusNode,
+                    style: const TextStyle(color: gruberFg, fontFamily: _terminalFontFamily, fontSize: 13),
+                    cursorColor: gruberYellow,
+                    decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
+                    onSubmitted: onCommandSubmit,
+                  ),
+                )
+              else
+                const _BlinkingCursor(),
+            ],
+          ),
+        ),
       ],
     );
   }
