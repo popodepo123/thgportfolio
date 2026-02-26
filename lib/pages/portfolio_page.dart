@@ -5,6 +5,7 @@ import 'package:thgportfolio/sections/footer_section.dart';
 import 'package:thgportfolio/sections/hero_section.dart';
 import 'package:thgportfolio/sections/projects_section.dart';
 import 'package:thgportfolio/sections/skills_section.dart';
+import 'package:thgportfolio/theme.dart';
 import 'package:thgportfolio/view_provider.dart';
 import 'package:thgportfolio/widgets/side_panel.dart';
 
@@ -33,38 +34,77 @@ class _PortfolioPageState extends State<PortfolioPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          portfolioViewNotifier.value =
-              portfolioViewNotifier.value == PortfolioView.professional
-                  ? PortfolioView.dev
-                  : PortfolioView.professional;
-        },
-        child: ValueListenableBuilder<PortfolioView>(
-          valueListenable: portfolioViewNotifier,
-          builder: (context, view, child) {
-            return Icon(
-              view == PortfolioView.professional
-                  ? Icons.terminal
-                  : Icons.person,
-            );
-          },
-        ),
-      ),
       body: ValueListenableBuilder<PortfolioView>(
         valueListenable: portfolioViewNotifier,
         builder: (context, view, child) {
-          return AnimatedSwitcher(
-            duration: const Duration(milliseconds: 600),
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            child: _buildView(view),
+          return Stack(
+            children: [
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 600),
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+                child: _buildView(view),
+              ),
+              // Subtle View Toggle in Bottom Right
+              Positioned(
+                bottom: 16,
+                right: 16,
+                child: _buildModeToggle(view),
+              ),
+            ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildModeToggle(PortfolioView currentView) {
+    final isDev = currentView == PortfolioView.dev;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          portfolioViewNotifier.value = isDev ? PortfolioView.professional : PortfolioView.dev;
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: gruberBgLighter,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: gruberYellow.withValues(alpha: 0.3)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isDev ? Icons.person_outline : Icons.terminal_outlined,
+                size: 16,
+                color: gruberYellow,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                isDev ? 'PROFESSIONAL' : 'DEVELOPER',
+                style: const TextStyle(
+                  color: gruberYellow,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

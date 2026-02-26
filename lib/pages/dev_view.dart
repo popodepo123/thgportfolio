@@ -153,7 +153,7 @@ class _DevViewState extends State<DevView> {
                                         ),
                               if (_currentFile.endsWith('.md'))
                                 Positioned(
-                                  top: 8,
+                                  top: 16,
                                   right: 16,
                                   child: _buildPreviewToggle(),
                                 ),
@@ -163,7 +163,7 @@ class _DevViewState extends State<DevView> {
                       ],
                     ),
                   ),
-                  _HelixStatusArea(currentFile: _currentFile),
+                  _HelixStatusArea(currentFile: _currentFile, localFiles: _localFiles),
                 ],
               );
             },
@@ -441,16 +441,22 @@ class _HelixBuffer extends StatelessWidget {
 
 class _HelixStatusArea extends StatelessWidget {
   final String currentFile;
-  const _HelixStatusArea({required this.currentFile});
+  final List<String> localFiles;
+  
+  const _HelixStatusArea({required this.currentFile, required this.localFiles});
+  
   @override
   Widget build(BuildContext context) {
+    final bool isLocal = localFiles.contains(currentFile);
+    final String displayPath = isLocal ? '~/system/$currentFile' : '~/projects/$currentFile';
+
     return Column(
       children: [
         Container(
           height: 24, color: gruberBgLighter,
           child: Row(children: [
             const _StatusBlock(text: ' NOR ', bgColor: gruberYellow, textColor: Colors.black),
-            _StatusBlock(text: ' ~/projects/$currentFile ', bgColor: gruberBg, textColor: gruberFg),
+            _StatusBlock(text: ' $displayPath ', bgColor: gruberBg, textColor: gruberFg),
             const Spacer(),
             const _StatusBlock(text: ' 1 sel ', bgColor: gruberBg, textColor: gruberQuartz),
             const _StatusBlock(text: ' 1:1 ', bgColor: gruberBg, textColor: gruberFg),

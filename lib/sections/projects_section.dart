@@ -324,6 +324,8 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                   MouseRegion(
                     cursor: SystemMouseCursors.click,
                     child: ExpansionTile(
+                      shape: const RoundedRectangleBorder(side: BorderSide.none),
+                      collapsedShape: const RoundedRectangleBorder(side: BorderSide.none),
                       initiallyExpanded: _expandedStates[index] ?? false,
                       onExpansionChanged: (bool expanded) {
                         setState(() {
