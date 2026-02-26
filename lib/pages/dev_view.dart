@@ -9,6 +9,7 @@ import 'package:thgportfolio/view_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:convert';
 
 const double _terminalFontSize = 14.0;
 const String _terminalFontFamily = 'Iosevka';
@@ -47,6 +48,7 @@ class _DevViewState extends ConsumerState<DevView> {
   bool _cursorLine = true;
   bool _isMatrixMode = false;
   bool _isZenMode = false;
+  bool _isHexMode = false;
 
   // Visual Mode
   bool _isVisualMode = false;
@@ -291,6 +293,8 @@ class _DevViewState extends ConsumerState<DevView> {
       setState(() => _isMatrixMode = !_isMatrixMode);
     } else if (trimmed == 'zen') {
       setState(() => _isZenMode = !_isZenMode);
+    } else if (trimmed == 'hex') {
+      setState(() => _isHexMode = !_isHexMode);
     }
     
     setState(() {
@@ -670,6 +674,35 @@ class _DevViewState extends ConsumerState<DevView> {
     return '';
   }
 
+  List<LineData> _getHexDumpLines(String text) {
+    final List<LineData> lines = [];
+    final bytes = utf8.encode(text);
+    
+    for (int i = 0; i < bytes.length; i += 16) {
+      final chunk = bytes.sublist(i, math.min(i + 16, bytes.length));
+      final hexPart = chunk.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ');
+      
+      final paddedHex = hexPart.padRight(47, ' ');
+      
+      final asciiPart = String.fromCharCodes(chunk.map((b) => (b >= 32 && b <= 126) ? b : 46));
+      
+      final offset = i.toRadixString(16).padLeft(8, '0');
+      
+      lines.add(LineData(
+        span: TextSpan(
+          children: [
+            TextSpan(text: '$offset: ', style: const TextStyle(color: gruberNiagara)),
+            TextSpan(text: '$paddedHex  ', style: const TextStyle(color: gruberFg)),
+            const TextSpan(text: '|', style: TextStyle(color: gruberQuartz)),
+            TextSpan(text: asciiPart, style: const TextStyle(color: gruberGreen)),
+            const TextSpan(text: '|', style: TextStyle(color: gruberQuartz)),
+          ],
+        ),
+      ));
+    }
+    return lines;
+  }
+
   List<LineData> _getBufferLines(String buffer) {
     if (_isLoading && _remoteContent == null) {
       return [LineData(span: const TextSpan(text: '// Communicating with Contribution API...', style: TextStyle(color: gruberQuartz)))];
@@ -681,6 +714,10 @@ class _DevViewState extends ConsumerState<DevView> {
     }
 
     if (contentToRender != null) {
+      if (_isHexMode) {
+        return _getHexDumpLines(contentToRender);
+      }
+
       final ext = buffer.split('.').last.toLowerCase();
       return switch (ext) {
         'dart' => _DartHighlighter.highlight(contentToRender, searchQuery: _searchQuery, onSymbolClick: (symbol) async {
@@ -711,6 +748,14 @@ class _DevViewState extends ConsumerState<DevView> {
       };
     }
     
+    if (_isHexMode) {
+      final lines = _getHexDumpLines(_getLocalRawContent(buffer));
+      if (_searchQuery.isNotEmpty) {
+         return lines.map((l) => LineData(span: _applySearchHighlight(l.span, _searchQuery))).toList();
+      }
+      return lines;
+    }
+
     // For local non-remote content (simulated via hardcoded methods) we'll use a basic search wrapper
     final baseLines = switch (buffer) {
       'README.md' => _MarkdownContent.getLines(),
