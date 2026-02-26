@@ -8,6 +8,7 @@ import 'package:thgportfolio/theme.dart';
 import 'package:thgportfolio/view_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
+import 'dart:math' as math;
 
 const double _terminalFontSize = 14.0;
 const String _terminalFontFamily = 'Iosevka';
@@ -44,6 +45,10 @@ class _DevViewState extends ConsumerState<DevView> {
   bool _relativeLineNumbers = false;
   bool _wrapText = false;
   bool _cursorLine = true;
+
+  // Visual Mode
+  bool _isVisualMode = false;
+  int _visualAnchorLine = -1;
 
   // Command & Search Mode
   bool _isCommandMode = false;
@@ -328,20 +333,57 @@ class _DevViewState extends ConsumerState<DevView> {
         focusNode: _focusNode,
         autofocus: true,
         onKeyEvent: (node, event) {
-          if ((_isCommandMode || _isSearchMode) && event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
-            setState(() {
-              _isCommandMode = false;
-              _isSearchMode = false;
-              if (_searchQuery.isEmpty) {
-                 _commandController.clear();
-              }
-              _focusNode.requestFocus();
-            });
-            return KeyEventResult.handled;
+          if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+             if (_isCommandMode || _isSearchMode) {
+               setState(() {
+                 _isCommandMode = false;
+                 _isSearchMode = false;
+                 if (_searchQuery.isEmpty) {
+                    _commandController.clear();
+                 }
+                 _focusNode.requestFocus();
+               });
+               return KeyEventResult.handled;
+             } else if (_isVisualMode) {
+               setState(() {
+                 _isVisualMode = false;
+                 _visualAnchorLine = -1;
+               });
+               return KeyEventResult.handled;
+             }
           }
           
-          // Vim-style navigation when in normal mode
           if (!_isCommandMode && !_isSearchMode && event is KeyDownEvent) {
+             if (event.logicalKey == LogicalKeyboardKey.keyV) {
+                setState(() {
+                   _isVisualMode = !_isVisualMode;
+                   _visualAnchorLine = _isVisualMode ? _currentScrollLine : -1;
+                });
+                return KeyEventResult.handled;
+             }
+             
+             if (_isVisualMode && event.logicalKey == LogicalKeyboardKey.keyY) {
+                // Yank (Copy)
+                final lines = _getBufferLines(_currentFile);
+                final start = math.min(_visualAnchorLine, _currentScrollLine) - 1;
+                final end = math.max(_visualAnchorLine, _currentScrollLine) - 1;
+                
+                final validStart = math.max(0, start);
+                final validEnd = math.min(lines.length - 1, end);
+                
+                if (validStart <= validEnd) {
+                   final selectedText = lines.sublist(validStart, validEnd + 1).map((l) => l.span.toPlainText()).join('\n');
+                   Clipboard.setData(ClipboardData(text: selectedText));
+                   debugPrint('JTD: Yanked ${validEnd - validStart + 1} lines to clipboard.');
+                }
+                
+                setState(() {
+                   _isVisualMode = false;
+                   _visualAnchorLine = -1;
+                });
+                return KeyEventResult.handled;
+             }
+
              // Buffer switching (Shift+H / Shift+L)
              if (HardwareKeyboard.instance.isShiftPressed) {
                 if (event.logicalKey == LogicalKeyboardKey.keyH && _openBuffers.length > 1) {
@@ -427,6 +469,8 @@ class _DevViewState extends ConsumerState<DevView> {
                                                     currentLine: _currentScrollLine,
                                                     wrapText: _wrapText,
                                                     highlightCursorLine: _cursorLine,
+                                                    isVisualMode: _isVisualMode,
+                                                    visualAnchorLine: _visualAnchorLine,
                                                   ),
                                         if (_currentFile.endsWith('.md'))
                                           Positioned(
@@ -448,6 +492,7 @@ class _DevViewState extends ConsumerState<DevView> {
                         localFiles: _localFiles,
                         isCommandMode: _isCommandMode,
                         isSearchMode: _isSearchMode,
+                        isVisualMode: _isVisualMode,
                         commandController: _commandController,
                         commandFocusNode: _commandFocusNode,
                         onCommandSubmit: _executeCommand,
@@ -832,6 +877,8 @@ class _HelixBuffer extends StatelessWidget {
   final int currentLine;
   final bool wrapText;
   final bool highlightCursorLine;
+  final bool isVisualMode;
+  final int visualAnchorLine;
   
   const _HelixBuffer({
     required this.fileName,
@@ -842,6 +889,8 @@ class _HelixBuffer extends StatelessWidget {
     this.currentLine = 1,
     this.wrapText = false,
     this.highlightCursorLine = true,
+    this.isVisualMode = false,
+    this.visualAnchorLine = -1,
   });
 
   @override
@@ -873,6 +922,13 @@ class _HelixBuffer extends StatelessWidget {
                   final actualLineNum = i + 1;
                   final isCurrentLine = actualLineNum == currentLine;
                   
+                  bool isVisuallySelected = false;
+                  if (isVisualMode && visualAnchorLine != -1) {
+                     final minLine = math.min(visualAnchorLine, currentLine);
+                     final maxLine = math.max(visualAnchorLine, currentLine);
+                     isVisuallySelected = actualLineNum >= minLine && actualLineNum <= maxLine;
+                  }
+                  
                   String displayNum = '$actualLineNum';
                   Color numColor = gruberBgLighter;
                   
@@ -886,9 +942,18 @@ class _HelixBuffer extends StatelessWidget {
                   } else if (isCurrentLine && highlightCursorLine) {
                      numColor = gruberYellow;
                   }
+                  
+                  if (isVisuallySelected) numColor = gruberWisteria;
+
+                  Color bgColor = Colors.transparent;
+                  if (isVisuallySelected) {
+                     bgColor = gruberWisteria.withValues(alpha: 0.2);
+                  } else if (highlightCursorLine && isCurrentLine) {
+                     bgColor = gruberBgLighter.withValues(alpha: 0.5);
+                  }
 
                   return Container(
-                    color: (highlightCursorLine && isCurrentLine) ? gruberBgLighter.withValues(alpha: 0.5) : Colors.transparent,
+                    color: bgColor,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -915,6 +980,7 @@ class _HelixStatusArea extends StatelessWidget {
   final List<String> localFiles;
   final bool isCommandMode;
   final bool isSearchMode;
+  final bool isVisualMode;
   final TextEditingController commandController;
   final FocusNode commandFocusNode;
   final Function(String) onCommandSubmit;
@@ -927,6 +993,7 @@ class _HelixStatusArea extends StatelessWidget {
     required this.localFiles,
     required this.isCommandMode,
     required this.isSearchMode,
+    required this.isVisualMode,
     required this.commandController,
     required this.commandFocusNode,
     required this.onCommandSubmit,
@@ -950,6 +1017,9 @@ class _HelixStatusArea extends StatelessWidget {
     } else if (isSearchMode) {
       modeText = ' SRC ';
       modeColor = gruberNiagara;
+    } else if (isVisualMode) {
+      modeText = ' VIS ';
+      modeColor = gruberWisteria;
     }
 
     return Column(
