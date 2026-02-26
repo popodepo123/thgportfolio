@@ -37,6 +37,8 @@ dependencies:
   font_awesome_flutter: ^10.10.0
   visibility_detector: ^0.4.0+2
   url_launcher: ^6.2.2
+  flutter_svg: ^2.2.3
+  web: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +69,7 @@ flutter:
     - assets/images/eo2.webp
     - assets/images/eo3.webp
     - assets/images/eo4.webp
+    - assets/images/animated_logo.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

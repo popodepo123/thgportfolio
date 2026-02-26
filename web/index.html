@@ -192,24 +192,10 @@
   </div>
 
   <script>
-    window.addEventListener('load', function (ev) {
-      // Download main.dart.js
-      FlutterLoader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
-        onEntrypointLoaded: function (engineInitializer) {
-          engineInitializer.initializeEngine().then(function (appRunner) {
-            appRunner.runApp();
-          });
-        }
-      });
-    });
-  </script>
-  <script>
     // Function to hide loading screen with fade effect
     function hideLoadingScreen() {
       const loadingScreen = document.getElementById('loading-screen');
+      if (!loadingScreen) return;
 
       // Start fade out animation
       loadingScreen.classList.add('fade-out');
@@ -221,13 +207,14 @@
     }
 
     // Wait for Flutter to be ready
-    document.addEventListener('flutter-first-frame', () => {
+    window.addEventListener('flutter-first-frame', () => {
       hideLoadingScreen();
     });
 
     // Fallback: hide loading screen after a reasonable timeout
     setTimeout(() => {
-      if (!document.getElementById('loading-screen').classList.contains('fade-out')) {
+      const loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen && !loadingScreen.classList.contains('fade-out')) {
         hideLoadingScreen();
       }
     }, 8000); // 8 second fallback

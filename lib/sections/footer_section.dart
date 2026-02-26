@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:thgportfolio/portfolio_data.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FooterSection extends StatelessWidget {
   const FooterSection({super.key});
+
+  Future<void> _launchUrl(String link) async {
+    if (await canLaunchUrl(Uri.parse(link))) {
+      await launchUrl(Uri.parse(link));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +26,24 @@ class FooterSection extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(portfolio.email, style: textTheme.bodyMedium),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (portfolio.githubUrl != null)
+                IconButton(
+                  icon: const FaIcon(FontAwesomeIcons.github),
+                  onPressed: () => _launchUrl(portfolio.githubUrl!),
+                  tooltip: 'GitHub',
+                ),
+              if (portfolio.gitlabUrl != null)
+                IconButton(
+                  icon: const FaIcon(FontAwesomeIcons.gitlab),
+                  onPressed: () => _launchUrl(portfolio.gitlabUrl!),
+                  tooltip: 'GitLab',
+                ),
+            ],
+          ),
           const SizedBox(height: 24),
           Text(
             'Awards & Certificates',

@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:thgportfolio/app.dart';
-import 'package:thgportfolio/loading_logo.dart';
+// import 'package:thgportfolio/loading_logo.dart';
 
 void main() {
   testWidgets('App loads successfully', (WidgetTester tester) async {

@@ -49,6 +49,19 @@ app.*.map.json
 
 # Agent guidelines (generated file)
 /AGENTS.md
+GEMINI.md
 
 # FVM Version Cache
 .fvm/
+
+# Local Secrets & State
+.env*
+*.hive
+*.lock
+*.keystore
+*.jks
+*.p12
+*.key
+google-services.json
+GoogleService-Info.plist
+log.txt

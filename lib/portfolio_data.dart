@@ -4,6 +4,8 @@ class PortfolioData {
   final String name;
   final String title;
   final String email;
+  final String? gitlabUrl;
+  final String? githubUrl;
   final String summary;
   final List<SkillCategory> skills;
   final List<Project> projects;
@@ -15,6 +17,8 @@ class PortfolioData {
     required this.name,
     required this.title,
     required this.email,
+    this.gitlabUrl,
+    this.githubUrl,
     required this.summary,
     required this.skills,
     required this.projects,
@@ -49,6 +53,7 @@ class Project {
   final String? playstoreLink;
   final String? appstoreLink;
   final String? githubLink;
+  final String? gitlabLink;
   final List<String> features;
   final List<ProjectImage>? images;
 
@@ -56,6 +61,7 @@ class Project {
     this.playstoreLink,
     this.appstoreLink,
     this.githubLink,
+    this.gitlabLink,
     required this.title,
     required this.description,
     required this.features,
@@ -138,6 +144,8 @@ final portfolio = PortfolioData(
   name: 'Tristan Harvey Godoy',
   title: 'Mobile Application Developer',
   email: 'godoytristanh@gmail.com',
+  githubUrl: 'https://github.com/popodepo123',
+  gitlabUrl: 'https://gitlab.com/godoytristanh',
   summary:
       'A versatile Mobile Application Developer specializing in Flutter and full-stack Dart. Experienced in creating intuitive, high-performance mobile applications from concept to deployment, with a strong background in system automation and data analysis.',
   skills: [
@@ -365,6 +373,21 @@ final portfolio = PortfolioData(
       ],
     ),
     Project(
+      gitlabLink: "https://gitlab.com/godoytristanh/fsa",
+      title: 'Flutter Simple Architecture (FSA)',
+      description:
+          'A clean, scalable architectural pattern for Flutter applications emphasizing strict separation of concerns, View-Isolation, and maintainability.',
+      features: [
+        'Strict Page Types: Smart (Async/Complex), Simple (Sync/Forms), and Static (Stateless)',
+        'Component Isolation: Logic-heavy (Smart) vs. Pure UI (Dumb) components',
+        'State Management: Riverpod for global state and Flutter Hooks for local state',
+        'Theme Management: Manual theme persistence using shared_preferences',
+        'CLI Tooling: Custom \'fsa generate\' CLI for project scaffolding',
+      ],
+      images: [],
+    ),
+    Project(
+      gitlabLink: "https://gitlab.com/godoytristanh/dart_filetree",
       githubLink: "https://github.com/popodepo123/dart_filetree",
       title: 'Dart Filetree for Helix',
       description:
@@ -375,6 +398,18 @@ final portfolio = PortfolioData(
         "Local storage using Hive for settings persistence",
         "Cross-platform file system operations",
         "Helix editor integration via zellij for seamless file opening",
+      ],
+      images: [],
+    ),
+    Project(
+      gitlabLink: "https://gitlab.com/godoytristanh/flutter_hotreload",
+      title: 'Flutter Hotreload Automation',
+      description:
+          'Enhancing Flutter development cycles with automated hot reload capabilities and custom state preservation hooks.',
+      features: [
+        'Development Workflow: Reduces iteration time during Flutter development',
+        'State Preservation: Mechanisms to ensure state is maintained or correctly reset during reload',
+        'Integration: Programmatic reload triggers via external events',
       ],
       images: [],
     ),

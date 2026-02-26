@@ -83,6 +83,16 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                                   trylaunchUrl(link);
                                 },
                               ),
+                            if (project.gitlabLink != null)
+                              IconButton(
+                                iconSize: 20,
+                                icon: FaIcon(FontAwesomeIcons.gitlab),
+                                onPressed: () async {
+                                  final link = project.gitlabLink;
+                                  if (link == null) return;
+                                  trylaunchUrl(link);
+                                },
+                              ),
                           ],
                         ),
                       ],
