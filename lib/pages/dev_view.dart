@@ -58,6 +58,8 @@ class _DevViewState extends ConsumerState<DevView> {
   String _searchQuery = '';
   final TextEditingController _commandController = TextEditingController();
   final FocusNode _commandFocusNode = FocusNode();
+  final List<String> _commandHistory = [];
+  int _historyIndex = -1;
 
   final Map<String, List<Map<String, dynamic>>> _childrenCache = {};
   final Set<String> _expandedPaths = {};
@@ -240,6 +242,13 @@ class _DevViewState extends ConsumerState<DevView> {
     }
 
     final trimmed = input.trim();
+    if (trimmed.isNotEmpty) {
+      if (_commandHistory.isEmpty || _commandHistory.last != trimmed) {
+        _commandHistory.add(trimmed);
+      }
+      _historyIndex = _commandHistory.length;
+    }
+
     final int? lineNumber = int.tryParse(trimmed);
 
     if (lineNumber != null) {
@@ -339,6 +348,33 @@ class _DevViewState extends ConsumerState<DevView> {
         focusNode: _focusNode,
         autofocus: true,
         onKeyEvent: (node, event) {
+          if (_isCommandMode && event is KeyDownEvent) {
+             if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+                if (_commandHistory.isNotEmpty && _historyIndex > 0) {
+                   setState(() {
+                      _historyIndex--;
+                      _commandController.text = _commandHistory[_historyIndex];
+                      _commandController.selection = TextSelection.fromPosition(TextPosition(offset: _commandController.text.length));
+                   });
+                }
+                return KeyEventResult.handled;
+             } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+                if (_commandHistory.isNotEmpty && _historyIndex < _commandHistory.length - 1) {
+                   setState(() {
+                      _historyIndex++;
+                      _commandController.text = _commandHistory[_historyIndex];
+                      _commandController.selection = TextSelection.fromPosition(TextPosition(offset: _commandController.text.length));
+                   });
+                } else if (_historyIndex == _commandHistory.length - 1) {
+                   setState(() {
+                      _historyIndex = _commandHistory.length;
+                      _commandController.clear();
+                   });
+                }
+                return KeyEventResult.handled;
+             }
+          }
+
           if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
              if (_isCommandMode || _isSearchMode) {
                setState(() {
