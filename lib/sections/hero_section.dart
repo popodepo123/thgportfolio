@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:thgportfolio/portfolio_data.dart';
 import 'package:thgportfolio/loading_logo.dart';
+import 'package:thgportfolio/widgets/contribution_heatmap.dart';
 
 class HeroSection extends StatelessWidget {
   const HeroSection({super.key});
@@ -30,6 +31,12 @@ class HeroSection extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(portfolio.summary, style: textTheme.bodyMedium),
+          const SizedBox(height: 32),
+          // Unified Contribution Heatmap
+          const ContributionHeatmap(
+            gitlabUser: 'godoytristanh',
+            githubUser: 'popodepo123',
+          ),
           const SizedBox(height: 48),
         ],
       ),

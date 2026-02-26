@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:thgportfolio/gitlab_service.dart';
+import 'package:thgportfolio/contribution_service.dart';
 import 'package:thgportfolio/portfolio_data.dart';
 import 'package:thgportfolio/theme.dart';
 
@@ -18,10 +18,11 @@ class _DevViewState extends State<DevView> {
   String _currentFile = 'README.md';
   bool _isPickerOpen = true;
   bool _isLoading = false;
+  bool _isImage = false;
   String? _remoteContent;
+  String? _imageUrl;
   final FocusNode _focusNode = FocusNode();
 
-  // Maps path -> its direct children
   final Map<String, List<Map<String, dynamic>>> _childrenCache = {};
   final Set<String> _expandedPaths = {};
 
@@ -49,13 +50,11 @@ class _DevViewState extends State<DevView> {
         _expandedPaths.add(path);
       });
 
-      // Load children if not in cache
       if (!_childrenCache.containsKey(path)) {
         setState(() => _isLoading = true);
-        
         final gitlabUrl = project?.gitlabLink ?? _findGitlabUrlForPath(path);
         if (gitlabUrl != null) {
-          final tree = await GitLabService.fetchTree(gitlabUrl, path: remoteRelativePath ?? _extractRemotePath(path));
+          final tree = await ContributionService.fetchTree(gitlabUrl, path: remoteRelativePath ?? _extractRemotePath(path));
           setState(() {
             _childrenCache[path] = tree;
             _isLoading = false;
@@ -73,26 +72,38 @@ class _DevViewState extends State<DevView> {
   }
 
   String _extractRemotePath(String path) {
-    // path format: "slug/folder/sub" -> "folder/sub"
     final parts = path.split('/');
     if (parts.length <= 1) return '';
     return parts.sublist(1).join('/');
   }
 
   Future<void> _handleFileSelection(String file, {String? gitlabUrl, String? remotePath}) async {
+    final isImg = file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg') || file.endsWith('.webp') || file.endsWith('.gif');
+    
     setState(() {
       _currentFile = file;
       _remoteContent = null;
+      _imageUrl = null;
+      _isImage = isImg;
     });
 
     if (gitlabUrl != null && remotePath != null) {
       setState(() => _isLoading = true);
-      final content = await GitLabService.fetchRawFile(gitlabUrl, filePath: remotePath);
-      if (mounted && _currentFile == file) {
+      
+      if (isImg) {
+        final rawUrl = '$gitlabUrl/-/raw/main/$remotePath';
         setState(() {
-          _remoteContent = content;
+          _imageUrl = ContributionService.wrapUrl(rawUrl);
           _isLoading = false;
         });
+      } else {
+        final content = await ContributionService.fetchRawFile(gitlabUrl, filePath: remotePath);
+        if (mounted && _currentFile == file) {
+          setState(() {
+            _remoteContent = content;
+            _isLoading = false;
+          });
+        }
       }
     }
   }
@@ -123,11 +134,34 @@ class _DevViewState extends State<DevView> {
                         onPathToggle: _togglePath,
                       ),
                     Expanded(
-                      child: _HelixBuffer(
-                        fileName: _currentFile,
-                        isLoading: _isLoading,
-                        lines: _getBufferLines(_currentFile),
-                      ),
+                      child: _isImage && _imageUrl != null
+                          ? Container(
+                              alignment: Alignment.topLeft,
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(_currentFile, style: const TextStyle(color: gruberQuartz, fontFamily: _terminalFontFamily, fontSize: 12)),
+                                  const SizedBox(height: 16),
+                                  Expanded(
+                                    child: Image.network(
+                                      _imageUrl!,
+                                      fit: BoxFit.contain,
+                                      loadingBuilder: (context, child, loadingProgress) {
+                                        if (loadingProgress == null) return child;
+                                        return const Center(child: CircularProgressIndicator(color: gruberYellow));
+                                      },
+                                      errorBuilder: (context, error, stackTrace) => Text('Error loading image: $error', style: const TextStyle(color: gruberRed)),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : _HelixBuffer(
+                              fileName: _currentFile,
+                              isLoading: _isLoading,
+                              lines: _getBufferLines(_currentFile),
+                            ),
                     ),
                   ],
                 ),
@@ -142,9 +176,12 @@ class _DevViewState extends State<DevView> {
 
   List<LineData> _getBufferLines(String buffer) {
     if (_isLoading && _remoteContent == null) {
-      return [LineData(span: const TextSpan(text: '// Communicating with GitLab API...', style: TextStyle(color: gruberQuartz)))];
+      return [LineData(span: const TextSpan(text: '// Communicating with Contribution API...', style: TextStyle(color: gruberQuartz)))];
     }
     if (_remoteContent != null) {
+      if (buffer.endsWith('.dart')) {
+        return _DartHighlighter.highlight(_remoteContent!);
+      }
       return _remoteContent!.split('\n').map((l) => LineData(span: TextSpan(text: l, style: TextStyle(color: _getRemoteStyle(buffer))))).toList();
     }
     return switch (buffer) {
@@ -161,7 +198,7 @@ class _DevViewState extends State<DevView> {
     if (fileName.endsWith('.dart')) return gruberGreen;
     if (fileName.endsWith('.yaml') || fileName.endsWith('.json')) return gruberNiagara;
     if (fileName.endsWith('.md')) return gruberFg;
-    return gruberFg.withOpacity(0.8);
+    return gruberFg.withValues(alpha: 0.8);
   }
 }
 
@@ -238,7 +275,7 @@ class _HelixPicker extends StatelessWidget {
           ...children.map((node) {
             final name = node['name'] as String;
             final type = node['type'] as String;
-            final nodePath = node['path'] as String; // Path from repo root
+            final nodePath = node['path'] as String;
             final nodeFullPath = '${fullPath.split('/').first}/$nodePath';
             
             if (type == 'tree') {
@@ -264,7 +301,7 @@ class _HelixPicker extends StatelessWidget {
             children: [
               Icon(icon, size: 14, color: isSelected ? gruberYellow : (color ?? gruberQuartz)),
               const SizedBox(width: 8),
-              Expanded(child: Text(text, style: TextStyle(color: isSelected ? gruberYellow : (color ?? gruberFg.withOpacity(0.7)), fontFamily: _terminalFontFamily, fontSize: 13), overflow: TextOverflow.ellipsis)),
+              Expanded(child: Text(text, style: TextStyle(color: isSelected ? gruberYellow : (color ?? gruberFg.withValues(alpha: 0.7)), fontFamily: _terminalFontFamily, fontSize: 13), overflow: TextOverflow.ellipsis)),
             ],
           ),
         ),
@@ -302,7 +339,7 @@ class _HelixBuffer extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SelectionContainer.disabled(
-                      child: SizedBox(width: 40, child: Text((i + 1).toString().padLeft(3), style: const TextStyle(color: gruberBgLighter, fontFamily: _terminalFontFamily, fontSize: 13))),
+                      child: SizedBox(width: 40, child: Text('${i + 1}'.padLeft(3), style: const TextStyle(color: gruberBgLighter, fontFamily: _terminalFontFamily, fontSize: 13))),
                     ),
                     const SizedBox(width: 12),
                     Expanded(child: Text.rich(line.span, maxLines: 1, softWrap: false, overflow: TextOverflow.clip, style: const TextStyle(fontFamily: _terminalFontFamily, fontSize: _terminalFontSize, color: gruberFg))),
@@ -379,10 +416,16 @@ class _MarkdownContent {
     final words = portfolio.summary.split(' ');
     String current = '';
     for (var w in words) {
-      if ((current + w).length > 60) { lines.add(LineData(span: TextSpan(text: current.trim(), style: const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic)))); current = w + ' '; }
-      else { current += w + ' '; }
+      if ((current + w).length > 60) {
+        lines.add(LineData(span: TextSpan(text: current.trim(), style: const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic))));
+        current = '$w ';
+      } else {
+        current = '$current$w ';
+      }
     }
-    if (current.isNotEmpty) lines.add(LineData(span: TextSpan(text: current.trim(), style: const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic))));
+    if (current.isNotEmpty) {
+      lines.add(LineData(span: TextSpan(text: current.trim(), style: const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic))));
+    }
     return lines;
   }
 }
@@ -392,7 +435,9 @@ class _ShellContent {
     final List<LineData> lines = [LineData(span: const TextSpan(text: '#!/bin/bash', style: TextStyle(color: gruberQuartz))), LineData(span: const TextSpan(text: ''))];
     for (var cat in portfolio.skills) {
       lines.add(LineData(span: TextSpan(text: 'echo "Loading ${cat.categoryName}..."', style: const TextStyle(color: gruberGreen))));
-      for (var s in cat.skills) lines.add(LineData(span: TextSpan(text: '  add_skill "${s.name}"', style: const TextStyle(color: gruberFg))));
+      for (var s in cat.skills) {
+        lines.add(LineData(span: TextSpan(text: '  add_skill "${s.name}"', style: const TextStyle(color: gruberFg))));
+      }
       lines.add(LineData(span: const TextSpan(text: '')));
     }
     return lines;
@@ -412,7 +457,9 @@ class _JsonContent {
       if (p.githubLink != null) _addRichField(lines, 'github', p.githubLink!, color: gruberNiagara);
       if (p.gitlabLink != null) _addRichField(lines, 'gitlab', p.gitlabLink!, color: gruberNiagara);
       lines.add(LineData(span: const TextSpan(children: [TextSpan(text: '      "features"', style: TextStyle(color: gruberFg)), TextSpan(text: '    : [', style: TextStyle(color: gruberQuartz))])));
-      for (var f in p.features) lines.add(LineData(span: TextSpan(text: '        "$f"${f == p.features.last ? "" : ","}', style: const TextStyle(color: gruberBrown))));
+      for (var f in p.features) {
+        lines.add(LineData(span: TextSpan(text: '        "$f"${f == p.features.last ? "" : ","}', style: const TextStyle(color: gruberBrown))));
+      }
       lines.add(LineData(span: const TextSpan(text: '      ]', style: TextStyle(color: gruberQuartz))));
       lines.add(LineData(span: TextSpan(text: '    }${i == portfolio.projects.length - 1 ? "" : ","}', style: const TextStyle(color: gruberQuartz))));
     }
@@ -429,13 +476,22 @@ class _JsonContent {
     bool first = true;
     for (var w in words) {
       if ((current + w).length > 60) {
-        if (first) { lines.add(LineData(span: TextSpan(children: [TextSpan(text: '$p$k', style: const TextStyle(color: gruberFg)), const TextSpan(text: ' : "', style: TextStyle(color: gruberQuartz)), TextSpan(text: current.trim(), style: TextStyle(color: color))]))); first = false; }
-        else { lines.add(LineData(span: TextSpan(children: [TextSpan(text: ' ' * (p.length + keyWidth + 4)), TextSpan(text: current.trim(), style: TextStyle(color: color))]))); }
-        current = w + ' ';
-      } else { current += word + ' '; }
+        if (first) {
+          lines.add(LineData(span: TextSpan(children: [TextSpan(text: '$p$k', style: const TextStyle(color: gruberFg)), const TextSpan(text: ' : "', style: TextStyle(color: gruberQuartz)), TextSpan(text: current.trim(), style: TextStyle(color: color))])));
+          first = false;
+        } else {
+          lines.add(LineData(span: TextSpan(children: [TextSpan(text: ' ' * (p.length + keyWidth + 4)), TextSpan(text: current.trim(), style: TextStyle(color: color))])));
+        }
+        current = '$w ';
+      } else {
+        current = '$current$w ';
+      }
     }
-    if (first) { lines.add(LineData(span: TextSpan(children: [TextSpan(text: '$p$k', style: const TextStyle(color: gruberFg)), const TextSpan(text: ' : "', style: TextStyle(color: gruberQuartz)), TextSpan(text: current.trim(), style: TextStyle(color: color)), const TextSpan(text: '",', style: TextStyle(color: gruberQuartz))]))); }
-    else { lines.add(LineData(span: TextSpan(children: [TextSpan(text: ' ' * (p.length + keyWidth + 4)), TextSpan(text: current.trim(), style: TextStyle(color: color)), const TextSpan(text: '",', style: TextStyle(color: gruberQuartz))]))); }
+    if (first) {
+      lines.add(LineData(span: TextSpan(children: [TextSpan(text: '$p$k', style: const TextStyle(color: gruberFg)), const TextSpan(text: ' : "', style: TextStyle(color: gruberQuartz)), TextSpan(text: current.trim(), style: TextStyle(color: color)), const TextSpan(text: '",', style: TextStyle(color: gruberQuartz))])));
+    } else {
+      lines.add(LineData(span: TextSpan(children: [TextSpan(text: ' ' * (p.length + keyWidth + 4)), TextSpan(text: current.trim(), style: TextStyle(color: color)), const TextSpan(text: '",', style: TextStyle(color: gruberQuartz))])));
+    }
   }
 }
 
@@ -449,10 +505,16 @@ class _LogContent {
       final words = e.description.split(' ');
       String current = '    ';
       for (var w in words) {
-        if ((current + w).length > 70) { lines.add(LineData(span: TextSpan(text: current.trimRight(), style: const TextStyle(color: gruberFg)))); current = '    ' + w + ' '; }
-        else { current += word + ' '; }
+        if ((current + w).length > 70) {
+          lines.add(LineData(span: TextSpan(text: current.trimRight(), style: const TextStyle(color: gruberFg))));
+          current = '    $w ';
+        } else {
+          current = '$current$w ';
+        }
       }
-      if (current.trim().isNotEmpty) lines.add(LineData(span: TextSpan(text: current.trimRight(), style: const TextStyle(color: gruberFg))));
+      if (current.trim().isNotEmpty) {
+        lines.add(LineData(span: TextSpan(text: current.trimRight(), style: const TextStyle(color: gruberFg))));
+      }
       lines.add(LineData(span: const TextSpan(text: '')));
     }
     return lines;
@@ -467,8 +529,71 @@ class _ConfigContent {
       if (portfolio.githubUrl != null) LineData(span: TextSpan(text: 'github = "${portfolio.githubUrl}"', style: const TextStyle(color: gruberFg))),
       if (portfolio.gitlabUrl != null) LineData(span: TextSpan(text: 'gitlab = "${portfolio.gitlabUrl}"', style: const TextStyle(color: gruberFg))),
       LineData(span: const TextSpan(text: '')),
-      const LineData(span: TextSpan(text: '[status]', style: TextStyle(color: gruberWisteria))),
-      const LineData(span: TextSpan(text: 'available = true', style: TextStyle(color: gruberGreen))),
+      LineData(span: const TextSpan(text: '[status]', style: TextStyle(color: gruberWisteria))),
+      LineData(span: const TextSpan(text: 'available = true', style: TextStyle(color: gruberGreen))),
     ];
   }
+}
+
+class _DartHighlighter {
+  static final keywords = {
+    'abstract', 'as', 'assert', 'async', 'await', 'break', 'case', 'catch', 'class', 'const', 'continue',
+    'covariant', 'default', 'deferred', 'do', 'dynamic', 'else', 'enum', 'export', 'extends', 'extension',
+    'external', 'factory', 'false', 'final', 'finally', 'for', 'function', 'get', 'hide', 'if', 'implements',
+    'import', 'in', 'interface', 'is', 'late', 'library', 'mixin', 'new', 'null', 'on', 'operator', 'part',
+    'rethrow', 'return', 'set', 'show', 'static', 'super', 'switch', 'sync', 'this', 'throw', 'true', 'try',
+    'typedef', 'var', 'void', 'while', 'with', 'yield'
+  };
+
+  static List<LineData> highlight(String code) {
+    final List<LineData> lines = [];
+    final rawLines = code.split('\n');
+
+    for (var line in rawLines) {
+      final List<TextSpan> spans = [];
+      int commentIndex = line.indexOf('//');
+      String textToHighlight = commentIndex != -1 ? line.substring(0, commentIndex) : line;
+      String commentPart = commentIndex != -1 ? line.substring(commentIndex) : '';
+
+      final tokens = _tokenize(textToHighlight);
+      for (var token in tokens) {
+        spans.add(TextSpan(text: token.text, style: _getStyleForToken(token)));
+      }
+
+      if (commentPart.isNotEmpty) {
+        spans.add(TextSpan(text: commentPart, style: const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic)));
+      }
+
+      lines.add(LineData(span: TextSpan(children: spans)));
+    }
+    return lines;
+  }
+
+  static List<_Token> _tokenize(String text) {
+    final List<_Token> tokens = [];
+    final pattern = RegExp(
+      '("[^"]*"|\'[^\']*\'|\\b[a-zA-Z_]\\w*\\b|\\d+|[^\\s\\w]+|\\s+)',
+    );
+
+    final matches = pattern.allMatches(text);
+    for (var match in matches) {
+      tokens.add(_Token(match.group(0)!));
+    }
+    return tokens;
+  }
+
+  static TextStyle _getStyleForToken(_Token token) {
+    final t = token.text.trim();
+    if (t.isEmpty) return const TextStyle();
+    if (t.startsWith("'") || t.startsWith('"')) return const TextStyle(color: gruberGreen);
+    if (keywords.contains(t)) return const TextStyle(color: gruberYellow, fontWeight: FontWeight.bold);
+    if (RegExp(r'^[A-Z]\w*$').hasMatch(t)) return const TextStyle(color: gruberNiagara);
+    if (RegExp(r'^\d+$').hasMatch(t)) return const TextStyle(color: gruberBrown);
+    return const TextStyle(color: gruberFg);
+  }
+}
+
+class _Token {
+  final String text;
+  _Token(this.text);
 }

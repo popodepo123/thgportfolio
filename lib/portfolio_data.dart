@@ -147,7 +147,7 @@ final portfolio = PortfolioData(
   githubUrl: 'https://github.com/popodepo123',
   gitlabUrl: 'https://gitlab.com/godoytristanh',
   summary:
-      'A versatile Mobile Application Developer specializing in Flutter and full-stack Dart. Experienced in creating intuitive, high-performance mobile applications from concept to deployment, with a strong background in system automation and data analysis.',
+      'I am a proactive and deeply curious software developer who thrives on solving complex bottlenecks and building efficient, scalable systems. My approach to technology is intensely hands-on: I don\'t just use tools; I build custom automations, optimize workflows, and actively mold my development environment to enforce clean architecture.\n\nMy learning philosophy is rooted in practical, tenacious problem-solving. Whether I am untangling deep dependency conflicts, building secure backend proxy functions, or diving into terminal logs to bypass infrastructure friction, I view technical roadblocks as opportunities to master the underlying mechanics of a system. I am consistently expanding my boundaries across the full stack—exploring new languages, robust backend solutions, and cloud architectures to ensure I am always building smarter, faster, and more securely.',
   skills: [
     SkillCategory(
       categoryName: 'Programming Languages',

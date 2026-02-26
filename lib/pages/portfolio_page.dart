@@ -54,53 +54,38 @@ class _PortfolioPageState extends State<PortfolioPage> {
       body: ValueListenableBuilder<PortfolioView>(
         valueListenable: portfolioViewNotifier,
         builder: (context, view, child) {
-          if (view == PortfolioView.dev) {
-            return const DevView();
-          }
-          return SelectionArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                if (constraints.maxWidth > 768) {
-                  // Wide screen layout
-                  return Row(
-                    children: [
-                      // Side Panel
-                      SidePanel(scrollController: _scrollController),
-                      // Main Content
-                      Expanded(
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 1000),
-                            child: ScrollConfiguration(
-                              behavior: ScrollConfiguration.of(
-                                context,
-                              ).copyWith(scrollbars: false),
-                              child: SingleChildScrollView(
-                                controller: _scrollController, // Attach controller
-                                physics: const ClampingScrollPhysics(),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 48,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    HeroSection(key: heroSectionKey),
-                                    SkillsSection(key: skillsSectionKey),
-                                    ProjectsSection(key: projectsSectionKey),
-                                    ExperienceSection(key: experienceSectionKey),
-                                    FooterSection(key: footerSectionKey),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  // Narrow screen layout
-                  return Center(
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 600),
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            child: _buildView(view),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildView(PortfolioView view) {
+    if (view == PortfolioView.dev) {
+      return const DevView(key: ValueKey('dev_view'));
+    }
+    return SelectionArea(
+      key: const ValueKey('prof_view'),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth > 768) {
+            // Wide screen layout
+            return Row(
+              children: [
+                // Side Panel
+                SidePanel(scrollController: _scrollController),
+                // Main Content
+                Expanded(
+                  child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 1000),
                       child: ScrollConfiguration(
@@ -110,7 +95,9 @@ class _PortfolioPageState extends State<PortfolioPage> {
                         child: SingleChildScrollView(
                           controller: _scrollController, // Attach controller
                           physics: const ClampingScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(vertical: 48),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 48,
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -124,11 +111,38 @@ class _PortfolioPageState extends State<PortfolioPage> {
                         ),
                       ),
                     ),
-                  );
-                }
-              },
-            ),
-          );
+                  ),
+                ),
+              ],
+            );
+          } else {
+            // Narrow screen layout
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1000),
+                child: ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(
+                    context,
+                  ).copyWith(scrollbars: false),
+                  child: SingleChildScrollView(
+                    controller: _scrollController, // Attach controller
+                    physics: const ClampingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(vertical: 48),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        HeroSection(key: heroSectionKey),
+                        SkillsSection(key: skillsSectionKey),
+                        ProjectsSection(key: projectsSectionKey),
+                        ExperienceSection(key: experienceSectionKey),
+                        FooterSection(key: footerSectionKey),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
         },
       ),
     );
