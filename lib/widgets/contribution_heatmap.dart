@@ -84,7 +84,6 @@ class _ContributionHeatmapState extends State<ContributionHeatmap> {
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    const weeksToShow = 52; 
     
     return LayoutBuilder(
       key: const ValueKey('data'),

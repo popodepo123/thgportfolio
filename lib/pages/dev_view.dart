@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:thgportfolio/contribution_service.dart';
 import 'package:thgportfolio/portfolio_data.dart';
 import 'package:thgportfolio/theme.dart';
@@ -19,6 +20,7 @@ class _DevViewState extends State<DevView> {
   bool _isPickerOpen = true;
   bool _isLoading = false;
   bool _isImage = false;
+  bool _isPreviewMode = false;
   String? _remoteContent;
   String? _imageUrl;
   final FocusNode _focusNode = FocusNode();
@@ -119,59 +121,142 @@ class _DevViewState extends State<DevView> {
         autofocus: true,
         child: Container(
           color: gruberBg,
-          child: Column(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    if (_isPickerOpen)
-                      _HelixPicker(
-                        localFiles: _localFiles,
-                        selectedFile: _currentFile,
-                        expandedPaths: _expandedPaths,
-                        childrenCache: _childrenCache,
-                        onFileSelected: _handleFileSelection,
-                        onPathToggle: _togglePath,
-                      ),
-                    Expanded(
-                      child: _isImage && _imageUrl != null
-                          ? Container(
-                              alignment: Alignment.topLeft,
-                              padding: const EdgeInsets.all(24),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(_currentFile, style: const TextStyle(color: gruberQuartz, fontFamily: _terminalFontFamily, fontSize: 12)),
-                                  const SizedBox(height: 16),
-                                  Expanded(
-                                    child: Image.network(
-                                      _imageUrl!,
-                                      fit: BoxFit.contain,
-                                      loadingBuilder: (context, child, loadingProgress) {
-                                        if (loadingProgress == null) return child;
-                                        return const Center(child: CircularProgressIndicator(color: gruberYellow));
-                                      },
-                                      errorBuilder: (context, error, stackTrace) => Text('Error loading image: $error', style: const TextStyle(color: gruberRed)),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : _HelixBuffer(
-                              fileName: _currentFile,
-                              isLoading: _isLoading,
-                              lines: _getBufferLines(_currentFile),
-                            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final bool shouldShowPicker = _isPickerOpen && constraints.maxWidth >= 800;
+              
+              return Column(
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        if (shouldShowPicker)
+                          _HelixPicker(
+                            localFiles: _localFiles,
+                            selectedFile: _currentFile,
+                            expandedPaths: _expandedPaths,
+                            childrenCache: _childrenCache,
+                            onFileSelected: _handleFileSelection,
+                            onPathToggle: _togglePath,
+                          ),
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              _isImage && _imageUrl != null
+                                  ? _buildImageBuffer()
+                                  : (_isPreviewMode && _currentFile.endsWith('.md'))
+                                      ? _buildMarkdownPreview()
+                                      : _HelixBuffer(
+                                          fileName: _currentFile,
+                                          isLoading: _isLoading,
+                                          lines: _getBufferLines(_currentFile),
+                                        ),
+                              if (_currentFile.endsWith('.md'))
+                                Positioned(
+                                  top: 8,
+                                  right: 16,
+                                  child: _buildPreviewToggle(),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  _HelixStatusArea(currentFile: _currentFile),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageBuffer() {
+    return Container(
+      alignment: Alignment.topLeft,
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(_currentFile, style: const TextStyle(color: gruberQuartz, fontFamily: _terminalFontFamily, fontSize: 12)),
+          const SizedBox(height: 16),
+          Expanded(
+            child: Image.network(
+              _imageUrl!,
+              fit: BoxFit.contain,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return const Center(child: CircularProgressIndicator(color: gruberYellow));
+              },
+              errorBuilder: (context, error, stackTrace) => Text('Error loading image: $error', style: const TextStyle(color: gruberRed)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMarkdownPreview() {
+    final String content = _remoteContent ?? _getMarkdownString(_currentFile);
+    return Container(
+      color: gruberBg,
+      padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
+      child: Markdown(
+        data: content,
+        styleSheet: MarkdownStyleSheet(
+          p: const TextStyle(color: gruberFg, fontFamily: _terminalFontFamily),
+          h1: const TextStyle(color: gruberYellow, fontSize: 24, fontWeight: FontWeight.bold, fontFamily: _terminalFontFamily),
+          h2: const TextStyle(color: gruberYellow, fontSize: 20, fontWeight: FontWeight.bold, fontFamily: _terminalFontFamily),
+          h3: const TextStyle(color: gruberYellow, fontSize: 18, fontWeight: FontWeight.bold, fontFamily: _terminalFontFamily),
+          code: const TextStyle(backgroundColor: gruberBgDarker, color: gruberGreen, fontFamily: _terminalFontFamily),
+          blockquote: const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic, fontFamily: _terminalFontFamily),
+          blockquoteDecoration: const BoxDecoration(
+            border: Border(left: BorderSide(color: gruberBgLighter, width: 4)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPreviewToggle() {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => setState(() => _isPreviewMode = !_isPreviewMode),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: gruberBgLighter,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: gruberYellow.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _isPreviewMode ? Icons.code : Icons.remove_red_eye_outlined,
+                size: 14,
+                color: gruberYellow,
               ),
-              _HelixStatusArea(currentFile: _currentFile),
+              const SizedBox(width: 6),
+              Text(
+                _isPreviewMode ? 'RAW' : 'PREVIEW',
+                style: const TextStyle(color: gruberYellow, fontSize: 10, fontWeight: FontWeight.bold, fontFamily: _terminalFontFamily),
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  String _getMarkdownString(String buffer) {
+    if (buffer == 'README.md') {
+      return portfolio.summary;
+    }
+    return '';
   }
 
   List<LineData> _getBufferLines(String buffer) {
