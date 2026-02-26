@@ -6,7 +6,6 @@ import 'package:thgportfolio/contribution_service.dart';
 import 'package:thgportfolio/portfolio_data.dart';
 import 'package:thgportfolio/theme.dart';
 import 'package:thgportfolio/view_provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:convert';
@@ -14,14 +13,14 @@ import 'dart:convert';
 const double _terminalFontSize = 14.0;
 const String _terminalFontFamily = 'Iosevka';
 
-class DevView extends ConsumerStatefulWidget {
+class DevView extends StatefulWidget {
   const DevView({super.key});
 
   @override
-  ConsumerState<DevView> createState() => _DevViewState();
+  State<DevView> createState() => _DevViewState();
 }
 
-class _DevViewState extends ConsumerState<DevView> {
+class _DevViewState extends State<DevView> {
   String _currentFile = 'README.md';
   final List<String> _openBuffers = ['README.md'];
   int _activeBufferIndex = 0;
@@ -263,7 +262,7 @@ class _DevViewState extends ConsumerState<DevView> {
           );
        }
     } else if (trimmed == 'q') {
-      ref.read(viewModeProvider.notifier).setProView();
+      portfolioViewNotifier.value = PortfolioView.professional;
     } else if (trimmed.startsWith('open ')) {
       final file = trimmed.substring(5).trim();
       if (_localFiles.contains(file)) {
@@ -775,7 +774,7 @@ class _DevViewState extends ConsumerState<DevView> {
   // A helper to inject search highlights into already generated TextSpans (used for the hardcoded local files)
   TextSpan _applySearchHighlight(TextSpan span, String query) {
      if (span.text != null && span.text!.isNotEmpty) {
-       return _GenericHighlighter.highlightSearchInText(span.text!, span.style, query);
+       return _GenericHighlighter.highlightSearchInText(span.text!, span.style ?? const TextStyle(), query);
      }
      if (span.children != null) {
         return TextSpan(
