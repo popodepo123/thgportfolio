@@ -43,6 +43,7 @@ class _DevViewState extends ConsumerState<DevView> {
   int _currentScrollLine = 1;
   bool _relativeLineNumbers = false;
   bool _wrapText = false;
+  bool _cursorLine = true;
 
   // Command & Search Mode
   bool _isCommandMode = false;
@@ -266,6 +267,10 @@ class _DevViewState extends ConsumerState<DevView> {
       setState(() => _wrapText = true);
     } else if (trimmed == 'set nowrap') {
       setState(() => _wrapText = false);
+    } else if (trimmed == 'set cul' || trimmed == 'set cursorline') {
+      setState(() => _cursorLine = true);
+    } else if (trimmed == 'set nocul' || trimmed == 'set nocursorline') {
+      setState(() => _cursorLine = false);
     }
     
     setState(() {
@@ -421,6 +426,7 @@ class _DevViewState extends ConsumerState<DevView> {
                                                     relativeLineNumbers: _relativeLineNumbers,
                                                     currentLine: _currentScrollLine,
                                                     wrapText: _wrapText,
+                                                    highlightCursorLine: _cursorLine,
                                                   ),
                                         if (_currentFile.endsWith('.md'))
                                           Positioned(
@@ -825,6 +831,7 @@ class _HelixBuffer extends StatelessWidget {
   final bool relativeLineNumbers;
   final int currentLine;
   final bool wrapText;
+  final bool highlightCursorLine;
   
   const _HelixBuffer({
     required this.fileName,
@@ -834,6 +841,7 @@ class _HelixBuffer extends StatelessWidget {
     this.relativeLineNumbers = false,
     this.currentLine = 1,
     this.wrapText = false,
+    this.highlightCursorLine = true,
   });
 
   @override
@@ -863,28 +871,34 @@ class _HelixBuffer extends StatelessWidget {
                 itemBuilder: (context, i) {
                   final line = lines[i];
                   final actualLineNum = i + 1;
+                  final isCurrentLine = actualLineNum == currentLine;
                   
                   String displayNum = '$actualLineNum';
                   Color numColor = gruberBgLighter;
                   
                   if (relativeLineNumbers) {
-                     if (actualLineNum == currentLine) {
+                     if (isCurrentLine) {
                         displayNum = '$actualLineNum';
                         numColor = gruberYellow;
                      } else {
                         displayNum = '${(actualLineNum - currentLine).abs()}';
                      }
+                  } else if (isCurrentLine && highlightCursorLine) {
+                     numColor = gruberYellow;
                   }
 
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SelectionContainer.disabled(
-                        child: SizedBox(width: 40, child: Text(displayNum.padLeft(3), style: TextStyle(color: numColor, fontFamily: _terminalFontFamily, fontSize: 13))),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text.rich(line.span, maxLines: wrapText ? null : 1, softWrap: wrapText, overflow: wrapText ? TextOverflow.visible : TextOverflow.clip, style: const TextStyle(fontFamily: _terminalFontFamily, fontSize: _terminalFontSize, color: gruberFg))),
-                    ],
+                  return Container(
+                    color: (highlightCursorLine && isCurrentLine) ? gruberBgLighter.withValues(alpha: 0.5) : Colors.transparent,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SelectionContainer.disabled(
+                          child: SizedBox(width: 40, child: Text(displayNum.padLeft(3), style: TextStyle(color: numColor, fontFamily: _terminalFontFamily, fontSize: 13))),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text.rich(line.span, maxLines: wrapText ? null : 1, softWrap: wrapText, overflow: wrapText ? TextOverflow.visible : TextOverflow.clip, style: const TextStyle(fontFamily: _terminalFontFamily, fontSize: _terminalFontSize, color: gruberFg))),
+                      ],
+                    ),
                   );
                 },
               ),
