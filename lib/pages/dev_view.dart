@@ -7,6 +7,7 @@ import 'package:thgportfolio/portfolio_data.dart';
 import 'package:thgportfolio/theme.dart';
 import 'package:thgportfolio/view_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:async';
 
 const double _terminalFontSize = 14.0;
 const String _terminalFontFamily = 'Iosevka';
@@ -27,7 +28,13 @@ class _DevViewState extends ConsumerState<DevView> {
   bool _isLoading = false;
   bool _isImage = false;
   bool _isPreviewMode = false;
-  bool _isCRTEnabled = true; // Surprise! Enabled by default
+  bool _isCRTEnabled = true;
+  
+  // Typewriter Mode
+  String? _typingContent;
+  int _visibleChars = 0;
+  Timer? _typingTimer;
+
   String? _remoteContent;
   String? _imageUrl;
   
@@ -48,6 +55,7 @@ class _DevViewState extends ConsumerState<DevView> {
   void initState() {
     super.initState();
     _focusNode.requestFocus();
+    _startTypewriter(_getMarkdownString('README.md'));
   }
 
   @override
@@ -56,7 +64,27 @@ class _DevViewState extends ConsumerState<DevView> {
     _scrollController.dispose();
     _commandController.dispose();
     _commandFocusNode.dispose();
+    _typingTimer?.cancel();
     super.dispose();
+  }
+
+  void _startTypewriter(String content) {
+    _typingTimer?.cancel();
+    setState(() {
+      _typingContent = content;
+      _visibleChars = 0;
+    });
+    
+    _typingTimer = Timer.periodic(const Duration(milliseconds: 5), (timer) {
+      setState(() {
+        if (_visibleChars < _typingContent!.length) {
+          _visibleChars += 15; // Type chunks for speed
+          if (_visibleChars > _typingContent!.length) _visibleChars = _typingContent!.length;
+        } else {
+          timer.cancel();
+        }
+      });
+    });
   }
 
   String _getSlug(Project p) => p.title.toLowerCase().replaceAll(' ', '_').replaceAll('(', '').replaceAll(')', '');
@@ -99,6 +127,7 @@ class _DevViewState extends ConsumerState<DevView> {
   Future<void> _handleFileSelection(String file, {String? gitlabUrl, String? remotePath, int? scrollToLine}) async {
     final isImg = file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg') || file.endsWith('.webp') || file.endsWith('.gif');
     
+    _typingTimer?.cancel();
     setState(() {
       if (!_openBuffers.contains(file)) {
         _openBuffers.add(file);
@@ -108,6 +137,7 @@ class _DevViewState extends ConsumerState<DevView> {
       _remoteContent = null;
       _imageUrl = null;
       _isImage = isImg;
+      _typingContent = null;
     });
 
     if (gitlabUrl != null && remotePath != null) {
@@ -143,7 +173,20 @@ class _DevViewState extends ConsumerState<DevView> {
           }
         }
       }
+    } else if (_localFiles.contains(file)) {
+      _startTypewriter(_getLocalRawContent(file));
     }
+  }
+
+  String _getLocalRawContent(String file) {
+     return switch (file) {
+      'README.md' => portfolio.summary,
+      'SKILLS.sh' => portfolio.skills.map((c) => '# ${c.categoryName}\n${c.skills.map((s) => "add_skill \"${s.name}\"").join("\n")}').join('\n\n'),
+      'PROJECTS.json' => portfolio.projects.map((p) => '{\n  "title": "${p.title}",\n  "desc": "${p.description}"\n}').join(',\n'),
+      'EXPERIENCE.log' => portfolio.experiences.map((e) => '[${e.period}] ${e.role} at ${e.company}').join('\n'),
+      'CONTACT.cfg' => 'email = "${portfolio.email}"\navailable = true',
+      _ => '',
+    };
   }
 
   void _closeBuffer(int index) {
@@ -188,6 +231,8 @@ class _DevViewState extends ConsumerState<DevView> {
     String content = '';
     if (_remoteContent != null) {
       content = _remoteContent!;
+    } else if (_typingContent != null) {
+      content = _typingContent!;
     } else {
       content = _getMarkdownString(_currentFile);
     }
@@ -396,10 +441,16 @@ class _DevViewState extends ConsumerState<DevView> {
     if (_isLoading && _remoteContent == null) {
       return [LineData(span: const TextSpan(text: '// Communicating with Contribution API...', style: TextStyle(color: gruberQuartz)))];
     }
-    if (_remoteContent != null) {
+    
+    String? contentToRender = _remoteContent;
+    if (_typingContent != null) {
+      contentToRender = _typingContent!.substring(0, _visibleChars);
+    }
+
+    if (contentToRender != null) {
       final ext = buffer.split('.').last.toLowerCase();
       return switch (ext) {
-        'dart' => _DartHighlighter.highlight(_remoteContent!, onSymbolClick: (symbol) async {
+        'dart' => _DartHighlighter.highlight(contentToRender, onSymbolClick: (symbol) async {
             debugPrint('JTD: Tapped symbol $symbol in $buffer');
             final gitlabUrl = _findGitlabUrlForPath(buffer);
             if (gitlabUrl != null) {
@@ -415,15 +466,15 @@ class _DevViewState extends ConsumerState<DevView> {
               }
             }
           }),
-        'rs' => _RustHighlighter.highlight(_remoteContent!),
-        'js' || 'ts' => _JavascriptHighlighter.highlight(_remoteContent!),
-        'html' || 'htm' => _HtmlHighlighter.highlight(_remoteContent!),
-        'css' => _CssHighlighter.highlight(_remoteContent!),
-        'sh' || 'bash' => _BashHighlighter.highlight(_remoteContent!),
-        'yaml' || 'yml' => _YamlHighlighter.highlight(_remoteContent!),
-        'toml' => _TomlHighlighter.highlight(_remoteContent!),
-        'bat' || 'cmd' => _BatchHighlighter.highlight(_remoteContent!),
-        _ => _remoteContent!.split('\n').map((l) => LineData(span: TextSpan(text: l, style: TextStyle(color: _getRemoteStyle(buffer))))).toList(),
+        'rs' => _RustHighlighter.highlight(contentToRender),
+        'js' || 'ts' => _JavascriptHighlighter.highlight(contentToRender),
+        'html' || 'htm' => _HtmlHighlighter.highlight(contentToRender),
+        'css' => _CssHighlighter.highlight(contentToRender),
+        'sh' || 'bash' => _BashHighlighter.highlight(contentToRender),
+        'yaml' || 'yml' => _YamlHighlighter.highlight(contentToRender),
+        'toml' => _TomlHighlighter.highlight(contentToRender),
+        'bat' || 'cmd' => _BatchHighlighter.highlight(contentToRender),
+        _ => contentToRender.split('\n').map((l) => LineData(span: TextSpan(text: l, style: TextStyle(color: _getRemoteStyle(buffer))))).toList(),
       };
     }
     return switch (buffer) {
