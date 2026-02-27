@@ -188,6 +188,11 @@
 
     let activeDownloads = 0;
     let globalSpeed = 0;
+    
+    // Boot tracking
+    const bootStartTime = performance.now();
+    let engineBootInterval = null;
+    let isDownloading = false;
 
     function formatBytes(bytes, decimals = 2) {
       if (bytes === 0) return '0 B';
@@ -196,6 +201,16 @@
       const sizes = ['B', 'KB', 'MB', 'GB'];
       const i = Math.floor(Math.log(bytes) / Math.log(k));
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    function startEngineBootTimer() {
+      if (engineBootInterval) return;
+      const engineStartTime = performance.now();
+      
+      engineBootInterval = setInterval(() => {
+        const elapsed = (performance.now() - engineStartTime) / 1000;
+        metricsText.innerHTML = `Booting: ${elapsed.toFixed(1)}s elapsed`;
+      }, 100);
     }
 
     window.fetch = async function (...args) {
@@ -209,6 +224,7 @@
         const contentLength = response.headers.get('content-length');
         if (contentLength) {
           activeDownloads++;
+          isDownloading = true;
           const total = parseInt(contentLength, 10);
           let loaded = 0;
           const startTime = performance.now();
@@ -221,8 +237,9 @@
                 if (done) {
                   activeDownloads--;
                   if (activeDownloads === 0) {
-                    metricsText.innerHTML = `[OK] Download complete`;
-                    statusText.innerHTML = `Booting engine...<span class="cursor"></span>`;
+                    isDownloading = false;
+                    statusText.innerHTML = `Initializing framework...<span class="cursor"></span>`;
+                    startEngineBootTimer();
                   }
                   break;
                 }
@@ -280,9 +297,15 @@
 
     // Wait for Flutter to be ready
     window.addEventListener('flutter-first-frame', () => {
-      metricsText.innerHTML = `[OK] Engine running`;
+      if (engineBootInterval) {
+        clearInterval(engineBootInterval);
+      }
+      
+      const totalBootTime = (performance.now() - bootStartTime) / 1000;
+      metricsText.innerHTML = `[OK] TTI: ${totalBootTime.toFixed(2)}s`;
       statusText.innerHTML = `Rendering view...<span class="cursor"></span>`;
-      setTimeout(hideLoadingScreen, 200); // Give a tiny delay for visual smoothness
+      
+      setTimeout(hideLoadingScreen, 400); // Give a tiny delay so user can read the final time
     });
 
     // Fallback: hide loading screen after a reasonable timeout
