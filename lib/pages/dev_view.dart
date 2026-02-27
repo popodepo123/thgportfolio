@@ -476,7 +476,60 @@ class _DevViewState extends State<DevView> {
               color: gruberBg,
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final bool shouldShowPicker = !_isZenMode && _isPickerOpen && constraints.maxWidth >= 800;
+                  if (constraints.maxWidth < 800) {
+                     return Scaffold(
+                       backgroundColor: gruberBg,
+                       appBar: AppBar(
+                         backgroundColor: gruberBgDarker,
+                         title: Text(_currentFile, style: const TextStyle(color: gruberYellow, fontFamily: _terminalFontFamily, fontSize: 14)),
+                         iconTheme: const IconThemeData(color: gruberFg),
+                         actions: [
+                            IconButton(
+                               icon: const Icon(Icons.exit_to_app, color: gruberRed),
+                               tooltip: 'Exit Dev View',
+                               onPressed: () { portfolioViewNotifier.value = PortfolioView.professional; },
+                            ),
+                         ],
+                       ),
+                       drawer: Drawer(
+                         backgroundColor: gruberBgDarker,
+                         child: _HelixPicker(
+                            localFiles: _localFiles,
+                            selectedFile: _currentFile,
+                            expandedPaths: _expandedPaths,
+                            childrenCache: _childrenCache,
+                            onFileSelected: (f, {gitlabUrl, remotePath, scrollToLine}) {
+                               _handleFileSelection(f, gitlabUrl: gitlabUrl, remotePath: remotePath, scrollToLine: scrollToLine);
+                               Navigator.of(context).pop();
+                            },
+                            onPathToggle: _togglePath,
+                         ),
+                       ),
+                       body: Stack(
+                         children: [
+                            _isImage && _imageUrl != null
+                                ? _buildImageBuffer()
+                                : (_isPreviewMode && _currentFile.endsWith('.md'))
+                                    ? _buildMarkdownPreview()
+                                    : _HelixBuffer(
+                                        fileName: _currentFile,
+                                        isLoading: _isLoading,
+                                        lines: _getBufferLines(_currentFile),
+                                        scrollController: _scrollController,
+                                        wrapText: true, // Auto-wrap on mobile
+                                      ),
+                            if (_currentFile.endsWith('.md'))
+                              Positioned(
+                                top: 16,
+                                right: 16,
+                                child: _buildPreviewToggle(),
+                              ),
+                         ],
+                       ),
+                     );
+                  }
+
+                  final bool shouldShowPicker = !_isZenMode && _isPickerOpen;
                   
                   return Column(
                     children: [
@@ -484,13 +537,16 @@ class _DevViewState extends State<DevView> {
                         child: Row(
                           children: [
                             if (shouldShowPicker)
-                              _HelixPicker(
-                                localFiles: _localFiles,
-                                selectedFile: _currentFile,
-                                expandedPaths: _expandedPaths,
-                                childrenCache: _childrenCache,
-                                onFileSelected: _handleFileSelection,
-                                onPathToggle: _togglePath,
+                              SizedBox(
+                                width: 280,
+                                child: _HelixPicker(
+                                  localFiles: _localFiles,
+                                  selectedFile: _currentFile,
+                                  expandedPaths: _expandedPaths,
+                                  childrenCache: _childrenCache,
+                                  onFileSelected: _handleFileSelection,
+                                  onPathToggle: _togglePath,
+                                ),
                               ),
                             Expanded(
                               child: Column(
@@ -897,7 +953,6 @@ class _HelixPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 280,
       decoration: const BoxDecoration(color: gruberBgDarker, border: Border(right: BorderSide(color: gruberBgLighter, width: 1))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
