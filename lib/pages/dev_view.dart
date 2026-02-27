@@ -48,6 +48,7 @@ class _DevViewState extends State<DevView> {
   bool _isMatrixMode = false;
   bool _isZenMode = false;
   bool _isHexMode = false;
+  bool _showBlame = false;
 
   // Visual Mode
   bool _isVisualMode = false;
@@ -294,6 +295,8 @@ class _DevViewState extends State<DevView> {
       setState(() => _isZenMode = !_isZenMode);
     } else if (trimmed == 'hex') {
       setState(() => _isHexMode = !_isHexMode);
+    } else if (trimmed == 'blame') {
+      setState(() => _showBlame = !_showBlame);
     }
     
     setState(() {
@@ -517,6 +520,7 @@ class _DevViewState extends State<DevView> {
                                         lines: _getBufferLines(_currentFile),
                                         scrollController: _scrollController,
                                         wrapText: true, // Auto-wrap on mobile
+                                        showBlame: _showBlame,
                                       ),
                             if (_currentFile.endsWith('.md'))
                               Positioned(
@@ -584,6 +588,7 @@ class _DevViewState extends State<DevView> {
                                                           highlightCursorLine: _cursorLine,
                                                           isVisualMode: _isVisualMode,
                                                           visualAnchorLine: _visualAnchorLine,
+                                                          showBlame: _showBlame,
                                                         ),
                                                       )
                                                     : _HelixBuffer(
@@ -597,6 +602,7 @@ class _DevViewState extends State<DevView> {
                                                         highlightCursorLine: _cursorLine,
                                                         isVisualMode: _isVisualMode,
                                                         visualAnchorLine: _visualAnchorLine,
+                                                        showBlame: _showBlame,
                                                       )),
                                         if (_currentFile.endsWith('.md'))
                                           Positioned(
@@ -799,6 +805,7 @@ class _DevViewState extends State<DevView> {
         'yaml' || 'yml' => _YamlHighlighter.highlight(contentToRender, searchQuery: _searchQuery),
         'toml' => _TomlHighlighter.highlight(contentToRender, searchQuery: _searchQuery),
         'bat' || 'cmd' => _BatchHighlighter.highlight(contentToRender, searchQuery: _searchQuery),
+        'md' => _MarkdownHighlighter.highlight(contentToRender, searchQuery: _searchQuery),
         _ => _GenericHighlighter.highlightPlain(contentToRender, _getRemoteStyle(buffer), searchQuery: _searchQuery),
       };
     }
@@ -813,7 +820,7 @@ class _DevViewState extends State<DevView> {
 
     // For local non-remote content (simulated via hardcoded methods) we'll use a basic search wrapper
     final baseLines = switch (buffer) {
-      'README.md' => _MarkdownContent.getLines(),
+      'README.md' => _MarkdownHighlighter.highlight(_getLocalRawContent(buffer), searchQuery: _searchQuery),
       'SKILLS.sh' => _ShellContent.getLines(),
       'PROJECTS.json' => _JsonContent.getLines(),
       'EXPERIENCE.log' => _LogContent.getLines(),
@@ -1046,6 +1053,7 @@ class _HelixBuffer extends StatelessWidget {
   final bool highlightCursorLine;
   final bool isVisualMode;
   final int visualAnchorLine;
+  final bool showBlame;
   
   const _HelixBuffer({
     required this.fileName,
@@ -1058,7 +1066,22 @@ class _HelixBuffer extends StatelessWidget {
     this.highlightCursorLine = true,
     this.isVisualMode = false,
     this.visualAnchorLine = -1,
+    this.showBlame = false,
   });
+
+  String _getPseudoBlame(int lineNum) {
+    // Generate a consistent but pseudo-random string based on the line number and file name
+    final hash = (fileName.hashCode ^ lineNum).abs();
+    final authors = ['Tristan', 'Tristan', 'Tristan', 'harvey']; // Mostly you
+    final times = ['2d ago', '1w ago', '3mo ago', '1y ago', 'just now'];
+    final author = authors[hash % authors.length];
+    final time = times[(hash >> 2) % times.length];
+    // Only show blame on some lines to make it look like contiguous commits
+    if (hash % 5 == 0 || lineNum == 1) {
+       return '$author • $time'.padRight(18);
+    }
+    return ''.padRight(18);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1124,6 +1147,13 @@ class _HelixBuffer extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        if (showBlame)
+                          SelectionContainer.disabled(
+                            child: SizedBox(
+                              width: 120, 
+                              child: Text(_getPseudoBlame(actualLineNum), style: TextStyle(color: gruberQuartz.withValues(alpha: 0.6), fontFamily: _terminalFontFamily, fontSize: 11), overflow: TextOverflow.clip, softWrap: false),
+                            ),
+                          ),
                         SelectionContainer.disabled(
                           child: SizedBox(width: 40, child: Text(displayNum.padLeft(3), style: TextStyle(color: numColor, fontFamily: _terminalFontFamily, fontSize: 13))),
                         ),
@@ -1328,26 +1358,67 @@ class _CRTOverlayState extends State<_CRTOverlay> with SingleTickerProviderState
 
 // --- Content Data Providers ---
 
-class _MarkdownContent {
-  static List<LineData> getLines() {
+class _MarkdownHighlighter {
+  static List<LineData> highlight(String code, {String searchQuery = ''}) {
     final List<LineData> lines = [];
-    lines.add(LineData(span: const TextSpan(text: '# README.md', style: TextStyle(color: gruberNiagara, fontWeight: FontWeight.bold))));
-    lines.add(LineData(span: const TextSpan(text: '')));
-    lines.add(LineData(span: TextSpan(text: '## ${portfolio.name}', style: const TextStyle(color: gruberYellow))));
-    lines.add(LineData(span: TextSpan(text: '> ${portfolio.title}', style: const TextStyle(color: gruberBrown))));
-    lines.add(LineData(span: const TextSpan(text: '')));
-    final words = portfolio.summary.split(' ');
-    String current = '';
-    for (var w in words) {
-      if ((current + w).length > 60) {
-        lines.add(LineData(span: TextSpan(text: current.trim(), style: const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic))));
-        current = '$w ';
+    for (var line in code.split('\n')) {
+      final List<TextSpan> spans = [];
+      final trimmed = line.trim();
+      
+      if (trimmed.startsWith('#')) {
+        // Headings
+        spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberNiagara, fontWeight: FontWeight.bold), searchQuery));
+      } else if (trimmed.startsWith('>')) {
+        // Blockquotes
+        spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberBrown, fontStyle: FontStyle.italic), searchQuery));
+      } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        // Unordered lists
+        final dashIndex = line.indexOf(trimmed.substring(0, 2));
+        if (dashIndex != -1) {
+           spans.add(TextSpan(text: line.substring(0, dashIndex), style: const TextStyle(color: gruberFg)));
+           spans.add(const TextSpan(text: '• ', style: TextStyle(color: gruberYellow, fontWeight: FontWeight.bold)));
+           spans.add(_GenericHighlighter.highlightSearchInText(line.substring(dashIndex + 2), const TextStyle(color: gruberFg), searchQuery));
+        } else {
+           spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberFg), searchQuery));
+        }
+      } else if (trimmed.startsWith('```')) {
+        // Code block backticks
+        spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberQuartz), searchQuery));
       } else {
-        current = '$current$w ';
+        // Parse inline backticks for code `something`
+        final parts = line.split('`');
+        for (int i = 0; i < parts.length; i++) {
+           if (i % 2 == 1) {
+              // Inside backticks
+              spans.add(_GenericHighlighter.highlightSearchInText('`${parts[i]}`', const TextStyle(color: gruberGreen), searchQuery));
+           } else {
+              // Parse links [name](url)
+              final linkPattern = RegExp(r'\[([^\]]+)\]\(([^\)]+)\)');
+              final linkMatches = linkPattern.allMatches(parts[i]);
+              if (linkMatches.isEmpty) {
+                 spans.add(_GenericHighlighter.highlightSearchInText(parts[i], const TextStyle(color: gruberFg), searchQuery));
+              } else {
+                 int lastMatchEnd = 0;
+                 for (var m in linkMatches) {
+                    if (m.start > lastMatchEnd) {
+                       spans.add(_GenericHighlighter.highlightSearchInText(parts[i].substring(lastMatchEnd, m.start), const TextStyle(color: gruberFg), searchQuery));
+                    }
+                    spans.add(const TextSpan(text: '[', style: TextStyle(color: gruberQuartz)));
+                    spans.add(_GenericHighlighter.highlightSearchInText(m.group(1)!, const TextStyle(color: gruberYellow, decoration: TextDecoration.underline), searchQuery));
+                    spans.add(const TextSpan(text: ']', style: TextStyle(color: gruberQuartz)));
+                    spans.add(const TextSpan(text: '(', style: TextStyle(color: gruberQuartz)));
+                    spans.add(TextSpan(text: m.group(2), style: const TextStyle(color: gruberWisteria, fontSize: 12)));
+                    spans.add(const TextSpan(text: ')', style: TextStyle(color: gruberQuartz)));
+                    lastMatchEnd = m.end;
+                 }
+                 if (lastMatchEnd < parts[i].length) {
+                    spans.add(_GenericHighlighter.highlightSearchInText(parts[i].substring(lastMatchEnd), const TextStyle(color: gruberFg), searchQuery));
+                 }
+              }
+           }
+        }
       }
-    }
-    if (current.isNotEmpty) {
-      lines.add(LineData(span: TextSpan(text: current.trim(), style: const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic))));
+      lines.add(LineData(span: TextSpan(children: spans)));
     }
     return lines;
   }
