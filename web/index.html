@@ -175,11 +175,95 @@
   <div id="loading-screen">
     <div class="loading-content">
       <div class="boot-text">➜ Initializing system...</div>
-      <div class="status-text">Loading components...<span class="cursor"></span></div>
+      <div class="status-text" id="status-text">Loading components...<span class="cursor"></span></div>
+      <div class="metrics-text" id="metrics-text" style="color: #95A99F; font-size: 0.8rem; margin-top: 8px; min-height: 1.2rem;"></div>
     </div>
   </div>
 
   <script>
+    // Intercept fetch to track download progress of large WASM/JS files
+    const originalFetch = window.fetch;
+    const statusText = document.getElementById('status-text');
+    const metricsText = document.getElementById('metrics-text');
+
+    let activeDownloads = 0;
+    let globalSpeed = 0;
+
+    function formatBytes(bytes, decimals = 2) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    window.fetch = async function (...args) {
+      const url = args[0] instanceof Request ? args[0].url : args[0];
+      const response = await originalFetch.apply(this, args);
+      
+      if (!response.body) return response;
+
+      // Only track major flutter web assets
+      if (url.includes('.wasm') || url.includes('.js') || url.includes('.bin')) {
+        const contentLength = response.headers.get('content-length');
+        if (contentLength) {
+          activeDownloads++;
+          const total = parseInt(contentLength, 10);
+          let loaded = 0;
+          const startTime = performance.now();
+
+          const reader = response.body.getReader();
+          const stream = new ReadableStream({
+            async start(controller) {
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) {
+                  activeDownloads--;
+                  if (activeDownloads === 0) {
+                    metricsText.innerHTML = `[OK] Download complete`;
+                    statusText.innerHTML = `Booting engine...<span class="cursor"></span>`;
+                  }
+                  break;
+                }
+                loaded += value.byteLength;
+                
+                const now = performance.now();
+                const duration = (now - startTime) / 1000;
+                
+                if (duration > 0.1) { // Update after 100ms
+                  const speed = loaded / duration; // bytes per second
+                  const remainingBytes = total - loaded;
+                  const etaSeconds = remainingBytes / speed;
+                  
+                  const speedStr = formatBytes(speed) + '/s';
+                  const loadedStr = formatBytes(loaded);
+                  const totalStr = formatBytes(total);
+                  const pct = Math.round((loaded / total) * 100);
+                  
+                  const filename = url.split('/').pop().split('?')[0];
+                  
+                  statusText.innerHTML = `Downloading ${filename} [${pct}%]<span class="cursor"></span>`;
+                  metricsText.innerHTML = `Speed: ${speedStr} | ETA: ${etaSeconds.toFixed(1)}s | Size: ${loadedStr} / ${totalStr}`;
+                }
+
+                controller.enqueue(value);
+              }
+              controller.close();
+              reader.releaseLock();
+            }
+          });
+
+          return new Response(stream, {
+            headers: response.headers,
+            status: response.status,
+            statusText: response.statusText,
+          });
+        }
+      }
+      return response;
+    };
+
     // Function to hide loading screen with fade effect
     function hideLoadingScreen() {
       const loadingScreen = document.getElementById('loading-screen');
@@ -196,7 +280,9 @@
 
     // Wait for Flutter to be ready
     window.addEventListener('flutter-first-frame', () => {
-      hideLoadingScreen();
+      metricsText.innerHTML = `[OK] Engine running`;
+      statusText.innerHTML = `Rendering view...<span class="cursor"></span>`;
+      setTimeout(hideLoadingScreen, 200); // Give a tiny delay for visual smoothness
     });
 
     // Fallback: hide loading screen after a reasonable timeout
@@ -205,7 +291,7 @@
       if (loadingScreen && !loadingScreen.classList.contains('fade-out')) {
         hideLoadingScreen();
       }
-    }, 8000); // 8 second fallback
+    }, 15000); // 15 second fallback to allow for longer downloads
   </script>
 
   <script src="flutter_bootstrap.js" async></script>
