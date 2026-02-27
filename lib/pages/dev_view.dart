@@ -434,6 +434,62 @@ class _DevViewState extends State<DevView> {
                 return KeyEventResult.handled;
               }
               
+              if (event.logicalKey == LogicalKeyboardKey.keyW) {
+                setState(() {
+                  final text = lines[_cursorRow].span.toPlainText();
+                  // Find next word start in current line
+                  int nextCol = -1;
+                  final regExp = RegExp(r'\w+');
+                  final matches = regExp.allMatches(text);
+                  for (final m in matches) {
+                    if (m.start > _cursorCol) {
+                      nextCol = m.start;
+                      break;
+                    }
+                  }
+
+                  if (nextCol != -1) {
+                    _cursorCol = nextCol;
+                  } else if (_cursorRow < lines.length - 1) {
+                    // Wrap to next line
+                    _cursorRow++;
+                    final nextText = lines[_cursorRow].span.toPlainText();
+                    final firstMatch = regExp.firstMatch(nextText);
+                    _cursorCol = firstMatch?.start ?? 0;
+                  }
+                });
+                _syncScroll();
+                return KeyEventResult.handled;
+              }
+
+              if (event.logicalKey == LogicalKeyboardKey.keyB) {
+                setState(() {
+                  final text = lines[_cursorRow].span.toPlainText();
+                  // Find previous word start in current line
+                  int prevCol = -1;
+                  final regExp = RegExp(r'\w+');
+                  final matches = regExp.allMatches(text).toList();
+                  for (final m in matches.reversed) {
+                    if (m.start < _cursorCol) {
+                      prevCol = m.start;
+                      break;
+                    }
+                  }
+
+                  if (prevCol != -1) {
+                    _cursorCol = prevCol;
+                  } else if (_cursorRow > 0) {
+                    // Wrap to previous line
+                    _cursorRow--;
+                    final prevText = lines[_cursorRow].span.toPlainText();
+                    final lastMatch = regExp.allMatches(prevText).lastOrNull;
+                    _cursorCol = lastMatch?.start ?? 0;
+                  }
+                });
+                _syncScroll();
+                return KeyEventResult.handled;
+              }
+
               if (event.logicalKey == LogicalKeyboardKey.keyG) {
                 setState(() {
                   _cursorRow = HardwareKeyboard.instance.isShiftPressed ? lines.length - 1 : 0;
