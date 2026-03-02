@@ -54,6 +54,7 @@ class Project {
   final String? appstoreLink;
   final String? githubLink;
   final String? gitlabLink;
+  final String? webLink;
   final List<String> features;
   final List<ProjectImage>? images;
 
@@ -62,6 +63,7 @@ class Project {
     this.appstoreLink,
     this.githubLink,
     this.gitlabLink,
+    this.webLink,
     required this.title,
     required this.description,
     required this.features,
@@ -298,6 +300,34 @@ final portfolio = PortfolioData(
     ),
   ],
   projects: [
+    Project(
+      title: 'KitaKits POS',
+      webLink: 'https://kitakits-pos.web.app/',
+      description:
+          'A modern, secure, and highly efficient Point of Sale (POS) system built with Flutter and Firebase. Designed for store owners with powerful management tools and a simple ordering interface for staff.',
+      features: [
+        'Dual-Mode Authentication: Store Owner (Admin) and Kiosk Staff accounts',
+        'Advanced Security: Root/Jailbreak detection, 2FA (TOTP), Biometric Lock, and Screen Protection',
+        'Store & Item Management: Item registration with barcode support and SKU tracking',
+        'Ordering & Sales: Real-time cart, responsive UI (Mobile/Tablet/Desktop), and Bluetooth thermal printer integration',
+        'Architecture: Feature-First structure with Hooks Riverpod and GoRouter',
+        'Maintenance: Force update system directly from Firestore',
+      ],
+    ),
+    Project(
+      title: 'Lapit: Rent Nearby',
+      webLink: 'https://rentsearch-482010.web.app/',
+      description:
+          'A location-based peer-to-peer rental platform that allows users to find and rent items in their immediate vicinity using an interactive map interface.',
+      features: [
+        'Interactive Map: Real-time discovery of rental items using Google Maps SDK and Places API',
+        'Anonymous Authentication: Low-friction entry for users to browse and interact with the platform',
+        'FSA Architecture: Built using the Flutter Simple Architecture pattern for high maintainability and scalability',
+        'Functional Programming: Robust logic implementation using fpdart (Either, Task, Unit)',
+        'State Management: Manual Riverpod Notifiers and AsyncNotifiers with custom ViewBuilder pattern',
+        'Responsive Design: Optimized for seamless performance across mobile and web platforms',
+      ],
+    ),
     Project(
       appstoreLink:
           'https://apps.apple.com/jp/app/easyorder-selfordersystem/id6446138891?l=en-US',

@@ -93,6 +93,16 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                                   trylaunchUrl(link);
                                 },
                               ),
+                            if (project.webLink != null)
+                              IconButton(
+                                iconSize: 20,
+                                icon: FaIcon(FontAwesomeIcons.globe),
+                                onPressed: () async {
+                                  final link = project.webLink;
+                                  if (link == null) return;
+                                  trylaunchUrl(link);
+                                },
+                              ),
                           ],
                         ),
                       ],
