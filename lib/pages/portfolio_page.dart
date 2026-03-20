@@ -4,7 +4,7 @@ import 'package:thgportfolio/portfolio_data.dart';
 import 'package:thgportfolio/sections/experience_section.dart';
 import 'package:thgportfolio/sections/footer_section.dart';
 import 'package:thgportfolio/sections/hero_section.dart';
-import 'package:thgportfolio/sections/inspirations_section.dart';
+import 'package:thgportfolio/sections/other_me_section.dart';
 import 'package:thgportfolio/sections/projects_section.dart';
 import 'package:thgportfolio/sections/skills_section.dart';
 import 'package:thgportfolio/theme.dart';
@@ -141,7 +141,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                               SkillsSection(key: skillsSectionKey),
                               ProjectsSection(key: projectsSectionKey),
                               ExperienceSection(key: experienceSectionKey),
-                              InspirationsSection(key: inspirationsSectionKey),
+                              OtherMeSection(key: otherMeSectionKey),
                               FooterSection(key: footerSectionKey),
                             ],
                           ),
@@ -172,7 +172,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                         SkillsSection(key: skillsSectionKey),
                         ProjectsSection(key: projectsSectionKey),
                         ExperienceSection(key: experienceSectionKey),
-                        InspirationsSection(key: inspirationsSectionKey),
+                        OtherMeSection(key: otherMeSectionKey),
                         FooterSection(key: footerSectionKey),
                       ],
                     ),

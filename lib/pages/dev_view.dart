@@ -72,7 +72,7 @@ class _DevViewState extends State<DevView> {
   final Map<String, List<Map<String, dynamic>>> _childrenCache = {};
   final Set<String> _expandedPaths = {};
 
-  final List<String> _localFiles = ['README.md', 'SKILLS.sh', 'PROJECTS.json', 'EXPERIENCE.log', 'CONTACT.cfg'];
+  final List<String> _localFiles = ['README.md', 'SKILLS.sh', 'PROJECTS.json', 'EXPERIENCE.log', 'OTHER_ME.md', 'CONTACT.cfg'];
 
   @override
   void initState() {
@@ -200,6 +200,7 @@ class _DevViewState extends State<DevView> {
       'SKILLS.sh' => portfolio.skills.map((c) => '# ${c.categoryName}\n${c.skills.map((s) => "add_skill \"${s.name}\"").join("\n")}').join('\n\n'),
       'PROJECTS.json' => portfolio.projects.map((p) => '{\n  "title": "${p.title}",\n  "desc": "${p.description}"\n}').join(',\n'),
       'EXPERIENCE.log' => portfolio.experiences.map((e) => '[${e.period}] ${e.role} at ${e.company}').join('\n'),
+      'OTHER_ME.md' => '# Other things about me\n\n## Hobbies\n${portfolio.hobbies.map((h) => "### ${h.title}\n${h.items.map((i) => "* $i").join("\n")}").join("\n\n")}\n\n## Inspirations\n${portfolio.inspirations.map((i) => "* ${i.name}: ${i.description}").join("\n")}',
       'CONTACT.cfg' => 'email = "${portfolio.email}"\navailable = true',
       _ => '',
     };

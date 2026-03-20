@@ -13,6 +13,7 @@ class PortfolioData {
   final List<Education> education;
   final List<Award> awards;
   final List<Inspiration> inspirations;
+  final List<HobbyCategory> hobbies;
 
   const PortfolioData({
     required this.name,
@@ -27,6 +28,7 @@ class PortfolioData {
     required this.education,
     required this.awards,
     required this.inspirations,
+    required this.hobbies,
   });
 }
 
@@ -42,6 +44,13 @@ class Inspiration {
     this.url,
     this.youtubeHandle,
   });
+}
+
+class HobbyCategory {
+  final String title;
+  final List<String> items;
+
+  const HobbyCategory({required this.title, required this.items});
 }
 
 class SkillDetail {
@@ -156,7 +165,7 @@ final GlobalKey heroSectionKey = GlobalKey();
 final GlobalKey skillsSectionKey = GlobalKey();
 final GlobalKey projectsSectionKey = GlobalKey();
 final GlobalKey experienceSectionKey = GlobalKey();
-final GlobalKey inspirationsSectionKey = GlobalKey();
+final GlobalKey otherMeSectionKey = GlobalKey();
 final GlobalKey footerSectionKey = GlobalKey();
 
 final portfolio = PortfolioData(
@@ -537,6 +546,20 @@ final portfolio = PortfolioData(
           'A sharp, opinionated developer focusing on the modern web ecosystem and AI updates. His focus on "DX" (Developer Experience) and the T3 stack has helped me stay on top of rapid changes in the web and AI landscape.',
       url: 'https://t3.gg/',
       youtubeHandle: '@t3dotgg',
+    ),
+  ],
+  hobbies: [
+    HobbyCategory(
+      title: 'Gaming',
+      items: ['League of Legends (PC)', 'WildRift', 'Valorant', 'Gunz the Duel', 'Dragon Nest'],
+    ),
+    HobbyCategory(
+      title: 'Rhythm Games',
+      items: ['osu! (Mania)', 'Deemo', 'Cytus', 'O2Jam', 'DJMax Respect V'],
+    ),
+    HobbyCategory(
+      title: 'Mobile JRPG & Gacha',
+      items: ['Soccer Spirits', 'Seven Knights Rebirth'],
     ),
   ],
 );

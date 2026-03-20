@@ -9,22 +9,18 @@ class InspirationsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Inspirations', style: textTheme.headlineMedium),
-          const SizedBox(height: 8),
-          Text(
-            'Creators and developers who shape my perspective on engineering and craft.',
-            style: textTheme.bodyMedium?.copyWith(color: gruberQuartz),
-          ),
-          const SizedBox(height: 24),
-          ...portfolio.inspirations.map((inspiration) => _InspirationCard(inspiration: inspiration)),
-          const SizedBox(height: 24),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Inspirations', style: textTheme.titleLarge),
+        const SizedBox(height: 8),
+        Text(
+          'Creators and developers who shape my perspective on engineering and craft.',
+          style: textTheme.bodyMedium?.copyWith(color: gruberQuartz),
+        ),
+        const SizedBox(height: 24),
+        ...portfolio.inspirations.map((inspiration) => _InspirationCard(inspiration: inspiration)),
+      ],
     );
   }
 }
