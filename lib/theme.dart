@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // Gruber Darker Palette
 const gruberBg = Color(0xFF181818);
@@ -16,7 +17,7 @@ const gruberRed = Color(0xFFF43841);
 
 final portfolioTheme = ThemeData(
   brightness: Brightness.dark,
-  fontFamily: 'Iosevka',
+  fontFamily: GoogleFonts.firaCode().fontFamily,
 
   // Color Scheme
   colorScheme: const ColorScheme.dark(
@@ -34,7 +35,7 @@ final portfolioTheme = ThemeData(
   scaffoldBackgroundColor: gruberBgDarker,
 
   // Text Theme
-  textTheme: const TextTheme(
+  textTheme: GoogleFonts.firaCodeTextTheme(const TextTheme(
     displayLarge: TextStyle(
       fontSize: 48,
       fontWeight: FontWeight.bold,
@@ -60,7 +61,7 @@ final portfolioTheme = ThemeData(
       fontWeight: FontWeight.w500,
       color: Colors.black,
     ),
-  ),
+  )),
 
   // Card Theme
   cardTheme: CardThemeData(
