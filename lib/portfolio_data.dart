@@ -35,13 +35,13 @@ class PortfolioData {
 class Inspiration {
   final String name;
   final String description;
-  final String? url;
+  final String? twitchHandle;
   final String? youtubeHandle;
 
   const Inspiration({
     required this.name,
     required this.description,
-    this.url,
+    this.twitchHandle,
     this.youtubeHandle,
   });
 }
@@ -524,35 +524,35 @@ final portfolio = PortfolioData(
       name: 'ThePrimeagen',
       description:
           'A Vim/Neovim enthusiast and Netflix engineer known for his high-energy educational content on development workflow, tooling, and low-level engineering. His focus on "moving fast" and mastering your editor has heavily influenced my approach to developer productivity.',
-      url: 'https://www.theprimeagen.com/',
+      twitchHandle: 'ThePrimeagen',
       youtubeHandle: '@ThePrimeagen',
     ),
     Inspiration(
-      name: 'Tsoding (Alexey Kutepov)',
+      name: 'Tsoding / Tsoding Daily (Alexey Kutepov)',
       description:
           'A legendary low-level programmer who builds everything from scratch—from compilers to game engines. His "painless" approach to complex problems and deep dives into C, assembly, and custom tooling inspire me to understand systems at their most fundamental level.',
-      url: 'https://tsoding.org/',
-      youtubeHandle: '@tsoding',
+      twitchHandle: 'tsoding',
+      youtubeHandle: '@tsodingdaily',
     ),
     Inspiration(
       name: 'Teej (TJ DeVries)',
       description:
           'A Neovim core contributor and Lua enthusiast. His work on Telescope and his deep knowledge of editor internals demonstrate how powerful a highly-tailored development environment can be.',
-      url: 'https://github.com/tjdevries',
+      twitchHandle: 'teej_dv',
       youtubeHandle: '@teejdv',
     ),
     Inspiration(
       name: 'Casey Muratori',
       description:
           'A veteran game developer and performance advocate. His work on Handmade Hero and "Performance-Aware Programming" has taught me the importance of understanding the hardware and writing software that is efficient by design.',
-      url: 'https://handmade.network/',
+      twitchHandle: 'cmuratori',
       youtubeHandle: '@MollyRocket',
     ),
     Inspiration(
       name: 'Theo - t3.gg',
       description:
           'A sharp, opinionated developer focusing on the modern web ecosystem and AI updates. His focus on "DX" (Developer Experience) and the T3 stack has helped me stay on top of rapid changes in the web and AI landscape.',
-      url: 'https://t3.gg/',
+      twitchHandle: 't3dotgg',
       youtubeHandle: '@t3dotgg',
     ),
   ],

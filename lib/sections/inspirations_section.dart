@@ -44,21 +44,37 @@ class _InspirationCard extends StatelessWidget {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                inspiration.name,
-                style: const TextStyle(
-                  color: gruberYellow,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  inspiration.name,
+                  style: const TextStyle(
+                    color: gruberYellow,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              if (inspiration.youtubeHandle != null)
-                _LinkButton(
-                  label: inspiration.youtubeHandle!,
-                  icon: Icons.play_circle_outline,
-                  onTap: () => launchUrl(Uri.parse('https://youtube.com/${inspiration.youtubeHandle}')),
-                ),
+              const SizedBox(width: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (inspiration.twitchHandle != null)
+                    _LinkButton(
+                      label: inspiration.twitchHandle!,
+                      icon: Icons.live_tv,
+                      onTap: () => launchUrl(Uri.parse('https://twitch.tv/${inspiration.twitchHandle}')),
+                    ),
+                  if (inspiration.youtubeHandle != null)
+                    _LinkButton(
+                      label: inspiration.youtubeHandle!,
+                      icon: Icons.play_circle_outline,
+                      onTap: () => launchUrl(Uri.parse('https://youtube.com/${inspiration.youtubeHandle}')),
+                    ),
+                ],
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -70,14 +86,6 @@ class _InspirationCard extends StatelessWidget {
               fontSize: 14,
             ),
           ),
-          if (inspiration.url != null) ...[
-            const SizedBox(height: 16),
-            _LinkButton(
-              label: 'Visit Website',
-              icon: Icons.language,
-              onTap: () => launchUrl(Uri.parse(inspiration.url!)),
-            ),
-          ],
         ],
       ),
     );
