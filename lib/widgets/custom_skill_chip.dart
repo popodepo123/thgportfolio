@@ -6,7 +6,7 @@ import 'package:thgportfolio/widgets/skill_widgets.dart';
 
 class CustomSkillChip extends StatefulWidget {
   final SkillDetail skillDetail;
-  final IconData? icon;
+  final dynamic icon;
   final TextTheme textTheme;
   const CustomSkillChip({
     super.key,
@@ -21,6 +21,25 @@ class CustomSkillChip extends StatefulWidget {
 
 class _CustomSkillChipState extends State<CustomSkillChip> {
   bool _isHovering = false;
+
+  Widget _buildIcon(dynamic iconData, Color color) {
+    if (iconData == null) return const SizedBox.shrink();
+    if (iconData is IconData && iconData.runtimeType.toString() != 'FaIconData') {
+      return Icon(
+        iconData,
+        size: 16,
+        color: color,
+        semanticLabel: widget.skillDetail.name,
+      );
+    } else {
+      return FaIcon(
+        iconData,
+        size: 16,
+        color: color,
+        semanticLabel: widget.skillDetail.name,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,13 +80,11 @@ class _CustomSkillChipState extends State<CustomSkillChip> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (widget.icon != null)
-                  FaIcon(
-                    widget.icon!,
-                    size: 16,
-                    color: _isHovering
+                  _buildIcon(
+                    widget.icon,
+                    _isHovering
                         ? Theme.of(context).colorScheme.onPrimary
                         : Theme.of(context).colorScheme.onSurface,
-                    semanticLabel: widget.skillDetail.name,
                   ),
                 if (widget.icon != null) const SizedBox(width: 8),
                 SelectionContainer.disabled(

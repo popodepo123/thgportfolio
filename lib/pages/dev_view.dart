@@ -13,7 +13,6 @@ import 'dart:convert';
 const double _terminalFontSize = 14.0;
 const String? _terminalFontFamily = null;
 const double _lineHeight = 20.0;
-const double _charWidth = 8.4; // Approximate for monospaced at 14pt
 
 class DevView extends StatefulWidget {
   const DevView({super.key});
@@ -1060,10 +1059,16 @@ class _GenericHighlighter {
       for (var token in _tokenize(text)) {
         final t = token.text; final trimmed = t.trim();
         Color color = gruberFg; FontWeight weight = FontWeight.normal;
-        if (trimmed.startsWith("'") || trimmed.startsWith('"')) color = gruberGreen;
-        else if (keywords.contains(trimmed)) { color = keywordColor; weight = FontWeight.bold; }
-        else if (RegExp(r'^\d+$').hasMatch(trimmed)) color = gruberBrown;
-        else if (RegExp(r'^[A-Z]\w*$').hasMatch(trimmed)) color = gruberNiagara;
+        if (trimmed.startsWith("'") || trimmed.startsWith('"')) {
+          color = gruberGreen;
+        } else if (keywords.contains(trimmed)) {
+          color = keywordColor;
+          weight = FontWeight.bold;
+        } else if (RegExp(r'^\d+$').hasMatch(trimmed)) {
+          color = gruberBrown;
+        } else if (RegExp(r'^[A-Z]\w*$').hasMatch(trimmed)) {
+          color = gruberNiagara;
+        }
         spans.add(highlightSearchInText(t, TextStyle(color: color, fontWeight: weight), searchQuery));
       }
       if (comment.isNotEmpty) spans.add(highlightSearchInText(comment, const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic), searchQuery));
@@ -1089,7 +1094,9 @@ class _GenericHighlighter {
     final List<_Token> tokens = [];
     final pattern = RegExp('("[^"]*"|\'[^\']*\'|\\b[a-zA-Z_]\\w*\\b|\\d+|[^\\s\\w]+|\\s+)');
     final matches = pattern.allMatches(text);
-    for (var match in matches) tokens.add(_Token(match.group(0)!));
+    for (var match in matches) {
+      tokens.add(_Token(match.group(0)!));
+    }
     return tokens;
   }
 }
@@ -1140,10 +1147,13 @@ class _YamlHighlighter {
     final List<LineData> lines = [];
     for (var line in code.split('\n')) {
       final List<TextSpan> spans = [];
-      if (line.trim().startsWith('#')) spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic), searchQuery));
-      else if (line.contains(':')) {
+      if (line.trim().startsWith('#')) {
+        spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic), searchQuery));
+      } else if (line.contains(':')) {
         final p = line.split(':'); spans.add(_GenericHighlighter.highlightSearchInText(p[0], const TextStyle(color: gruberYellow, fontWeight: FontWeight.bold), searchQuery)); spans.add(_GenericHighlighter.highlightSearchInText(':', const TextStyle(color: gruberQuartz), searchQuery)); spans.add(_GenericHighlighter.highlightSearchInText(p.sublist(1).join(':'), const TextStyle(color: gruberFg), searchQuery));
-      } else spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberFg), searchQuery));
+      } else {
+        spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberFg), searchQuery));
+      }
       lines.add(LineData(span: TextSpan(children: spans)));
     }
     return lines;
@@ -1155,11 +1165,15 @@ class _TomlHighlighter {
     final List<LineData> lines = [];
     for (var line in code.split('\n')) {
       final List<TextSpan> spans = []; final trimmed = line.trim();
-      if (trimmed.startsWith('#')) spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic), searchQuery));
-      else if (trimmed.startsWith('[') && trimmed.endsWith(']')) spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberWisteria, fontWeight: FontWeight.bold), searchQuery));
-      else if (line.contains('=')) {
+      if (trimmed.startsWith('#')) {
+        spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberQuartz, fontStyle: FontStyle.italic), searchQuery));
+      } else if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+        spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberWisteria, fontWeight: FontWeight.bold), searchQuery));
+      } else if (line.contains('=')) {
         final p = line.split('='); spans.add(_GenericHighlighter.highlightSearchInText(p[0], const TextStyle(color: gruberYellow), searchQuery)); spans.add(_GenericHighlighter.highlightSearchInText(' = ', const TextStyle(color: gruberQuartz), searchQuery)); spans.add(_GenericHighlighter.highlightSearchInText(p.sublist(1).join('='), const TextStyle(color: gruberGreen), searchQuery));
-      } else spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberFg), searchQuery));
+      } else {
+        spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberFg), searchQuery));
+      }
       lines.add(LineData(span: TextSpan(children: spans)));
     }
     return lines;
@@ -1171,7 +1185,11 @@ class _HtmlHighlighter {
     final List<LineData> lines = [];
     for (var line in code.split('\n')) {
       final List<TextSpan> spans = []; final pattern = RegExp(r'(<[^>]+>)|([^<]+)'); final matches = pattern.allMatches(line);
-      for (var m in matches) { final t = m.group(0)!; if (t.startsWith('<')) spans.add(_GenericHighlighter.highlightSearchInText(t, const TextStyle(color: gruberOrange, fontWeight: FontWeight.bold), searchQuery)); else spans.add(_GenericHighlighter.highlightSearchInText(t, const TextStyle(color: gruberFg), searchQuery)); }
+      for (var m in matches) { final t = m.group(0)!; if (t.startsWith('<')) {
+        spans.add(_GenericHighlighter.highlightSearchInText(t, const TextStyle(color: gruberOrange, fontWeight: FontWeight.bold), searchQuery));
+      } else {
+        spans.add(_GenericHighlighter.highlightSearchInText(t, const TextStyle(color: gruberFg), searchQuery));
+      } }
       lines.add(LineData(span: TextSpan(children: spans)));
     }
     return lines;
@@ -1185,7 +1203,7 @@ class _CssHighlighter {
       final List<TextSpan> spans = [];
       if (line.contains('{')) { final p = line.split('{'); spans.add(_GenericHighlighter.highlightSearchInText(p[0], const TextStyle(color: gruberYellow, fontWeight: FontWeight.bold), searchQuery)); spans.add(_GenericHighlighter.highlightSearchInText(' {', const TextStyle(color: gruberQuartz), searchQuery)); }
       else if (line.contains(':')) { final p = line.split(':'); spans.add(_GenericHighlighter.highlightSearchInText(p[0], const TextStyle(color: gruberNiagara), searchQuery)); spans.add(_GenericHighlighter.highlightSearchInText(': ', const TextStyle(color: gruberQuartz), searchQuery)); spans.add(_GenericHighlighter.highlightSearchInText(p.sublist(1).join(':'), const TextStyle(color: gruberGreen), searchQuery)); }
-      else spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberFg), searchQuery));
+      else { spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberFg), searchQuery)); }
       lines.add(LineData(span: TextSpan(children: spans)));
     }
     return lines;
@@ -1202,20 +1220,27 @@ class _MarkdownHighlighter {
     final List<LineData> lines = [];
     for (var line in code.split('\n')) {
       final List<TextSpan> spans = []; final t = line.trim();
-      if (t.startsWith('#')) spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberNiagara, fontWeight: FontWeight.bold), searchQuery));
-      else if (t.startsWith('>')) spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberBrown, fontStyle: FontStyle.italic), searchQuery));
-      else if (t.startsWith('- ') || t.startsWith('* ')) {
+      if (t.startsWith('#')) {
+        spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberNiagara, fontWeight: FontWeight.bold), searchQuery));
+      } else if (t.startsWith('>')) {
+        spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberBrown, fontStyle: FontStyle.italic), searchQuery));
+      } else if (t.startsWith('- ') || t.startsWith('* ')) {
         final di = line.indexOf(t.substring(0, 2)); if (di != -1) { spans.add(TextSpan(text: line.substring(0, di), style: const TextStyle(color: gruberFg))); spans.add(const TextSpan(text: '• ', style: TextStyle(color: gruberYellow, fontWeight: FontWeight.bold))); spans.add(_GenericHighlighter.highlightSearchInText(line.substring(di + 2), const TextStyle(color: gruberFg), searchQuery)); }
-        else spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberFg), searchQuery));
-      } else if (t.startsWith('```')) spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberQuartz), searchQuery));
-      else {
+        else {
+          spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberFg), searchQuery));
+        }
+      } else if (t.startsWith('```')) {
+        spans.add(_GenericHighlighter.highlightSearchInText(line, const TextStyle(color: gruberQuartz), searchQuery));
+      } else {
         final parts = line.split('`');
         for (int i = 0; i < parts.length; i++) {
-           if (i % 2 == 1) spans.add(_GenericHighlighter.highlightSearchInText('`${parts[i]}`', const TextStyle(color: gruberGreen), searchQuery));
-           else {
+           if (i % 2 == 1) {
+             spans.add(_GenericHighlighter.highlightSearchInText('`${parts[i]}`', const TextStyle(color: gruberGreen), searchQuery));
+           } else {
               final linkPattern = RegExp(r'\[([^\]]+)\]\(([^\)]+)\)'); final linkMatches = linkPattern.allMatches(parts[i]);
-              if (linkMatches.isEmpty) spans.add(_GenericHighlighter.highlightSearchInText(parts[i], const TextStyle(color: gruberFg), searchQuery));
-              else {
+              if (linkMatches.isEmpty) {
+                spans.add(_GenericHighlighter.highlightSearchInText(parts[i], const TextStyle(color: gruberFg), searchQuery));
+              } else {
                  int last = 0;
                  for (var m in linkMatches) {
                     if (m.start > last) spans.add(_GenericHighlighter.highlightSearchInText(parts[i].substring(last, m.start), const TextStyle(color: gruberFg), searchQuery));
@@ -1227,18 +1252,6 @@ class _MarkdownHighlighter {
         }
       }
       lines.add(LineData(span: TextSpan(children: spans)));
-    }
-    return lines;
-  }
-}
-
-class _ShellContent {
-  static List<LineData> getLines() {
-    final List<LineData> lines = [LineData(span: const TextSpan(text: '#!/bin/bash', style: TextStyle(color: gruberQuartz))), LineData(span: const TextSpan(text: ''))];
-    for (var cat in portfolio.skills) {
-      lines.add(LineData(span: TextSpan(text: 'echo "Loading ${cat.categoryName}..."', style: const TextStyle(color: gruberGreen))));
-      for (var s in cat.skills) lines.add(LineData(span: TextSpan(text: '  add_skill "${s.name}"', style: const TextStyle(color: gruberFg))));
-      lines.add(LineData(span: const TextSpan(text: '')));
     }
     return lines;
   }

@@ -1,7 +1,7 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart'; // Added for Icons class
 
-final Map<String, IconData> skillIcons = {
+final Map<String, dynamic> skillIcons = {
   'Dart': Icons.code,
   'Web (Javascript, HTML, CSS)': FontAwesomeIcons.code,
   'Javascript': FontAwesomeIcons.js,
