@@ -64,13 +64,6 @@ class SidePanel extends StatelessWidget {
           MouseRegion(
             cursor: SystemMouseCursors.click,
             child: ListTile(
-              title: Text('Other things about me', style: textTheme.bodyMedium),
-              onTap: () => _scrollToSection(otherMeSectionKey),
-            ),
-          ),
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: ListTile(
               title: Text('Contact', style: textTheme.bodyMedium),
               onTap: () => _scrollToSection(footerSectionKey),
             ),

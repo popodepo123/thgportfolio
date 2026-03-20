@@ -11,8 +11,8 @@ class HobbiesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Hobbies & Interests', style: textTheme.titleLarge),
-        const SizedBox(height: 16),
+        Text('Hobbies & Interests', style: textTheme.headlineMedium),
+        const SizedBox(height: 24),
         ...portfolio.hobbies.map((category) => _HobbyCategoryWidget(category: category)),
       ],
     );
@@ -26,7 +26,7 @@ class _HobbyCategoryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20.0),
+      padding: const EdgeInsets.only(bottom: 32.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -34,15 +34,13 @@ class _HobbyCategoryWidget extends StatelessWidget {
             category.title,
             style: const TextStyle(
               color: gruberNiagara,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: category.items.map((item) => _HobbyChip(item: item)).toList(),
+          const SizedBox(height: 16),
+          Column(
+            children: category.items.map((item) => _HobbyListItem(item: item)).toList(),
           ),
         ],
       ),
@@ -50,60 +48,83 @@ class _HobbyCategoryWidget extends StatelessWidget {
   }
 }
 
-class _HobbyChip extends StatelessWidget {
+class _HobbyListItem extends StatelessWidget {
   final HobbyItem item;
-  const _HobbyChip({required this.item});
+  const _HobbyListItem({required this.item});
 
   @override
   Widget build(BuildContext context) {
-    Widget chipContent = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: gruberBg,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: gruberBgLighter),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (item.imageUrl != null) ...[
             ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(6),
               child: Image.network(
                 item.imageUrl!,
-                height: 18,
-                width: 18,
+                height: 48,
+                width: 48,
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => const Icon(Icons.videogame_asset, size: 14, color: gruberQuartz),
+                errorBuilder: (context, error, stackTrace) => Container(
+                  height: 48,
+                  width: 48,
+                  color: gruberBgDarker,
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.videogame_asset, size: 24, color: gruberQuartz),
+                ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 16),
+          ] else ...[
+             Container(
+               height: 48,
+               width: 48,
+               decoration: BoxDecoration(
+                 color: gruberBgDarker,
+                 borderRadius: BorderRadius.circular(6),
+               ),
+               alignment: Alignment.center,
+               child: const Icon(Icons.star, size: 24, color: gruberQuartz),
+             ),
+             const SizedBox(width: 16),
           ],
-          Text(
-            item.name,
-            style: const TextStyle(
-              color: gruberFg,
-              fontSize: 13,
-              fontFamily: 'Fira Code',
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.name,
+                  style: const TextStyle(
+                    color: gruberYellow,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Fira Code',
+                  ),
+                ),
+                if (item.description != null && item.description!.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    item.description!,
+                    style: const TextStyle(
+                      color: gruberFg,
+                      fontSize: 14,
+                      height: 1.4,
+                    ),
+                  ),
+                ]
+              ],
             ),
           ),
         ],
       ),
     );
-
-    if (item.description != null && item.description!.isNotEmpty) {
-      return Tooltip(
-        message: item.description,
-        textStyle: const TextStyle(color: Colors.black, fontSize: 12),
-        decoration: BoxDecoration(
-          color: gruberYellow,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        waitDuration: const Duration(milliseconds: 300),
-        child: chipContent,
-      );
-    }
-
-    return chipContent;
   }
 }

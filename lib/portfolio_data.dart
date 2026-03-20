@@ -546,7 +546,7 @@ final portfolio = PortfolioData(
       description:
           'A veteran game developer and performance advocate. His work on Handmade Hero and "Performance-Aware Programming" has taught me the importance of understanding the hardware and writing software that is efficient by design.',
       url: 'https://handmade.network/',
-      youtubeHandle: '@cmuratori',
+      youtubeHandle: '@MollyRocket',
     ),
     Inspiration(
       name: 'Theo - t3.gg',

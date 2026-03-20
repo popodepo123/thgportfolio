@@ -20,10 +20,12 @@ class PortfolioPage extends StatefulWidget {
 
 class _PortfolioPageState extends State<PortfolioPage> {
   final ScrollController _scrollController = ScrollController();
+  final ScrollController _otherScrollController = ScrollController();
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _otherScrollController.dispose();
     super.dispose();
   }
 
@@ -43,7 +45,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                     child: child,
                   );
                 },
-                child: _buildView(view),
+                child: _buildView(view, context),
               ),
               // Subtle View Toggle in Bottom Right
               Positioned(
@@ -105,83 +107,134 @@ class _PortfolioPageState extends State<PortfolioPage> {
     );
   }
 
-  Widget _buildView(PortfolioView view) {
+  Widget _buildView(PortfolioView view, BuildContext context) {
     if (view == PortfolioView.dev) {
       return const DevView(key: ValueKey('dev_view'));
     }
     return SelectionArea(
       key: const ValueKey('prof_view'),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth > 768) {
-            // Wide screen layout
-            return Row(
-              children: [
-                // Side Panel
-                SidePanel(scrollController: _scrollController),
-                // Main Content
-                Expanded(
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1000),
-                      child: ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(
-                          context,
-                        ).copyWith(scrollbars: false),
-                        child: SingleChildScrollView(
-                          controller: _scrollController, // Attach controller
-                          physics: const ClampingScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 48,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              HeroSection(key: heroSectionKey),
-                              SkillsSection(key: skillsSectionKey),
-                              ProjectsSection(key: projectsSectionKey),
-                              ExperienceSection(key: experienceSectionKey),
-                              OtherMeSection(key: otherMeSectionKey),
-                              FooterSection(key: footerSectionKey),
-                            ],
-                          ),
+      child: DefaultTabController(
+        length: 2,
+        child: Column(
+          children: [
+            Container(
+               color: gruberBgDarker,
+               child: const TabBar(
+                  indicatorColor: gruberYellow,
+                  labelColor: gruberYellow,
+                  unselectedLabelColor: gruberFg,
+                  tabs: [
+                     Tab(text: 'Professional Work'),
+                     Tab(text: 'Other things about me'),
+                  ],
+               ),
+            ),
+            Expanded(
+              child: TabBarView(
+                 children: [
+                   _buildProfessionalTab(context),
+                   _buildOtherTab(context),
+                 ]
+              )
+            )
+          ]
+        )
+      )
+    );
+  }
+
+  Widget _buildProfessionalTab(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth > 768) {
+          // Wide screen layout
+          return Row(
+            children: [
+              // Side Panel
+              SidePanel(scrollController: _scrollController),
+              // Main Content
+              Expanded(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1000),
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(
+                        context,
+                      ).copyWith(scrollbars: false),
+                      child: SingleChildScrollView(
+                        controller: _scrollController, // Attach controller
+                        physics: const ClampingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 48,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            HeroSection(key: heroSectionKey),
+                            SkillsSection(key: skillsSectionKey),
+                            ProjectsSection(key: projectsSectionKey),
+                            ExperienceSection(key: experienceSectionKey),
+                            FooterSection(key: footerSectionKey),
+                          ],
                         ),
                       ),
                     ),
                   ),
                 ),
-              ],
-            );
-          } else {
-            // Narrow screen layout
-            return Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1000),
-                child: ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(
-                    context,
-                  ).copyWith(scrollbars: false),
-                  child: SingleChildScrollView(
-                    controller: _scrollController, // Attach controller
-                    physics: const ClampingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(vertical: 48),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        HeroSection(key: heroSectionKey),
-                        SkillsSection(key: skillsSectionKey),
-                        ProjectsSection(key: projectsSectionKey),
-                        ExperienceSection(key: experienceSectionKey),
-                        OtherMeSection(key: otherMeSectionKey),
-                        FooterSection(key: footerSectionKey),
-                      ],
-                    ),
+              ),
+            ],
+          );
+        } else {
+          // Narrow screen layout
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1000),
+              child: ScrollConfiguration(
+                behavior: ScrollConfiguration.of(
+                  context,
+                ).copyWith(scrollbars: false),
+                child: SingleChildScrollView(
+                  controller: _scrollController, // Attach controller
+                  physics: const ClampingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(vertical: 48),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      HeroSection(key: heroSectionKey),
+                      SkillsSection(key: skillsSectionKey),
+                      ProjectsSection(key: projectsSectionKey),
+                      ExperienceSection(key: experienceSectionKey),
+                      FooterSection(key: footerSectionKey),
+                    ],
                   ),
                 ),
               ),
-            );
-          }
-        },
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildOtherTab(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1000),
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+          child: SingleChildScrollView(
+            controller: _otherScrollController,
+            physics: const ClampingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(vertical: 48),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                OtherMeSection(),
+                FooterSection(),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
