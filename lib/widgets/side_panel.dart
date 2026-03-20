@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:thgportfolio/pages/portfolio_page.dart';
+import 'package:thgportfolio/portfolio_data.dart';
 
 class SidePanel extends StatelessWidget {
   final ScrollController scrollController;
@@ -59,6 +59,13 @@ class SidePanel extends StatelessWidget {
                 style: textTheme.bodyMedium,
               ),
               onTap: () => _scrollToSection(experienceSectionKey),
+            ),
+          ),
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: ListTile(
+              title: Text('Inspirations', style: textTheme.bodyMedium),
+              onTap: () => _scrollToSection(inspirationsSectionKey),
             ),
           ),
           MouseRegion(

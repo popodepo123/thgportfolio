@@ -12,6 +12,7 @@ class PortfolioData {
   final List<Experience> experiences;
   final List<Education> education;
   final List<Award> awards;
+  final List<Inspiration> inspirations;
 
   const PortfolioData({
     required this.name,
@@ -25,6 +26,21 @@ class PortfolioData {
     required this.experiences,
     required this.education,
     required this.awards,
+    required this.inspirations,
+  });
+}
+
+class Inspiration {
+  final String name;
+  final String description;
+  final String? url;
+  final String? youtubeHandle;
+
+  const Inspiration({
+    required this.name,
+    required this.description,
+    this.url,
+    this.youtubeHandle,
   });
 }
 
@@ -140,6 +156,7 @@ final GlobalKey heroSectionKey = GlobalKey();
 final GlobalKey skillsSectionKey = GlobalKey();
 final GlobalKey projectsSectionKey = GlobalKey();
 final GlobalKey experienceSectionKey = GlobalKey();
+final GlobalKey inspirationsSectionKey = GlobalKey();
 final GlobalKey footerSectionKey = GlobalKey();
 
 final portfolio = PortfolioData(
@@ -483,6 +500,22 @@ final portfolio = PortfolioData(
     Award(
       name: 'PRC Civil Engineering Professional (0176577)',
       issuer: 'Professional Regulation Commission',
+    ),
+  ],
+  inspirations: [
+    Inspiration(
+      name: 'ThePrimeagen',
+      description:
+          'A Vim/Neovim enthusiast and Netflix engineer known for his high-energy educational content on development workflow, tooling, and low-level engineering. His focus on "moving fast" and mastering your editor has heavily influenced my approach to developer productivity.',
+      url: 'https://www.theprimeagen.com/',
+      youtubeHandle: '@ThePrimeagen',
+    ),
+    Inspiration(
+      name: 'Tsoding (Alexey Kutepov)',
+      description:
+          'A legendary low-level programmer who builds everything from scratch—from compilers to game engines. His "painless" approach to complex problems and deep dives into C, assembly, and custom tooling inspire me to understand systems at their most fundamental level.',
+      url: 'https://tsoding.org/',
+      youtubeHandle: '@tsoding',
     ),
   ],
 );

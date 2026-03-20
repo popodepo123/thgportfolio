@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:thgportfolio/pages/dev_view.dart';
+import 'package:thgportfolio/portfolio_data.dart';
 import 'package:thgportfolio/sections/experience_section.dart';
 import 'package:thgportfolio/sections/footer_section.dart';
 import 'package:thgportfolio/sections/hero_section.dart';
+import 'package:thgportfolio/sections/inspirations_section.dart';
 import 'package:thgportfolio/sections/projects_section.dart';
 import 'package:thgportfolio/sections/skills_section.dart';
 import 'package:thgportfolio/theme.dart';
 import 'package:thgportfolio/view_provider.dart';
 import 'package:thgportfolio/widgets/side_panel.dart';
-
-final GlobalKey heroSectionKey = GlobalKey();
-final GlobalKey skillsSectionKey = GlobalKey();
-final GlobalKey projectsSectionKey = GlobalKey();
-final GlobalKey experienceSectionKey = GlobalKey();
-final GlobalKey footerSectionKey = GlobalKey();
 
 class PortfolioPage extends StatefulWidget {
   const PortfolioPage({super.key});
@@ -145,6 +141,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                               SkillsSection(key: skillsSectionKey),
                               ProjectsSection(key: projectsSectionKey),
                               ExperienceSection(key: experienceSectionKey),
+                              InspirationsSection(key: inspirationsSectionKey),
                               FooterSection(key: footerSectionKey),
                             ],
                           ),
@@ -175,6 +172,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                         SkillsSection(key: skillsSectionKey),
                         ProjectsSection(key: projectsSectionKey),
                         ExperienceSection(key: experienceSectionKey),
+                        InspirationsSection(key: inspirationsSectionKey),
                         FooterSection(key: footerSectionKey),
                       ],
                     ),
