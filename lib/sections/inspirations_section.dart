@@ -55,7 +55,6 @@ class _InspirationCard extends StatelessWidget {
                   color: gruberYellow,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'Iosevka',
                 ),
               ),
               if (inspiration.youtubeHandle != null)

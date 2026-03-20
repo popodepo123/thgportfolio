@@ -11,9 +11,9 @@ import 'dart:math' as math;
 import 'dart:convert';
 
 const double _terminalFontSize = 14.0;
-const String _terminalFontFamily = 'Iosevka';
+const String _terminalFontFamily = null;
 const double _lineHeight = 20.0;
-const double _charWidth = 8.4; // Approximate for Iosevka at 14pt
+const double _charWidth = 8.4; // Approximate for monospaced at 14pt
 
 class DevView extends StatefulWidget {
   const DevView({super.key});
