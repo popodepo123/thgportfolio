@@ -42,7 +42,7 @@ class _HobbyCategoryWidget extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: category.items.map((item) => _HobbyChip(label: item)).toList(),
+            children: category.items.map((item) => _HobbyChip(item: item)).toList(),
           ),
         ],
       ),

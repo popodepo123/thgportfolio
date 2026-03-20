@@ -11,7 +11,7 @@ import 'dart:math' as math;
 import 'dart:convert';
 
 const double _terminalFontSize = 14.0;
-const String _terminalFontFamily = null;
+const String? _terminalFontFamily = null;
 const double _lineHeight = 20.0;
 const double _charWidth = 8.4; // Approximate for monospaced at 14pt
 
