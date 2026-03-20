@@ -552,7 +552,7 @@ final portfolio = PortfolioData(
       name: 'Theo - t3.gg',
       description:
           'A sharp, opinionated developer focusing on the modern web ecosystem and AI updates. His focus on "DX" (Developer Experience) and the T3 stack has helped me stay on top of rapid changes in the web and AI landscape.',
-      twitchHandle: 't3dotgg',
+      twitchHandle: 'theo',
       youtubeHandle: '@t3dotgg',
     ),
   ],
