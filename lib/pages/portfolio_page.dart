@@ -9,7 +9,6 @@ import 'package:thgportfolio/sections/projects_section.dart';
 import 'package:thgportfolio/sections/skills_section.dart';
 import 'package:thgportfolio/theme.dart';
 import 'package:thgportfolio/view_provider.dart';
-import 'package:thgportfolio/widgets/side_panel.dart';
 
 class PortfolioPage extends StatefulWidget {
   const PortfolioPage({super.key});
@@ -120,12 +119,24 @@ class _PortfolioPageState extends State<PortfolioPage> {
             Container(
                color: gruberBgDarker,
                child: const TabBar(
+                  dividerColor: Colors.transparent,
                   indicatorColor: gruberYellow,
+                  indicatorSize: TabBarIndicatorSize.label,
                   labelColor: gruberYellow,
                   unselectedLabelColor: gruberFg,
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    fontFamily: 'Fira Code',
+                  ),
+                  unselectedLabelStyle: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 14,
+                    fontFamily: 'Fira Code',
+                  ),
                   tabs: [
-                     Tab(text: 'Professional Work'),
-                     Tab(text: 'Other things about me'),
+                     Tab(text: 'PROFESSIONAL_WORK'),
+                     Tab(text: 'OTHER_ME'),
                   ],
                ),
             ),
@@ -144,75 +155,28 @@ class _PortfolioPageState extends State<PortfolioPage> {
   }
 
   Widget _buildProfessionalTab(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth > 768) {
-          // Wide screen layout
-          return Row(
-            children: [
-              // Side Panel
-              SidePanel(scrollController: _scrollController),
-              // Main Content
-              Expanded(
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1000),
-                    child: ScrollConfiguration(
-                      behavior: ScrollConfiguration.of(
-                        context,
-                      ).copyWith(scrollbars: false),
-                      child: SingleChildScrollView(
-                        controller: _scrollController, // Attach controller
-                        physics: const ClampingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 48,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            HeroSection(key: heroSectionKey),
-                            SkillsSection(key: skillsSectionKey),
-                            ProjectsSection(key: projectsSectionKey),
-                            ExperienceSection(key: experienceSectionKey),
-                            FooterSection(key: footerSectionKey),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
-        } else {
-          // Narrow screen layout
-          return Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1000),
-              child: ScrollConfiguration(
-                behavior: ScrollConfiguration.of(
-                  context,
-                ).copyWith(scrollbars: false),
-                child: SingleChildScrollView(
-                  controller: _scrollController, // Attach controller
-                  physics: const ClampingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(vertical: 48),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      HeroSection(key: heroSectionKey),
-                      SkillsSection(key: skillsSectionKey),
-                      ProjectsSection(key: projectsSectionKey),
-                      ExperienceSection(key: experienceSectionKey),
-                      FooterSection(key: footerSectionKey),
-                    ],
-                  ),
-                ),
-              ),
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1000),
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            physics: const ClampingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(vertical: 48),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HeroSection(key: heroSectionKey),
+                SkillsSection(key: skillsSectionKey),
+                ProjectsSection(key: projectsSectionKey),
+                ExperienceSection(key: experienceSectionKey),
+                FooterSection(key: footerSectionKey),
+              ],
             ),
-          );
-        }
-      },
+          ),
+        ),
+      ),
     );
   }
 
