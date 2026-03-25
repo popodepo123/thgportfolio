@@ -39,19 +39,12 @@ class _PortfolioPageState extends State<PortfolioPage> {
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 600),
                 transitionBuilder: (Widget child, Animation<double> animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  );
+                  return FadeTransition(opacity: animation, child: child);
                 },
                 child: _buildView(view, context),
               ),
               // Subtle View Toggle in Bottom Right
-              Positioned(
-                bottom: 16,
-                right: 16,
-                child: _buildModeToggle(view),
-              ),
+              Positioned(bottom: 16, right: 16, child: _buildModeToggle(view)),
             ],
           );
         },
@@ -65,7 +58,9 @@ class _PortfolioPageState extends State<PortfolioPage> {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () {
-          portfolioViewNotifier.value = isDev ? PortfolioView.professional : PortfolioView.dev;
+          portfolioViewNotifier.value = isDev
+              ? PortfolioView.professional
+              : PortfolioView.dev;
         },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -106,6 +101,50 @@ class _PortfolioPageState extends State<PortfolioPage> {
     );
   }
 
+  Widget _buildTabHeader(int index, String label, BuildContext context) {
+    final tabController = DefaultTabController.of(context);
+    return ListenableBuilder(
+      listenable: tabController,
+      builder: (context, child) {
+        final isSelected = tabController.index == index;
+        return MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: () => tabController.animateTo(index),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: isSelected ? gruberYellow : gruberFg,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      fontSize: 14,
+                      fontFamily: "Fira Code",
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    height: 2,
+                    width: label.length * 8.0,
+                    decoration: BoxDecoration(
+                      color: isSelected ? gruberYellow : Colors.transparent,
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildView(PortfolioView view, BuildContext context) {
     if (view == PortfolioView.dev) {
       return const DevView(key: ValueKey('dev_view'));
@@ -117,40 +156,27 @@ class _PortfolioPageState extends State<PortfolioPage> {
         child: Column(
           children: [
             Container(
-               color: gruberBgDarker,
-               child: const TabBar(
-                  dividerColor: Colors.transparent,
-                  indicatorColor: gruberYellow,
-                  indicatorSize: TabBarIndicatorSize.label,
-                  labelColor: gruberYellow,
-                  unselectedLabelColor: gruberFg,
-                  labelStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    fontFamily: 'Fira Code',
-                  ),
-                  unselectedLabelStyle: TextStyle(
-                    fontWeight: FontWeight.normal,
-                    fontSize: 14,
-                    fontFamily: 'Fira Code',
-                  ),
-                  tabs: [
-                     Tab(text: 'PROFESSIONAL_WORK'),
-                     Tab(text: 'OTHER_ME'),
-                  ],
-               ),
+              color: gruberBgDarker,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              child: Row(
+                children: [
+                  _buildTabHeader(0, 'Professional Work', context),
+                  const SizedBox(width: 32),
+                  _buildTabHeader(1, 'Other Me', context),
+                ],
+              ),
             ),
             Expanded(
               child: TabBarView(
-                 children: [
-                   _buildProfessionalTab(context),
-                   _buildOtherTab(context),
-                 ]
-              )
-            )
-          ]
-        )
-      )
+                children: [
+                  _buildProfessionalTab(context),
+                  _buildOtherTab(context),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -192,10 +218,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
             padding: const EdgeInsets.symmetric(vertical: 48),
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                OtherMeSection(),
-                FooterSection(),
-              ],
+              children: [OtherMeSection(), FooterSection()],
             ),
           ),
         ),
