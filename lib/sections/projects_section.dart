@@ -45,64 +45,25 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
-                    child: Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      runAlignment: WrapAlignment.start,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(project.title, style: textTheme.titleLarge),
-                        SizedBox(width: 5),
-                        Row(
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
                           children: [
                             if (project.playstoreLink != null)
-                              IconButton(
-                                iconSize: 20,
-                                icon: FaIcon(FontAwesomeIcons.googlePlay),
-                                onPressed: () async {
-                                  final link = project.playstoreLink;
-                                  if (link == null) return;
-                                  trylaunchUrl(link);
-                                },
-                              ),
+                              _buildIconButton(FontAwesomeIcons.googlePlay, project.playstoreLink!),
                             if (project.appstoreLink != null)
-                              IconButton(
-                                iconSize: 20,
-                                icon: FaIcon(FontAwesomeIcons.appStore),
-                                onPressed: () async {
-                                  final link = project.appstoreLink;
-                                  if (link == null) return;
-                                  trylaunchUrl(link);
-                                },
-                              ),
+                              _buildIconButton(FontAwesomeIcons.appStore, project.appstoreLink!),
                             if (project.githubLink != null)
-                              IconButton(
-                                iconSize: 20,
-                                icon: FaIcon(FontAwesomeIcons.github),
-                                onPressed: () async {
-                                  final link = project.githubLink;
-                                  if (link == null) return;
-                                  trylaunchUrl(link);
-                                },
-                              ),
+                              _buildIconButton(FontAwesomeIcons.github, project.githubLink!),
                             if (project.gitlabLink != null)
-                              IconButton(
-                                iconSize: 20,
-                                icon: FaIcon(FontAwesomeIcons.gitlab),
-                                onPressed: () async {
-                                  final link = project.gitlabLink;
-                                  if (link == null) return;
-                                  trylaunchUrl(link);
-                                },
-                              ),
+                              _buildIconButton(FontAwesomeIcons.gitlab, project.gitlabLink!),
                             if (project.webLink != null)
-                              IconButton(
-                                iconSize: 20,
-                                icon: FaIcon(FontAwesomeIcons.globe),
-                                onPressed: () async {
-                                  final link = project.webLink;
-                                  if (link == null) return;
-                                  trylaunchUrl(link);
-                                },
-                              ),
+                              _buildIconButton(FontAwesomeIcons.globe, project.webLink!),
                           ],
                         ),
                       ],
@@ -393,6 +354,16 @@ class _ProjectsSectionState extends State<ProjectsSection> {
           const SizedBox(height: 24),
         ],
       ),
+    );
+  }
+
+  Widget _buildIconButton(dynamic icon, String link) {
+    return IconButton(
+      iconSize: 20,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(),
+      icon: icon is IconData ? Icon(icon) : FaIcon(icon),
+      onPressed: () => trylaunchUrl(link),
     );
   }
 

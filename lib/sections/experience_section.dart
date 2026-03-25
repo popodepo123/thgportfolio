@@ -14,6 +14,8 @@ class _ExperienceSectionState extends State<ExperienceSection> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -37,11 +39,17 @@ class _ExperienceSectionState extends State<ExperienceSection> {
                       _expandedStates[index] = expanded;
                     });
                   },
-                  title: Text(exp.role, style: textTheme.titleLarge),
+                  title: Text(
+                    exp.role,
+                    style: isMobile
+                        ? textTheme.titleLarge?.copyWith(fontSize: 18)
+                        : textTheme.titleLarge,
+                  ),
                   subtitle: Text(
                     '${exp.company} | ${exp.period}',
                     style: textTheme.bodyMedium?.copyWith(
                       color: Colors.white70,
+                      fontSize: isMobile ? 13 : 14,
                     ),
                   ),
                   children: [

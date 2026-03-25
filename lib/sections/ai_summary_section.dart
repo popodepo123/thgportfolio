@@ -10,7 +10,7 @@ class AISummarySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('AI Summary: The Learner Profile', style: textTheme.headlineMedium),
+        Text('AI Summary', style: textTheme.headlineMedium),
         const SizedBox(height: 24),
         Container(
           width: double.infinity,
@@ -31,15 +31,18 @@ class AISummarySection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(Icons.psychology, color: gruberYellow, size: 24),
                   SizedBox(width: 12),
-                  Text(
-                    'Architectural & Tenacious Learner',
-                    style: TextStyle(
-                      color: gruberFg,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Text(
+                      'Architectural & Tenacious Learner',
+                      style: TextStyle(
+                        color: gruberFg,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],

@@ -20,6 +20,8 @@ class _SkillsSectionState extends State<SkillsSection> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Column(
@@ -35,7 +37,12 @@ class _SkillsSectionState extends State<SkillsSection> {
                 children: [
                   Text(
                     category.categoryName,
-                    style: textTheme.titleLarge?.copyWith(color: Colors.white),
+                    style: isMobile
+                        ? textTheme.titleLarge?.copyWith(
+                          color: Colors.white,
+                          fontSize: 18,
+                        )
+                        : textTheme.titleLarge?.copyWith(color: Colors.white),
                   ),
                   const SizedBox(height: 12),
                   Wrap(

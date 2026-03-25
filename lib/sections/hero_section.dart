@@ -9,6 +9,8 @@ class HeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -18,7 +20,12 @@ class HeroSection extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Expanded(
-                child: Text(portfolio.name, style: textTheme.displayLarge),
+                child: Text(
+                  portfolio.name,
+                  style: isMobile
+                      ? textTheme.displayLarge?.copyWith(fontSize: 32)
+                      : textTheme.displayLarge,
+                ),
               ),
               const SizedBox(width: 16),
               const LoadingLogo(size: 30.0),

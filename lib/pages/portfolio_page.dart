@@ -54,6 +54,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
 
   Widget _buildModeToggle(PortfolioView currentView) {
     final isDev = currentView == PortfolioView.dev;
+    final isMobile = MediaQuery.of(context).size.width < 600;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -63,7 +64,10 @@ class _PortfolioPageState extends State<PortfolioPage> {
               : PortfolioView.dev;
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 8 : 12,
+            vertical: isMobile ? 4 : 6,
+          ),
           decoration: BoxDecoration(
             color: gruberBgLighter,
             borderRadius: BorderRadius.circular(4),
@@ -81,15 +85,15 @@ class _PortfolioPageState extends State<PortfolioPage> {
             children: [
               Icon(
                 isDev ? Icons.person_outline : Icons.terminal_outlined,
-                size: 16,
+                size: isMobile ? 14 : 16,
                 color: gruberYellow,
               ),
               const SizedBox(width: 8),
               Text(
                 isDev ? 'PROFESSIONAL' : 'DEVELOPER',
-                style: const TextStyle(
+                style: TextStyle(
                   color: gruberYellow,
-                  fontSize: 11,
+                  fontSize: isMobile ? 9 : 11,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
                 ),
@@ -103,6 +107,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
 
   Widget _buildTabHeader(int index, String label, BuildContext context) {
     final tabController = DefaultTabController.maybeOf(context);
+    final isMobile = MediaQuery.of(context).size.width < 600;
     if (tabController == null) {
       return Text(label);
     }
@@ -115,7 +120,10 @@ class _PortfolioPageState extends State<PortfolioPage> {
           child: GestureDetector(
             onTap: () => tabController.animateTo(index),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 4 : 8,
+                vertical: 4,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -126,14 +134,14 @@ class _PortfolioPageState extends State<PortfolioPage> {
                       fontWeight: isSelected
                           ? FontWeight.bold
                           : FontWeight.normal,
-                      fontSize: 14,
+                      fontSize: isMobile ? 12 : 14,
                       fontFamily: "Fira Code",
                     ),
                   ),
                   const SizedBox(height: 8),
                   Container(
                     height: 2,
-                    width: label.length * 8.0,
+                    width: label.length * (isMobile ? 7.0 : 8.0),
                     decoration: BoxDecoration(
                       color: isSelected ? gruberYellow : Colors.transparent,
                       borderRadius: BorderRadius.circular(1),
@@ -152,6 +160,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
     if (view == PortfolioView.dev) {
       return const DevView(key: ValueKey('dev_view'));
     }
+    final isMobile = MediaQuery.of(context).size.width < 600;
     return SelectionArea(
       key: const ValueKey('prof_view'),
       child: DefaultTabController(
@@ -162,16 +171,18 @@ class _PortfolioPageState extends State<PortfolioPage> {
               children: [
                 Container(
                   color: gruberBgDarker,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 12 : 24,
+                    vertical: 12,
+                  ),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
                         _buildTabHeader(0, 'Work', context),
-                        const SizedBox(width: 32),
+                        SizedBox(width: isMobile ? 16 : 32),
                         _buildTabHeader(1, 'Other Me', context),
-                        const SizedBox(width: 32),
+                        SizedBox(width: isMobile ? 16 : 32),
                         _buildTabHeader(2, 'Blogs', context),
                       ],
                     ),
