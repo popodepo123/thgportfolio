@@ -155,7 +155,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
     return SelectionArea(
       key: const ValueKey('prof_view'),
       child: DefaultTabController(
-        length: 2,
+        length: 3,
         child: Builder(
           builder: (context) {
             return Column(
@@ -164,12 +164,17 @@ class _PortfolioPageState extends State<PortfolioPage> {
                   color: gruberBgDarker,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  child: Row(
-                    children: [
-                      _buildTabHeader(0, 'Professional Work', context),
-                      const SizedBox(width: 32),
-                      _buildTabHeader(1, 'Other Me', context),
-                    ],
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildTabHeader(0, 'Work', context),
+                        const SizedBox(width: 32),
+                        _buildTabHeader(1, 'Other Me', context),
+                        const SizedBox(width: 32),
+                        _buildTabHeader(2, 'Blogs', context),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
@@ -177,6 +182,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
                     children: [
                       _buildProfessionalTab(context),
                       _buildOtherTab(context),
+                      _buildBlogsTab(context),
                     ],
                   ),
                 ),
@@ -184,6 +190,31 @@ class _PortfolioPageState extends State<PortfolioPage> {
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildBlogsTab(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.edit_note, size: 64, color: gruberQuartz),
+          SizedBox(height: 16),
+          Text(
+            'Coming Soon',
+            style: TextStyle(
+              color: gruberQuartz,
+              fontSize: 24,
+              fontFamily: "Fira Code",
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'I will be sharing my thoughts and technical deep-dives here.',
+            style: TextStyle(color: gruberQuartz, fontSize: 14),
+          ),
+        ],
       ),
     );
   }
