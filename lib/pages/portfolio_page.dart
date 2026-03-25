@@ -153,28 +153,33 @@ class _PortfolioPageState extends State<PortfolioPage> {
       key: const ValueKey('prof_view'),
       child: DefaultTabController(
         length: 2,
-        child: Column(
-          children: [
-            Container(
-              color: gruberBgDarker,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              child: Row(
-                children: [
-                  _buildTabHeader(0, 'Professional Work', context),
-                  const SizedBox(width: 32),
-                  _buildTabHeader(1, 'Other Me', context),
-                ],
-              ),
-            ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  _buildProfessionalTab(context),
-                  _buildOtherTab(context),
-                ],
-              ),
-            ),
-          ],
+        child: Builder(
+          builder: (context) {
+            return Column(
+              children: [
+                Container(
+                  color: gruberBgDarker,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  child: Row(
+                    children: [
+                      _buildTabHeader(0, 'Professional Work', context),
+                      const SizedBox(width: 32),
+                      _buildTabHeader(1, 'Other Me', context),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      _buildProfessionalTab(context),
+                      _buildOtherTab(context),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
