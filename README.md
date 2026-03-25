@@ -79,4 +79,6 @@ Tristan Harvey Godoy
 - GitLab: [@godoytristanh](https://gitlab.com/godoytristanh)
 
 ---
+*Last Updated: March 2026*
+
 *Built with Flutter & Dart.*

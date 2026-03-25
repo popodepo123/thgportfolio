@@ -58,6 +58,11 @@ class FooterSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 48),
+          Text(
+            '© ${DateTime.now().year} Tristan Harvey Godoy',
+            style: textTheme.bodySmall?.copyWith(color: Colors.white54),
+          ),
+          const SizedBox(height: 24),
         ],
       ),
     );
