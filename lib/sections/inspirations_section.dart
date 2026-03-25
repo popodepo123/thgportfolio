@@ -31,6 +31,36 @@ class _InspirationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    
+    final nameWidget = Text(
+      inspiration.name,
+      style: const TextStyle(
+        color: gruberYellow,
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+
+    final linksWidget = Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        if (inspiration.twitchHandle != null)
+          _LinkButton(
+            label: inspiration.twitchHandle!,
+            icon: Icons.live_tv,
+            onTap: () => launchUrl(Uri.parse('https://twitch.tv/${inspiration.twitchHandle}')),
+          ),
+        if (inspiration.youtubeHandle != null)
+          _LinkButton(
+            label: inspiration.youtubeHandle!,
+            icon: Icons.play_circle_outline,
+            onTap: () => launchUrl(Uri.parse('https://youtube.com/${inspiration.youtubeHandle}')),
+          ),
+      ],
+    );
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -42,41 +72,20 @@ class _InspirationCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  inspiration.name,
-                  style: const TextStyle(
-                    color: gruberYellow,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  if (inspiration.twitchHandle != null)
-                    _LinkButton(
-                      label: inspiration.twitchHandle!,
-                      icon: Icons.live_tv,
-                      onTap: () => launchUrl(Uri.parse('https://twitch.tv/${inspiration.twitchHandle}')),
-                    ),
-                  if (inspiration.youtubeHandle != null)
-                    _LinkButton(
-                      label: inspiration.youtubeHandle!,
-                      icon: Icons.play_circle_outline,
-                      onTap: () => launchUrl(Uri.parse('https://youtube.com/${inspiration.youtubeHandle}')),
-                    ),
-                ],
-              ),
-            ],
-          ),
+          if (isMobile) ...[
+            nameWidget,
+            const SizedBox(height: 12),
+            linksWidget,
+          ] else
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: nameWidget),
+                const SizedBox(width: 16),
+                linksWidget,
+              ],
+            ),
           const SizedBox(height: 12),
           Text(
             inspiration.description,
