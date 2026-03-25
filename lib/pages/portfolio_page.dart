@@ -102,7 +102,10 @@ class _PortfolioPageState extends State<PortfolioPage> {
   }
 
   Widget _buildTabHeader(int index, String label, BuildContext context) {
-    final tabController = DefaultTabController.of(context);
+    final tabController = DefaultTabController.maybeOf(context);
+    if (tabController == null) {
+      return Text(label);
+    }
     return ListenableBuilder(
       listenable: tabController,
       builder: (context, child) {

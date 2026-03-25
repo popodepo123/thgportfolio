@@ -88,6 +88,7 @@ class _ContributionHeatmapState extends State<ContributionHeatmap> {
     return LayoutBuilder(
       key: const ValueKey('data'),
       builder: (context, constraints) {
+        if (_unifiedContributions == null) return const SizedBox.shrink();
         final double availableWidth = constraints.maxWidth;
         const int weeksToShow = 52;
         const double spacing = 1.0;
