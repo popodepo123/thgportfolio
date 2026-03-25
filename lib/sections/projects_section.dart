@@ -144,8 +144,12 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                                       );
 
                                       galleryPageController.addListener(() {
-                                        currentPageNotifier.value =
-                                            galleryPageController.page!.round();
+                                        if (galleryPageController.hasClients && galleryPageController.page != null) {
+                                          final int page = galleryPageController.page!.round();
+                                          if (project.images != null && project.images!.isNotEmpty) {
+                                            currentPageNotifier.value = page.clamp(0, project.images!.length - 1);
+                                          }
+                                        }
                                       });
 
                                       return Dialog(

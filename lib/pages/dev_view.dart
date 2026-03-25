@@ -100,7 +100,7 @@ class _DevViewState extends State<DevView> {
     });
     
     _typingTimer = Timer.periodic(const Duration(milliseconds: 5), (timer) {
-      if (mounted) {
+      if (mounted && _typingContent != null) {
         setState(() {
           if (_visibleChars < _typingContent!.length) {
             _visibleChars += 15;

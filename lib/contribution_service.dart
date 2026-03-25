@@ -83,7 +83,8 @@ class ContributionService {
       _recursiveTreeCache[repoUrl] = fullTree;
     }
 
-    final tree = _recursiveTreeCache[repoUrl]!;
+    final tree = _recursiveTreeCache[repoUrl] ?? [];
+    if (tree.isEmpty) return null;
     final snakeSymbol = symbol
         .replaceAllMapped(RegExp(r'([a-z0-9])([A-Z])'), (m) => '${m.group(1)}_${m.group(2)}')
         .toLowerCase();

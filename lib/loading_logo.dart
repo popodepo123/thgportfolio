@@ -58,8 +58,8 @@ class _LoadingLogoState extends State<LoadingLogo>
     logo = LoadingLogoT(size: widget.size);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       start();
-      animationController!.repeat();
-      animationController!.addListener(() {
+      animationController?.repeat();
+      animationController?.addListener(() {
         setState(() {});
       });
     });
@@ -376,7 +376,7 @@ class _AnimatedStickState extends State<AnimatedStick>
       upperBound: 1.0,
     );
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      start(controller!);
+      if (controller != null) start(controller!);
     });
   }
 
