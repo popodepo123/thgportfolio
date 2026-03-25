@@ -1,62 +1,82 @@
-# THG Portfolio
+# Tristan Harvey Godoy - Portfolio
 
-## Project Overview
+[![Live Site](https://img.shields.io/badge/Live-Portfolio-ffdd33?style=for-the-badge&logo=flutter)](https://popodepo123.github.io/thgportfolio/)
 
-This is a personal portfolio website built with Flutter, showcasing my projects, skills, and experience. It's designed to be responsive and interactive across various devices.
+A modern, high-performance personal portfolio built with Flutter, featuring a unique dual-mode interface that bridges the gap between professional presentation and developer-centric technical depth.
 
-## What You'll See
+## 🚀 Key Features
 
-This portfolio features:
+- **Dual-Mode Experience**: Switch seamlessly between a clean **Professional View** and a terminal-inspired **Developer View**.
+- **Helix/Vim-Style Developer View**: A fully functional TUI (Terminal User Interface) simulation with:
+  - Vim-style keyboard navigation (`h`, `j`, `k`, `l`, `w`, `b`, `g`, `G`).
+  - Real-time syntax highlighting for multiple languages.
+  - Command-line mode for navigation and settings.
+  - Project file tree with GitLab API integration.
+- **TUI Splash Screen**: A custom-built boot sequence that tracks real-time asset download progress and system initialization.
+- **Contribution Heatmap**: A unified GitHub and GitLab activity tracker.
+- **Responsive Design**: Optimized for everything from mobile devices to large desktop monitors.
 
--   **Hero Section:** An introduction to my professional identity.
--   **Project Showcase:** Displays my projects with descriptions and links.
--   **Skills Overview:** A clear list of my technical skills.
--   **Experience Timeline:** A detailed breakdown of my professional history.
--   **Contact Information:** Easy ways to get in touch.
--   **Responsive Design:** Adapts seamlessly to different screen sizes.
+## 🛠️ Technologies Used
 
-## Visuals (Screenshots)
+- **Framework**: [Flutter](https://flutter.dev) (Web)
+- **Language**: [Dart](https://dart.dev)
+- **State Management**: ValueNotifiers & StateProvider
+- **Icons**: [FontAwesome](https://fontawesome.com)
+- **Typography**: [Google Fonts (Fira Code)](https://fonts.google.com/specimen/Fira+Code)
+- **Deployment**: GitHub Pages (docs/ directory)
 
+## 📂 Project Structure
 
--   **Screenshots:** (Consider adding screenshots here)
-    -   `screenshot_hero_section.png`
-    -   `screenshot_projects.png`
+- `lib/pages/`: Main view logic (Professional vs. Developer).
+- `lib/sections/`: Individual components for the Professional view (Hero, Projects, Skills, etc.).
+- `lib/widgets/`: Reusable UI components like the `ContributionHeatmap` and `LoadingLogo`.
+- `lib/loading_logo.dart`: The logic behind the animated "THG" logo.
+- `docs/`: The compiled web release for GitHub Pages hosting.
 
-## Technologies Used
-
--   **Flutter:** UI toolkit for cross-platform development.
--   **Dart:** The programming language for Flutter.
-
-## Getting Started
-
-To run this project locally:
+## 🏁 Getting Started
 
 ### Prerequisites
 
-Ensure Flutter is installed: [https://flutter.dev/docs/get-started/install](https://flutter.dev/docs/get-started/install)
+- [Flutter SDK](https://docs.flutter.dev/get-started/install)
+- [FVM](https://fvm.app/) (Recommended)
 
 ### Installation
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/your-username/thgportfolio.git
+    git clone https://github.com/popodepo123/thgportfolio.git
     cd thgportfolio
     ```
-2.  Get Flutter packages:
+2.  Install dependencies:
     ```bash
-    fvm flutter pub get
+    flutter pub get
     ```
 
-### Running the Application
+### Running Locally
 
-To run in a web browser:
+To run the application in Chrome:
 
 ```bash
-fvm flutter run -d web
+flutter run -d chrome
 ```
 
-## Contact
+## 🏗️ Deployment
 
-[Tristan] - [godoytristanh@gmail.com]
+To build the project for GitHub Pages:
 
-Project Repository: [https://github.com/popodepo123/thgportfolio](https://github.com/popodepo123/thgportfolio)
+```bash
+flutter build web --release --base-href "/thgportfolio/"
+rm -rf docs/*
+cp -r build/web/* docs/
+touch docs/.nojekyll
+```
+
+## 📧 Contact
+
+**Tristan Harvey Godoy**
+- **Email**: [godoytristanh@gmail.com](mailto:godoytristanh@gmail.com)
+- **GitHub**: [@popodepo123](https://github.com/popodepo123)
+- **GitLab**: [@godoytristanh](https://gitlab.com/godoytristanh)
+
+---
+*Built with ❤️ using Flutter & Dart.*
