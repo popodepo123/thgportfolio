@@ -39,9 +39,9 @@ class _SkillsSectionState extends State<SkillsSection> {
                     category.categoryName,
                     style: isMobile
                         ? textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontSize: 18,
-                        )
+                            color: Colors.white,
+                            fontSize: 18,
+                          )
                         : textTheme.titleLarge?.copyWith(color: Colors.white),
                   ),
                   const SizedBox(height: 12),

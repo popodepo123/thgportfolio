@@ -13,7 +13,9 @@ class HobbiesSection extends StatelessWidget {
       children: [
         Text('Hobbies & Interests', style: textTheme.headlineMedium),
         const SizedBox(height: 24),
-        ...portfolio.hobbies.map((category) => _HobbyCategoryWidget(category: category)),
+        ...portfolio.hobbies.map(
+          (category) => _HobbyCategoryWidget(category: category),
+        ),
       ],
     );
   }
@@ -40,7 +42,9 @@ class _HobbyCategoryWidget extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Column(
-            children: category.items.map((item) => _HobbyListItem(item: item)).toList(),
+            children: category.items
+                .map((item) => _HobbyListItem(item: item))
+                .toList(),
           ),
         ],
       ),
@@ -78,23 +82,27 @@ class _HobbyListItem extends StatelessWidget {
                   width: 48,
                   color: gruberBgDarker,
                   alignment: Alignment.center,
-                  child: const Icon(Icons.videogame_asset, size: 24, color: gruberQuartz),
+                  child: const Icon(
+                    Icons.videogame_asset,
+                    size: 24,
+                    color: gruberQuartz,
+                  ),
                 ),
               ),
             ),
             const SizedBox(width: 16),
           ] else ...[
-             Container(
-               height: 48,
-               width: 48,
-               decoration: BoxDecoration(
-                 color: gruberBgDarker,
-                 borderRadius: BorderRadius.circular(6),
-               ),
-               alignment: Alignment.center,
-               child: const Icon(Icons.star, size: 24, color: gruberQuartz),
-             ),
-             const SizedBox(width: 16),
+            Container(
+              height: 48,
+              width: 48,
+              decoration: BoxDecoration(
+                color: gruberBgDarker,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              alignment: Alignment.center,
+              child: const Icon(Icons.star, size: 24, color: gruberQuartz),
+            ),
+            const SizedBox(width: 16),
           ],
           Expanded(
             child: Column(
@@ -109,7 +117,8 @@ class _HobbyListItem extends StatelessWidget {
                     fontFamily: 'Fira Code',
                   ),
                 ),
-                if (item.description != null && item.description!.isNotEmpty) ...[
+                if (item.description != null &&
+                    item.description!.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Text(
                     item.description!,
@@ -119,7 +128,7 @@ class _HobbyListItem extends StatelessWidget {
                       height: 1.4,
                     ),
                   ),
-                ]
+                ],
               ],
             ),
           ),

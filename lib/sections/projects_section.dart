@@ -55,15 +55,30 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                           runSpacing: 8,
                           children: [
                             if (project.playstoreLink != null)
-                              _buildIconButton(FontAwesomeIcons.googlePlay, project.playstoreLink!),
+                              _buildIconButton(
+                                FontAwesomeIcons.googlePlay,
+                                project.playstoreLink!,
+                              ),
                             if (project.appstoreLink != null)
-                              _buildIconButton(FontAwesomeIcons.appStore, project.appstoreLink!),
+                              _buildIconButton(
+                                FontAwesomeIcons.appStore,
+                                project.appstoreLink!,
+                              ),
                             if (project.githubLink != null)
-                              _buildIconButton(FontAwesomeIcons.github, project.githubLink!),
+                              _buildIconButton(
+                                FontAwesomeIcons.github,
+                                project.githubLink!,
+                              ),
                             if (project.gitlabLink != null)
-                              _buildIconButton(FontAwesomeIcons.gitlab, project.gitlabLink!),
+                              _buildIconButton(
+                                FontAwesomeIcons.gitlab,
+                                project.gitlabLink!,
+                              ),
                             if (project.webLink != null)
-                              _buildIconButton(FontAwesomeIcons.globe, project.webLink!),
+                              _buildIconButton(
+                                FontAwesomeIcons.globe,
+                                project.webLink!,
+                              ),
                           ],
                         ),
                       ],
@@ -105,10 +120,19 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                                       );
 
                                       galleryPageController.addListener(() {
-                                        if (galleryPageController.hasClients && galleryPageController.page != null) {
-                                          final int page = galleryPageController.page!.round();
-                                          if (project.images != null && project.images!.isNotEmpty) {
-                                            currentPageNotifier.value = page.clamp(0, project.images!.length - 1);
+                                        if (galleryPageController.hasClients &&
+                                            galleryPageController.page !=
+                                                null) {
+                                          final int page = galleryPageController
+                                              .page!
+                                              .round();
+                                          if (project.images != null &&
+                                              project.images!.isNotEmpty) {
+                                            currentPageNotifier.value = page
+                                                .clamp(
+                                                  0,
+                                                  project.images!.length - 1,
+                                                );
                                           }
                                         }
                                       });
@@ -299,8 +323,12 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                   MouseRegion(
                     cursor: SystemMouseCursors.click,
                     child: ExpansionTile(
-                      shape: const RoundedRectangleBorder(side: BorderSide.none),
-                      collapsedShape: const RoundedRectangleBorder(side: BorderSide.none),
+                      shape: const RoundedRectangleBorder(
+                        side: BorderSide.none,
+                      ),
+                      collapsedShape: const RoundedRectangleBorder(
+                        side: BorderSide.none,
+                      ),
                       initiallyExpanded: _expandedStates[index] ?? false,
                       onExpansionChanged: (bool expanded) {
                         setState(() {

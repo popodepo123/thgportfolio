@@ -14,72 +14,66 @@ class DevSetupSection extends StatelessWidget {
       children: [
         Text('Dev Setup', style: textTheme.headlineMedium),
         const SizedBox(height: 24),
-        _buildResponsiveGrid(
-          context,
-          isMobile,
-          [
-            _buildSetupCategory(
-              context,
-              'Hardware & OS',
-              [
-                'MacBook Air (M3) - Main Workstation',
-                'macOS Sequoia - Primary OS',
-                'Custom Built PC - Windows 11',
-              ],
-            ),
-            _buildSetupCategory(
-              context,
-              'Terminal & Shell',
-              [
-                'Ghostty / WezTerm - GPU accelerated terminals',
-                'Zsh with Zoxide - Fast navigation',
-                'Tmux / Zellij - Multiplexers',
-              ],
-            ),
-            _buildSetupCategory(
-              context,
-              'Editors & IDEs',
-              [
-                'Helix / Neovim - Primary modal editors',
-                'VS Code / Android Studio / Xcode',
-              ],
-            ),
-            _buildSetupCategory(
-              context,
-              'Tools & AI Workflow',
-              [
-                'OpenCode & Gemini CLI - Open-source AI terminal agents',
-                'Ollama & LM Studio - Local LLM execution',
-                'FVM - Flutter version management',
-                'Git / GitHub / GitLab - CI/CD',
-              ],
-            ),
-          ],
-        ),
+        _buildResponsiveGrid(context, isMobile, [
+          _buildSetupCategory(context, 'Hardware & OS', [
+            'MacBook Air (M3) - Main Workstation',
+            'macOS Sequoia - Primary OS',
+            'Custom Built PC - Windows 11',
+          ]),
+          _buildSetupCategory(context, 'Terminal & Shell', [
+            'Ghostty / WezTerm - GPU accelerated terminals',
+            'Zsh with Zoxide - Fast navigation',
+            'Tmux / Zellij - Multiplexers',
+          ]),
+          _buildSetupCategory(context, 'Editors & IDEs', [
+            'Helix / Neovim - Primary modal editors',
+            'VS Code / Android Studio / Xcode',
+          ]),
+          _buildSetupCategory(context, 'Tools & AI Workflow', [
+            'OpenCode & Gemini CLI - Open-source AI terminal agents',
+            'Ollama & LM Studio - Local LLM execution',
+            'FVM - Flutter version management',
+            'Git / GitHub / GitLab - CI/CD',
+          ]),
+        ]),
       ],
     );
   }
 
-  Widget _buildResponsiveGrid(BuildContext context, bool isMobile, List<Widget> children) {
+  Widget _buildResponsiveGrid(
+    BuildContext context,
+    bool isMobile,
+    List<Widget> children,
+  ) {
     if (isMobile) {
       return Column(
-        children: children.map((c) => Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: c,
-        )).toList(),
+        children: children
+            .map(
+              (c) =>
+                  Padding(padding: const EdgeInsets.only(bottom: 16), child: c),
+            )
+            .toList(),
       );
     }
     return Wrap(
       spacing: 16,
       runSpacing: 16,
-      children: children.map((c) => SizedBox(
-        width: (MediaQuery.of(context).size.width - 64 - 16) / 2,
-        child: c,
-      )).toList(),
+      children: children
+          .map(
+            (c) => SizedBox(
+              width: (MediaQuery.of(context).size.width - 64 - 16) / 2,
+              child: c,
+            ),
+          )
+          .toList(),
     );
   }
 
-  Widget _buildSetupCategory(BuildContext context, String title, List<String> items) {
+  Widget _buildSetupCategory(
+    BuildContext context,
+    String title,
+    List<String> items,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -99,21 +93,23 @@ class DevSetupSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          ...items.map((item) => Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('• ', style: TextStyle(color: gruberNiagara)),
-                    Expanded(
-                      child: Text(
-                        item,
-                        style: const TextStyle(color: gruberFg, fontSize: 13),
-                      ),
+          ...items.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('• ', style: TextStyle(color: gruberNiagara)),
+                  Expanded(
+                    child: Text(
+                      item,
+                      style: const TextStyle(color: gruberFg, fontSize: 13),
                     ),
-                  ],
-                ),
-              )),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

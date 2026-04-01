@@ -35,33 +35,31 @@ final portfolioTheme = ThemeData(
   scaffoldBackgroundColor: gruberBgDarker,
 
   // Text Theme
-  textTheme: GoogleFonts.firaCodeTextTheme(const TextTheme(
-    displayLarge: TextStyle(
-      fontSize: 48,
-      fontWeight: FontWeight.bold,
-      color: gruberFg,
+  textTheme: GoogleFonts.firaCodeTextTheme(
+    const TextTheme(
+      displayLarge: TextStyle(
+        fontSize: 48,
+        fontWeight: FontWeight.bold,
+        color: gruberFg,
+      ),
+      headlineMedium: TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.w600,
+        color: gruberYellow,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+        color: gruberFg,
+      ),
+      bodyMedium: TextStyle(fontSize: 16, height: 1.5, color: gruberFg),
+      labelLarge: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: Colors.black,
+      ),
     ),
-    headlineMedium: TextStyle(
-      fontSize: 28,
-      fontWeight: FontWeight.w600,
-      color: gruberYellow,
-    ),
-    titleLarge: TextStyle(
-      fontSize: 22,
-      fontWeight: FontWeight.w600,
-      color: gruberFg,
-    ),
-    bodyMedium: TextStyle(
-      fontSize: 16,
-      height: 1.5,
-      color: gruberFg,
-    ),
-    labelLarge: TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.w500,
-      color: Colors.black,
-    ),
-  )),
+  ),
 
   // Card Theme
   cardTheme: CardThemeData(
@@ -82,10 +80,7 @@ final portfolioTheme = ThemeData(
     secondarySelectedColor: gruberYellow,
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-    labelStyle: const TextStyle(
-      color: gruberFg,
-      fontWeight: FontWeight.w500,
-    ),
+    labelStyle: const TextStyle(color: gruberFg, fontWeight: FontWeight.w500),
     brightness: Brightness.dark,
   ),
 

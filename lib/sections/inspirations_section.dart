@@ -19,7 +19,9 @@ class InspirationsSection extends StatelessWidget {
           style: textTheme.bodyMedium?.copyWith(color: gruberQuartz),
         ),
         const SizedBox(height: 24),
-        ...portfolio.inspirations.map((inspiration) => _InspirationCard(inspiration: inspiration)),
+        ...portfolio.inspirations.map(
+          (inspiration) => _InspirationCard(inspiration: inspiration),
+        ),
       ],
     );
   }
@@ -32,7 +34,7 @@ class _InspirationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
-    
+
     final nameWidget = Text(
       inspiration.name,
       style: const TextStyle(
@@ -50,13 +52,17 @@ class _InspirationCard extends StatelessWidget {
           _LinkButton(
             label: inspiration.twitchHandle!,
             icon: Icons.live_tv,
-            onTap: () => launchUrl(Uri.parse('https://twitch.tv/${inspiration.twitchHandle}')),
+            onTap: () => launchUrl(
+              Uri.parse('https://twitch.tv/${inspiration.twitchHandle}'),
+            ),
           ),
         if (inspiration.youtubeHandle != null)
           _LinkButton(
             label: inspiration.youtubeHandle!,
             icon: Icons.play_circle_outline,
-            onTap: () => launchUrl(Uri.parse('https://youtube.com/${inspiration.youtubeHandle}')),
+            onTap: () => launchUrl(
+              Uri.parse('https://youtube.com/${inspiration.youtubeHandle}'),
+            ),
           ),
       ],
     );
@@ -89,11 +95,7 @@ class _InspirationCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             inspiration.description,
-            style: const TextStyle(
-              color: gruberFg,
-              height: 1.4,
-              fontSize: 14,
-            ),
+            style: const TextStyle(color: gruberFg, height: 1.4, fontSize: 14),
           ),
         ],
       ),

@@ -18,7 +18,10 @@ class AISummarySection extends StatelessWidget {
           decoration: BoxDecoration(
             color: gruberBg,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: gruberYellow.withValues(alpha: 0.2), width: 1.5),
+            border: Border.all(
+              color: gruberYellow.withValues(alpha: 0.2),
+              width: 1.5,
+            ),
             boxShadow: [
               BoxShadow(
                 color: gruberYellow.withValues(alpha: 0.05),
@@ -97,11 +100,7 @@ class AISummarySection extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             content,
-            style: const TextStyle(
-              color: gruberFg,
-              fontSize: 14,
-              height: 1.5,
-            ),
+            style: const TextStyle(color: gruberFg, fontSize: 14, height: 1.5),
           ),
         ],
       ),

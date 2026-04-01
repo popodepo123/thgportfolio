@@ -477,6 +477,19 @@ final portfolio = PortfolioData(
       ],
       images: [],
     ),
+    Project(
+      gitlabLink: 'https://gitlab.com/godoytristanh/rust-dart-serializer-cli',
+      title: 'Rust-Dart Serializer CLI',
+      description:
+          'A command-line tool designed to facilitate the serialization and interoperability between Rust and Dart. It automates the generation of boilerplate code required to pass structured data between these two languages.',
+      features: [
+        'Automated Code Generation: Streamlines the creation of serialization logic, reducing manual boilerplate for Rust-to-Dart data transfer.',
+        'CLI-First Workflow: Provides a developer-friendly command-line interface for easy integration into build pipelines and CI/CD workflows.',
+        'Cross-Language Type Mapping: Ensures consistent data structures across both Rust and Dart environments.',
+        'Performance-Oriented: Leverages Rust\'s efficiency to handle complex serialization tasks suitable for high-performance applications.',
+      ],
+      images: [],
+    ),
   ],
   experiences: [
     Experience(
@@ -564,29 +577,36 @@ final portfolio = PortfolioData(
           name: 'League of Legends (PC)',
           imageUrl:
               'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/League_of_Legends_2019_vector.svg/1200px-League_of_Legends_2019_vector.svg.png',
-          description: 'A highly competitive, team-based strategy game where two teams of five champions face off.',
+          description:
+              'A highly competitive, team-based strategy game where two teams of five champions face off.',
         ),
         HobbyItem(
           name: 'WildRift',
           imageUrl:
               'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/League_of_Legends_Wild_Rift_logo.png/1200px-League_of_Legends_Wild_Rift_logo.png',
-          description: 'The fast-paced mobile and console adaptation of League of Legends.',
+          description:
+              'The fast-paced mobile and console adaptation of League of Legends.',
         ),
         HobbyItem(
           name: 'Valorant',
           imageUrl:
               'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Valorant_logo_-_pink_color_version.svg/1200px-Valorant_logo_-_pink_color_version.svg.png',
-          description: 'A 5v5 character-based tactical shooter blending precise gunplay with unique agent abilities.',
+          description:
+              'A 5v5 character-based tactical shooter blending precise gunplay with unique agent abilities.',
         ),
         HobbyItem(
           name: 'Gunz the Duel',
-          imageUrl: 'https://upload.wikimedia.org/wikipedia/en/2/2a/Gunz_The_Duel_logo.png',
-          description: 'A classic, fast-paced third-person shooter known for its acrobatic "K-Style" movement mechanics.',
+          imageUrl:
+              'https://upload.wikimedia.org/wikipedia/en/2/2a/Gunz_The_Duel_logo.png',
+          description:
+              'A classic, fast-paced third-person shooter known for its acrobatic "K-Style" movement mechanics.',
         ),
         HobbyItem(
           name: 'Dragon Nest',
-          imageUrl: 'https://upload.wikimedia.org/wikipedia/en/d/da/DragonNestLogo.png',
-          description: 'A dynamic action RPG featuring intense non-targeting combat and epic boss raids.',
+          imageUrl:
+              'https://upload.wikimedia.org/wikipedia/en/d/da/DragonNestLogo.png',
+          description:
+              'A dynamic action RPG featuring intense non-targeting combat and epic boss raids.',
         ),
       ],
     ),
@@ -597,27 +617,36 @@ final portfolio = PortfolioData(
           name: 'osu! (Mania)',
           imageUrl:
               'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Osu%21_Logo_2016.svg/1200px-Osu%21_Logo_2016.svg.png',
-          description: 'A competitive, community-driven rhythm game mode hitting falling notes to the beat.',
+          description:
+              'A competitive, community-driven rhythm game mode hitting falling notes to the beat.',
         ),
         HobbyItem(
           name: 'Deemo',
-          imageUrl: 'https://upload.wikimedia.org/wikipedia/en/b/b3/Deemo_Logo.png',
-          description: 'A story-driven rhythm game blending beautiful piano melodies with an emotional narrative.',
+          imageUrl:
+              'https://upload.wikimedia.org/wikipedia/en/b/b3/Deemo_Logo.png',
+          description:
+              'A story-driven rhythm game blending beautiful piano melodies with an emotional narrative.',
         ),
         HobbyItem(
           name: 'Cytus',
-          imageUrl: 'https://upload.wikimedia.org/wikipedia/en/c/ca/Cytus_logo.png',
-          description: 'A futuristic rhythm game with a unique Active Scan Line system and electronic music.',
+          imageUrl:
+              'https://upload.wikimedia.org/wikipedia/en/c/ca/Cytus_logo.png',
+          description:
+              'A futuristic rhythm game with a unique Active Scan Line system and electronic music.',
         ),
         HobbyItem(
           name: 'O2Jam',
-          imageUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/a/a2/O2Jam_logo.jpg/250px-O2Jam_logo.jpg',
-          description: 'A classic PC rhythm game known for its challenging chart patterns and nostalgic tracks.',
+          imageUrl:
+              'https://upload.wikimedia.org/wikipedia/en/thumb/a/a2/O2Jam_logo.jpg/250px-O2Jam_logo.jpg',
+          description:
+              'A classic PC rhythm game known for its challenging chart patterns and nostalgic tracks.',
         ),
         HobbyItem(
           name: 'DJMax Respect V',
-          imageUrl: 'https://cdn.cloudflare.steamstatic.com/steam/apps/960170/logo.png',
-          description: 'The definitive edition of the legendary DJMax series with an extensive music library.',
+          imageUrl:
+              'https://cdn.cloudflare.steamstatic.com/steam/apps/960170/logo.png',
+          description:
+              'The definitive edition of the legendary DJMax series with an extensive music library.',
         ),
       ],
     ),
@@ -626,13 +655,17 @@ final portfolio = PortfolioData(
       items: [
         HobbyItem(
           name: 'Soccer Spirits',
-          imageUrl: 'https://upload.wikimedia.org/wikipedia/en/5/52/Soccer_Spirits_Logo.png',
-          description: 'A fantasy soccer RPG card game featuring dynamic turn-based matches and anime artwork.',
+          imageUrl:
+              'https://upload.wikimedia.org/wikipedia/en/5/52/Soccer_Spirits_Logo.png',
+          description:
+              'A fantasy soccer RPG card game featuring dynamic turn-based matches and anime artwork.',
         ),
         HobbyItem(
           name: 'Seven Knights Rebirth',
-          imageUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/Seven_Knights_logo.png/220px-Seven_Knights_logo.png',
-          description: 'The highly anticipated remake of the classic mobile RPG with modernized 3D graphics.',
+          imageUrl:
+              'https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/Seven_Knights_logo.png/220px-Seven_Knights_logo.png',
+          description:
+              'The highly anticipated remake of the classic mobile RPG with modernized 3D graphics.',
         ),
       ],
     ),

@@ -23,7 +23,8 @@ class _SkillChipState extends State<SkillChip> {
 
   Widget? _buildIcon(dynamic iconData, Color color) {
     if (iconData == null) return null;
-    if (iconData is IconData && iconData.runtimeType.toString() != 'FaIconData') {
+    if (iconData is IconData &&
+        iconData.runtimeType.toString() != 'FaIconData') {
       return Icon(
         iconData,
         size: 16,
