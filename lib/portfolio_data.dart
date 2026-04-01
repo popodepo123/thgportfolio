@@ -479,14 +479,15 @@ final portfolio = PortfolioData(
     ),
     Project(
       gitlabLink: 'https://gitlab.com/godoytristanh/rust-dart-serializer-cli',
-      title: 'Rust-Dart Serializer CLI',
+      title: 'Rust Dart Serializer',
       description:
-          'A command-line tool designed to facilitate the serialization and interoperability between Rust and Dart. It automates the generation of boilerplate code required to pass structured data between these two languages.',
+          'A high-performance Rust CLI tool that generates immutable, freezed-like Dart classes. It serves as a faster, simpler alternative to build_runner, providing instant code generation without extra dependencies.',
       features: [
-        'Automated Code Generation: Streamlines the creation of serialization logic, reducing manual boilerplate for Rust-to-Dart data transfer.',
-        'CLI-First Workflow: Provides a developer-friendly command-line interface for easy integration into build pipelines and CI/CD workflows.',
-        'Cross-Language Type Mapping: Ensures consistent data structures across both Rust and Dart environments.',
-        'Performance-Oriented: Leverages Rust\'s efficiency to handle complex serialization tasks suitable for high-performance applications.',
+        'Instant Generation: No more waiting for build_runner to watch or regenerate; results are immediate.',
+        'Zero Configuration: No build_runner, build.yaml, or complex builder setups required.',
+        'No Extra Dependencies: Generate robust serialization and copyWith logic without adding Freezed to your project.',
+        'One-shot Generation: Designed for easy integration into CI pipelines or on-demand usage.',
+        'Immutable Patterns: Automatically implements copyWith, toString, value equality, and hash codes.',
       ],
       images: [],
     ),
