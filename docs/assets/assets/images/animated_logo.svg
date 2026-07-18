@@ -12,14 +12,14 @@
       66%, 100% { opacity: 0; }
     }
     .spin { transform-origin: 50px 50px; animation: spin 4s linear infinite; }
-    .letter { fill: none; stroke: #00FFFF; stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; }
+    .letter { fill: none; stroke: #FFDD33; stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; }
     .anim { stroke-dasharray: 150; animation: draw 2s ease-out forwards; }
     .t { animation: sequence 9s infinite; }
     .h { animation: sequence 9s infinite; animation-delay: 3s; }
     .g { animation: sequence 9s infinite; animation-delay: 6s; }
   </style>
-  <rect x="10" y="10" width="80" height="80" rx="8" fill="#0A0A0F" />
-  <rect class="spin" x="5" y="5" width="90" height="90" rx="4" fill="none" stroke="#FFFF00" stroke-width="2" stroke-dasharray="10 5" />
+  <rect x="10" y="10" width="80" height="80" rx="8" fill="#101010" />
+  <rect class="spin" x="5" y="5" width="90" height="90" rx="4" fill="none" stroke="#FFDD33" stroke-width="2" stroke-dasharray="10 5" />
   <g class="t"><path class="letter anim" d="M 30 35 L 70 30" /><path class="letter anim" d="M 50 30 L 50 70" /></g>
   <g class="h"><path class="letter anim" d="M 30 30 L 30 70" /><path class="letter anim" d="M 70 30 L 70 70" /><path class="letter anim" d="M 30 50 L 70 50" /></g>
   <g class="g"><path class="letter anim" d="M 70 35 L 35 30 L 30 70 L 70 75 L 70 50 L 50 55" /></g>

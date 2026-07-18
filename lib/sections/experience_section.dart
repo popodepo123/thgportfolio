@@ -69,6 +69,28 @@ class _ExperienceSectionState extends State<ExperienceSection> {
               ),
             );
           }),
+          const SizedBox(height: 16),
+          Text("Education", style: textTheme.headlineMedium),
+          const SizedBox(height: 16),
+          ...portfolio.education.map(
+            (education) => Card(
+              child: ListTile(
+                title: Text(
+                  education.degree,
+                  style: isMobile
+                      ? textTheme.titleLarge?.copyWith(fontSize: 18)
+                      : textTheme.titleLarge,
+                ),
+                subtitle: Text(
+                  "${education.institution} | ${education.period}",
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: Colors.white70,
+                    fontSize: isMobile ? 13 : 14,
+                  ),
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: 24),
         ],
       ),

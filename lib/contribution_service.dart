@@ -144,8 +144,10 @@ class ContributionService {
     List<_Candidate> candidates = [];
 
     for (var node in tree) {
-      if (node['type'] != 'blob' || !(node['path'] as String).endsWith('.dart'))
+      if (node['type'] != 'blob' ||
+          !(node['path'] as String).endsWith('.dart')) {
         continue;
+      }
       final String path = node['path'] as String;
       final String fileName = path.split('/').last.toLowerCase();
       int score = 0;
@@ -163,16 +165,22 @@ class ContributionService {
       for (var comp in components) {
         if (fuzzySymbol.contains(comp) && fileName.contains(comp)) {
           score += 40;
-          if (fuzzySymbol.endsWith(comp) && fileName.contains(comp))
+          if (fuzzySymbol.endsWith(comp) && fileName.contains(comp)) {
             score += 20;
+          }
         }
       }
-      if (currentDir != null && path.startsWith(currentDir)) score += 30;
+      if (currentDir != null && path.startsWith(currentDir)) {
+        score += 30;
+      }
       if (fileName
           .replaceAll('_', '')
-          .contains(fuzzySymbol.replaceAll('_', '')))
+          .contains(fuzzySymbol.replaceAll('_', ''))) {
         score += 10;
-      if (score > 0) candidates.add(_Candidate(path: path, score: score));
+      }
+      if (score > 0) {
+        candidates.add(_Candidate(path: path, score: score));
+      }
     }
 
     candidates.sort((a, b) => b.score.compareTo(a.score));

@@ -49,7 +49,7 @@ class _SkillsSectionState extends State<SkillsSection> {
                     spacing: 12,
                     runSpacing: 12,
                     children: category.skills.map((skillDetail) {
-                      final icon = skillIcons[skillDetail.name];
+                      final icon = skillIcons[skillDetail.name]!;
                       return CustomSkillChip(
                         skillDetail: skillDetail,
                         icon: icon,

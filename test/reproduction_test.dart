@@ -4,9 +4,13 @@ import 'package:thgportfolio/sections/hero_section.dart';
 
 void main() {
   testWidgets('HeroSection layout test', (WidgetTester tester) async {
-    await tester.pumpWidget(MaterialApp(home: Scaffold(body: HeroSection())));
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: SingleChildScrollView(child: HeroSection())),
+      ),
+    );
 
-    // If it doesn't crash, the test passes.
     expect(find.byType(HeroSection), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

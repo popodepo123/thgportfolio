@@ -12,7 +12,7 @@ class InspirationsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Inspirations', style: textTheme.titleLarge),
+        Text('Inspirations', style: textTheme.headlineMedium),
         const SizedBox(height: 8),
         Text(
           'Creators and developers who shape my perspective on engineering and craft.',
@@ -129,12 +129,12 @@ class _LinkButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 14, color: gruberNiagara),
+              Icon(icon, size: 14, color: gruberYellow),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: const TextStyle(
-                  color: gruberNiagara,
+                  color: gruberYellow,
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),

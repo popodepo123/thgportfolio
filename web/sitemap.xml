@@ -4,15 +4,15 @@
 
   <url>
     <loc>https://popodepo123.github.io/thgportfolio/</loc>
-    <lastmod>2024-12-19</lastmod>
+    <lastmod>2026-07-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
 
     <!-- Portfolio sections as images for better SEO -->
     <image:image>
-      <image:loc>https://popodepo123.github.io/thgportfolio/icons/Icon-512.png</image:loc>
-      <image:title>Tristan Harvey Godoy - Full Stack Developer Portfolio</image:title>
-      <image:caption>Professional portfolio showcasing development projects and skills</image:caption>
+      <image:loc>https://popodepo123.github.io/thgportfolio/og-image.png</image:loc>
+      <image:title>Tristan Harvey Godoy - Mobile Application Developer</image:title>
+      <image:caption>Mobile application development portfolio showcasing Flutter projects, skills, and professional experience</image:caption>
     </image:image>
 
   </url>

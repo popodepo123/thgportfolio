@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:thgportfolio/portfolio_data.dart';
 import 'package:thgportfolio/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,11 +13,14 @@ class ProjectsSection extends StatefulWidget {
 class _ProjectsSectionState extends State<ProjectsSection> {
   final Map<int, bool> _expandedStates = {};
 
-  Future<void> trylaunchUrl(String link) async {
-    if (await canLaunchUrl(Uri.parse(link))) {
-      await launchUrl(Uri.parse(link));
-    } else {
-      if (!mounted) return;
+  Future<void> _launchUrl(String link) async {
+    try {
+      final launched = await launchUrl(Uri.parse(link));
+      if (launched) return;
+    } catch (_) {
+      // The user receives a visible error below.
+    }
+    if (mounted) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Could not launch $link')));
@@ -55,29 +57,34 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                           runSpacing: 8,
                           children: [
                             if (project.playstoreLink != null)
-                              _buildIconButton(
-                                FontAwesomeIcons.googlePlay,
+                              _buildLinkButton(
+                                Icons.android,
                                 project.playstoreLink!,
+                                "Google Play",
                               ),
                             if (project.appstoreLink != null)
-                              _buildIconButton(
-                                FontAwesomeIcons.appStore,
+                              _buildLinkButton(
+                                Icons.apple,
                                 project.appstoreLink!,
+                                "App Store",
                               ),
                             if (project.githubLink != null)
-                              _buildIconButton(
-                                FontAwesomeIcons.github,
+                              _buildLinkButton(
+                                Icons.code,
                                 project.githubLink!,
+                                "GitHub",
                               ),
                             if (project.gitlabLink != null)
-                              _buildIconButton(
-                                FontAwesomeIcons.gitlab,
+                              _buildLinkButton(
+                                Icons.source_outlined,
                                 project.gitlabLink!,
+                                "GitLab",
                               ),
                             if (project.webLink != null)
-                              _buildIconButton(
-                                FontAwesomeIcons.globe,
+                              _buildLinkButton(
+                                Icons.open_in_new,
                                 project.webLink!,
+                                "Live",
                               ),
                           ],
                         ),
@@ -106,37 +113,26 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                             child: MouseRegion(
                               cursor: SystemMouseCursors.click,
                               child: GestureDetector(
-                                onTap: () {
-                                  showDialog(
+                                onTap: () async {
+                                  final galleryPageController = PageController(
+                                    initialPage: imageIndex,
+                                  );
+                                  final currentPageNotifier =
+                                      ValueNotifier<int>(imageIndex);
+                                  galleryPageController.addListener(() {
+                                    if (!galleryPageController.hasClients) {
+                                      return;
+                                    }
+                                    final page = galleryPageController.page;
+                                    if (page == null) return;
+                                    currentPageNotifier.value = page
+                                        .round()
+                                        .clamp(0, project.images!.length - 1);
+                                  });
+
+                                  await showDialog<void>(
                                     context: context,
                                     builder: (BuildContext context) {
-                                      final PageController
-                                      galleryPageController = PageController(
-                                        initialPage: imageIndex,
-                                      );
-                                      final ValueNotifier<int>
-                                      currentPageNotifier = ValueNotifier<int>(
-                                        imageIndex,
-                                      );
-
-                                      galleryPageController.addListener(() {
-                                        if (galleryPageController.hasClients &&
-                                            galleryPageController.page !=
-                                                null) {
-                                          final int page = galleryPageController
-                                              .page!
-                                              .round();
-                                          if (project.images != null &&
-                                              project.images!.isNotEmpty) {
-                                            currentPageNotifier.value = page
-                                                .clamp(
-                                                  0,
-                                                  project.images!.length - 1,
-                                                );
-                                          }
-                                        }
-                                      });
-
                                       return Dialog(
                                         backgroundColor: Theme.of(
                                           context,
@@ -173,14 +169,14 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                                                     ProjectImageFromAsset() =>
                                                       Image.asset(
                                                         projectImage.asset,
-                                                        // fit: BoxFit.fill,
+                                                        fit: BoxFit.contain,
                                                         semanticLabel:
                                                             projectImage.title,
                                                       ),
                                                     ProjectImageFromUrl() =>
                                                       Image.network(
                                                         projectImage.url,
-                                                        // fit: BoxFit.fill,
+                                                        fit: BoxFit.contain,
                                                         semanticLabel:
                                                             projectImage.title,
                                                       ),
@@ -301,6 +297,8 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                                       );
                                     },
                                   );
+                                  galleryPageController.dispose();
+                                  currentPageNotifier.dispose();
                                 },
                                 child: Card(
                                   clipBehavior: Clip.antiAlias,
@@ -385,13 +383,11 @@ class _ProjectsSectionState extends State<ProjectsSection> {
     );
   }
 
-  Widget _buildIconButton(dynamic icon, String link) {
-    return IconButton(
-      iconSize: 20,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(),
-      icon: icon is IconData ? Icon(icon) : FaIcon(icon),
-      onPressed: () => trylaunchUrl(link),
+  Widget _buildLinkButton(IconData icon, String link, String label) {
+    return OutlinedButton.icon(
+      icon: Icon(icon, size: 16),
+      label: Text(label),
+      onPressed: () => _launchUrl(link),
     );
   }
 
@@ -399,12 +395,12 @@ class _ProjectsSectionState extends State<ProjectsSection> {
     return switch (image) {
       ProjectImageFromAsset() => Image.asset(
         image.asset,
-        fit: BoxFit.fill,
+        fit: BoxFit.contain,
         semanticLabel: image.title,
       ),
       ProjectImageFromUrl() => Image.network(
         image.url,
-        fit: BoxFit.fill,
+        fit: BoxFit.contain,
         semanticLabel: image.title,
       ),
     };

@@ -17,7 +17,7 @@ class SkillDetailDialog extends StatelessWidget {
           child: ListBody(
             children: <Widget>[
               Text('Description: ${skill.description}'),
-              if (skill.websiteUrl != null)
+              if (skill.websiteUrl?.trim().isNotEmpty ?? false)
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: MouseRegion(

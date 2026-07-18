@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:thgportfolio/sections/ai_summary_section.dart';
 import 'package:thgportfolio/sections/dev_setup_section.dart';
 import 'package:thgportfolio/sections/hobbies_section.dart';
 import 'package:thgportfolio/sections/inspirations_section.dart';
@@ -22,8 +21,6 @@ class OtherMeSection extends StatelessWidget {
           const HobbiesSection(),
           const SizedBox(height: 48),
           const InspirationsSection(),
-          const SizedBox(height: 48),
-          const AISummarySection(),
           const SizedBox(height: 48),
         ],
       ),

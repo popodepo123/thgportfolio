@@ -23,7 +23,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tristan Harvey Godoy - Portfolio',
+      title: 'Tristan Harvey Godoy - Mobile Application Developer',
       theme: portfolioTheme,
       scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,

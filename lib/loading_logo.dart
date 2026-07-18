@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:thgportfolio/theme.dart';
 
 class LoadingLogo extends StatefulWidget {
   const LoadingLogo({super.key, this.speedMs = 300, this.size = 300});
@@ -14,36 +17,33 @@ class _LoadingLogoState extends State<LoadingLogo>
     with SingleTickerProviderStateMixin {
   AnimationController? animationController;
   late Widget logo;
-  bool _isAnimating = true;
+  Timer? _letterTimer;
 
-  void start() async {
-    while (_isAnimating && mounted) {
-      final int gap = widget.speedMs;
-      await Future.delayed(Duration(milliseconds: gap * 3));
-      if (!mounted || !_isAnimating) return;
+  void start() {
+    var phase = 0;
+    _letterTimer = Timer.periodic(Duration(milliseconds: widget.speedMs * 3), (
+      _,
+    ) {
+      if (!mounted) return;
+      phase = (phase + 1) % 4;
+      if (phase == 3) return;
       setState(() {
-        logo = LoadingLogoH(
-          fullStickDurationMs: widget.speedMs,
-          size: widget.size,
-        );
+        logo = switch (phase) {
+          1 => LoadingLogoH(
+            fullStickDurationMs: widget.speedMs,
+            size: widget.size,
+          ),
+          2 => LoadingLogoG(
+            fullStickDurationMs: widget.speedMs,
+            size: widget.size,
+          ),
+          _ => LoadingLogoT(
+            fullStickDurationMs: widget.speedMs,
+            size: widget.size,
+          ),
+        };
       });
-      await Future.delayed(Duration(milliseconds: gap * 3));
-      if (!mounted || !_isAnimating) return;
-      setState(() {
-        logo = LoadingLogoG(
-          size: widget.size,
-          fullStickDurationMs: widget.speedMs,
-        );
-      });
-      await Future.delayed(Duration(milliseconds: gap * 3 * 2));
-      if (!mounted || !_isAnimating) return;
-      setState(() {
-        logo = LoadingLogoT(
-          size: widget.size,
-          fullStickDurationMs: widget.speedMs,
-        );
-      });
-    }
+    });
   }
 
   @override
@@ -57,17 +57,18 @@ class _LoadingLogoState extends State<LoadingLogo>
     );
     logo = LoadingLogoT(size: widget.size);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (!mounted) return;
       start();
       animationController?.repeat();
       animationController?.addListener(() {
-        setState(() {});
+        if (mounted) setState(() {});
       });
     });
   }
 
   @override
   void dispose() {
-    _isAnimating = false;
+    _letterTimer?.cancel();
     animationController?.dispose();
     super.dispose();
   }
@@ -100,7 +101,7 @@ class _LoadingLogoState extends State<LoadingLogo>
               width: widget.size * 2,
               height: widget.size * 2,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.yellow, width: 3),
+                border: Border.all(color: gruberYellow, width: 3),
               ),
             ),
           ),
@@ -350,20 +351,23 @@ class AnimatedStick extends StatefulWidget {
 class _AnimatedStickState extends State<AnimatedStick>
     with SingleTickerProviderStateMixin {
   AnimationController? controller;
-  bool _isAnimating = true;
+  Timer? _delayTimer;
 
-  void start(AnimationController controller) async {
-    if (!_isAnimating) return;
+  void start(AnimationController controller) {
+    void forward() {
+      if (mounted) controller.forward();
+    }
 
-    await Future.delayed(widget.delay);
-    if (!mounted || !_isAnimating) return;
-
-    controller.forward();
     controller.addListener(() {
-      if (mounted && _isAnimating) {
+      if (mounted) {
         setState(() {});
       }
     });
+    if (widget.delay == Duration.zero) {
+      forward();
+    } else {
+      _delayTimer = Timer(widget.delay, forward);
+    }
   }
 
   @override
@@ -376,13 +380,13 @@ class _AnimatedStickState extends State<AnimatedStick>
       upperBound: 1.0,
     );
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (controller != null) start(controller!);
+      if (mounted && controller != null) start(controller!);
     });
   }
 
   @override
   void dispose() {
-    _isAnimating = false;
+    _delayTimer?.cancel();
     controller?.dispose();
     super.dispose();
   }
@@ -424,7 +428,7 @@ class _AnimatedStickState extends State<AnimatedStick>
               },
             ),
             child: Container(
-              decoration: BoxDecoration(color: Colors.yellow),
+              decoration: const BoxDecoration(color: gruberYellow),
               height: switch (widget.axis) {
                 Axis.horizontal => widget.thickness,
                 Axis.vertical => widget.length * controllerVaue,

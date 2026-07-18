@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">Tristan Harvey Godoy portfolio</title>
+  <desc id="description">Black and yellow portfolio card for a mobile application developer.</desc>
+  <rect width="1200" height="630" fill="#101010"/>
+  <rect x="90" y="145" width="340" height="340" rx="64" fill="#101010" stroke="#ffdd33" stroke-width="10"/>
+  <text x="260" y="360" text-anchor="middle" fill="#ffdd33" font-family="Menlo, monospace" font-size="120" font-weight="700">THG</text>
+  <text x="500" y="245" fill="#ffdd33" font-family="Menlo, monospace" font-size="50" font-weight="700">Tristan Harvey Godoy</text>
+  <text x="500" y="315" fill="#e4e4ef" font-family="Menlo, monospace" font-size="31">Mobile Application Developer</text>
+  <text x="500" y="375" fill="#ffdd33" font-family="Menlo, monospace" font-size="22">Flutter  •  Dart  •  Mobile Engineering</text>
+</svg>

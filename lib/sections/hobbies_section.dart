@@ -35,7 +35,7 @@ class _HobbyCategoryWidget extends StatelessWidget {
           Text(
             category.title,
             style: const TextStyle(
-              color: gruberNiagara,
+              color: gruberYellow,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -69,26 +69,24 @@ class _HobbyListItem extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (item.imageUrl != null) ...[
+          if (item.imageAsset != null || item.imageUrl != null) ...[
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
-              child: Image.network(
-                item.imageUrl!,
-                height: 48,
-                width: 48,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 48,
-                  width: 48,
-                  color: gruberBgDarker,
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.videogame_asset,
-                    size: 24,
-                    color: gruberQuartz,
-                  ),
-                ),
-              ),
+              child: item.imageAsset != null
+                  ? Image.asset(
+                      item.imageAsset!,
+                      height: 48,
+                      width: 48,
+                      fit: BoxFit.contain,
+                      semanticLabel: "${item.name} artwork",
+                    )
+                  : Image.network(
+                      item.imageUrl!,
+                      height: 48,
+                      width: 48,
+                      fit: BoxFit.contain,
+                      semanticLabel: "${item.name} artwork",
+                    ),
             ),
             const SizedBox(width: 16),
           ] else ...[
@@ -100,7 +98,14 @@ class _HobbyListItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(6),
               ),
               alignment: Alignment.center,
-              child: const Icon(Icons.star, size: 24, color: gruberQuartz),
+              child: Text(
+                item.name.characters.first.toUpperCase(),
+                style: const TextStyle(
+                  color: gruberYellow,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             const SizedBox(width: 16),
           ],

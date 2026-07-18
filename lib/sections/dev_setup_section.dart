@@ -17,7 +17,7 @@ class DevSetupSection extends StatelessWidget {
         _buildResponsiveGrid(context, isMobile, [
           _buildSetupCategory(context, 'Hardware & OS', [
             'MacBook Air (M3) - Main Workstation',
-            'macOS Sequoia - Primary OS',
+            'macOS - Primary OS',
             'Custom Built PC - Windows 11',
           ]),
           _buildSetupCategory(context, 'Terminal & Shell', [
@@ -99,7 +99,7 @@ class DevSetupSection extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('• ', style: TextStyle(color: gruberNiagara)),
+                  const Text('• ', style: TextStyle(color: gruberYellow)),
                   Expanded(
                     child: Text(
                       item,

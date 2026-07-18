@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:thgportfolio/portfolio_data.dart';
 import 'package:thgportfolio/widgets/skill_widgets.dart';
 
 class SkillChip extends StatefulWidget {
   final SkillDetail skillDetail;
-  final dynamic icon;
+  final IconData icon;
   final TextTheme textTheme;
   const SkillChip({
     super.key,
@@ -21,26 +20,6 @@ class SkillChip extends StatefulWidget {
 class _SkillChipState extends State<SkillChip> {
   bool _isHovering = false;
 
-  Widget? _buildIcon(dynamic iconData, Color color) {
-    if (iconData == null) return null;
-    if (iconData is IconData &&
-        iconData.runtimeType.toString() != 'FaIconData') {
-      return Icon(
-        iconData,
-        size: 16,
-        color: color,
-        semanticLabel: widget.skillDetail.name,
-      );
-    } else {
-      return FaIcon(
-        iconData,
-        size: 16,
-        color: color,
-        semanticLabel: widget.skillDetail.name,
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -54,7 +33,7 @@ class _SkillChipState extends State<SkillChip> {
       },
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
-        onHover: (event) {
+        onEnter: (event) {
           setState(() {
             _isHovering = true;
           });
@@ -71,14 +50,18 @@ class _SkillChipState extends State<SkillChip> {
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
               color: _isHovering
-                  ? Theme.of(context).colorScheme.tertiary
+                  ? Theme.of(context).colorScheme.primary
                   : Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Chip(
-              avatar: _buildIcon(
+              avatar: Icon(
                 widget.icon,
-                Theme.of(context).colorScheme.onPrimary,
+                size: 16,
+                color: _isHovering
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.onSurface,
+                semanticLabel: widget.skillDetail.name,
               ),
               label: SelectionContainer.disabled(
                 child: DefaultTextStyle(

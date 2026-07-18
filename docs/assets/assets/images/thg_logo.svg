@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
+  <title id="title">THG monogram</title>
+  <desc id="description">Tristan Harvey Godoy monogram in yellow on a black background.</desc>
+  <rect width="512" height="512" rx="96" fill="#101010"/>
+  <rect x="36" y="36" width="440" height="440" rx="72" fill="none" stroke="#ffdd33" stroke-width="12"/>
+  <text x="256" y="305" text-anchor="middle" fill="#ffdd33" font-family="monospace" font-size="150" font-weight="700">THG</text>
+</svg>

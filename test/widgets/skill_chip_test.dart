@@ -34,20 +34,22 @@ void main() {
       );
 
       // Initial state
+      final theme = Theme.of(tester.element(find.byType(SkillChip)));
       final initialContainer = tester.widget<AnimatedContainer>(
         find.byType(AnimatedContainer),
       );
       expect(initialContainer.decoration, isA<BoxDecoration>());
       expect(
         (initialContainer.decoration as BoxDecoration).color,
-        Theme.of(
-          tester.element(find.byType(MaterialApp)),
-        ).colorScheme.surfaceContainerHighest,
+        theme.colorScheme.surfaceContainerHighest,
       );
 
       final initialText = tester.widget<Text>(find.text('Flutter'));
-      expect(initialText.style?.color, isNotNull);
-      expect(initialText.style?.color, Colors.white);
+      expect(initialText.style, isNull);
+      expect(
+        DefaultTextStyle.of(tester.element(find.text('Flutter'))).style.color,
+        theme.colorScheme.onSurface,
+      );
 
       // Hover state
       final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
@@ -61,11 +63,14 @@ void main() {
       );
       expect(
         (hoveredContainer.decoration as BoxDecoration).color,
-        Theme.of(tester.element(find.byType(MaterialApp))).colorScheme.tertiary,
+        theme.colorScheme.primary,
       );
 
-      final hoveredText = tester.widget<Text>(find.text('Flutter'));
-      expect(hoveredText.style?.color, Colors.black);
+      expect(
+        DefaultTextStyle.of(tester.element(find.text('Flutter'))).style.color,
+        theme.colorScheme.onPrimary,
+      );
+      await gesture.removePointer();
     });
   });
 }

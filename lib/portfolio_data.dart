@@ -6,6 +6,7 @@ class PortfolioData {
   final String email;
   final String? gitlabUrl;
   final String? githubUrl;
+  final String resumeAssetPath;
   final String summary;
   final List<SkillCategory> skills;
   final List<Project> projects;
@@ -21,6 +22,7 @@ class PortfolioData {
     required this.email,
     this.gitlabUrl,
     this.githubUrl,
+    required this.resumeAssetPath,
     required this.summary,
     required this.skills,
     required this.projects,
@@ -56,9 +58,15 @@ class HobbyCategory {
 class HobbyItem {
   final String name;
   final String? imageUrl;
+  final String? imageAsset;
   final String? description;
 
-  const HobbyItem({required this.name, this.imageUrl, this.description});
+  const HobbyItem({
+    required this.name,
+    this.imageUrl,
+    this.imageAsset,
+    this.description,
+  }) : assert(imageUrl == null || imageAsset == null);
 }
 
 class SkillDetail {
@@ -182,362 +190,432 @@ final portfolio = PortfolioData(
   email: 'godoytristanh@gmail.com',
   githubUrl: 'https://github.com/popodepo123',
   gitlabUrl: 'https://gitlab.com/godoytristanh',
+  resumeAssetPath: 'assets/resume_thg_dev_20260718.pdf',
   summary:
-      'I am a proactive and deeply curious software developer who thrives on solving complex bottlenecks and building efficient, scalable systems. My approach to technology is intensely hands-on: I don\'t just use tools; I build custom automations, optimize workflows, and actively mold my development environment to enforce clean architecture.\n\nMy learning philosophy is rooted in practical, tenacious problem-solving. Whether I am untangling deep dependency conflicts, building secure backend proxy functions, or diving into terminal logs to bypass infrastructure friction, I view technical roadblocks as opportunities to master the underlying mechanics of a system. I am consistently expanding my boundaries across the full stack—exploring new languages, robust backend solutions, and cloud architectures to ensure I am always building smarter, faster, and more securely.',
+      "Mobile application developer focused on production Flutter systems, maintainable feature-first architecture, native platform integrations, and reliable developer tooling. My recent work includes online banking, restaurant ordering and point-of-sale workflows, EV charging maps, Bluetooth thermal printers, media pipelines, Firebase services, and REST APIs across Android, iOS, and web.",
   skills: [
     SkillCategory(
-      categoryName: 'Programming Languages',
+      categoryName: "Programming Languages",
       skills: [
         SkillDetail(
-          name: 'Dart',
-          description:
-              'An open-source, client-optimized programming language developed by Google for developing fast applications across various platforms, including web, mobile, and desktop, and is the foundational language for the Flutter UI framework.',
-          websiteUrl: 'https://dart.dev',
+          name: "Dart",
+          description: "Primary language for Flutter application development.",
+          websiteUrl: "https://dart.dev",
         ),
         SkillDetail(
-          name: 'Web (Javascript, HTML, CSS)',
+          name: "Web (JavaScript, HTML, CSS)",
           description:
-              'A foundational set of technologies for building web pages and web applications. HTML provides the structure, CSS handles the styling, and JavaScript adds interactivity and dynamic behavior.',
+              "Web technologies used for interfaces, internal tools, and Google Apps Script web applications.",
+          websiteUrl: "https://developer.mozilla.org/en-US/docs/Web",
         ),
         SkillDetail(
-          name: 'VBA',
-          description:
-              'Visual Basic for Applications (VBA) is an implementation of Microsoft\'s event-driven programming language Visual Basic 6, which is built into most Microsoft Office applications. It allows for automation of tasks and extension of application functionality.',
+          name: "VBA",
+          description: "Office automation and MS Access/Excel systems.",
           websiteUrl:
-              'https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba',
+              "https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba",
         ),
         SkillDetail(
-          name: 'SQL',
+          name: "SQL",
           description:
-              'Structured Query Language (SQL) is a domain-specific language used to manage and manipulate data in relational database management systems. It is used for data querying, manipulation, definition, and control.',
-          websiteUrl: 'https://www.iso.org/standard/76583.html',
-        ),
-      ],
-    ),
-    SkillCategory(
-      categoryName: 'Frameworks',
-      skills: [
-        SkillDetail(
-          name: 'Flutter',
-          description:
-              'An open-source UI software development kit (SDK) created by Google for crafting beautiful, fast user experiences for mobile, web, and desktop from a single codebase.',
-          websiteUrl: 'https://flutter.dev',
+              "Relational data querying, transformation, and reporting.",
         ),
         SkillDetail(
-          name: 'Jaspr (Dart Web Framework)',
+          name: "Kotlin",
           description:
-              'A modern, free, and open-source web framework for building websites using the Dart programming language, offering a development experience similar to Flutter but rendering native HTML and CSS.',
-          websiteUrl: 'https://jaspr.site',
+              "Android-native integrations through Flutter platform channels.",
+          websiteUrl: "https://kotlinlang.org",
         ),
         SkillDetail(
-          name: 'MIT App Inventor',
-          description:
-              'An intuitive, visual programming environment that enables individuals to build fully functional applications for Android and iOS devices using a blocks-based coding approach.',
-          websiteUrl: 'https://appinventor.mit.edu/',
-        ),
-        SkillDetail(
-          name: 'Serverpod (dart backend server)',
-          description:
-              'An open-source, scalable app server and backend framework written in Dart, specifically designed for the Flutter community, enabling full-stack Dart development with features like automatic code generation, caching, and ORM.',
-          websiteUrl: 'https://serverpod.dev',
+          name: "Swift",
+          description: "iOS-native SDK and platform-channel integrations.",
+          websiteUrl: "https://www.swift.org",
         ),
       ],
     ),
     SkillCategory(
-      categoryName: 'Other Tools',
+      categoryName: "Frameworks",
       skills: [
         SkillDetail(
-          name: 'VS Code',
+          name: "Flutter",
           description:
-              'Visual Studio Code (VS Code) is a free, lightweight, and powerful source code editor developed by Microsoft, designed for building and debugging modern web and cloud applications with extensive language support and extensions.',
-          websiteUrl: 'https://code.visualstudio.com/',
+              "Cross-platform UI development for Android, iOS, and web.",
+          websiteUrl: "https://flutter.dev",
         ),
         SkillDetail(
-          name: 'Android Studio',
+          name: "Jaspr (Dart Web Framework)",
           description:
-              'Android Studio is the official Integrated Development Environment (IDE) for Android app development, providing a comprehensive suite of tools for code editing, testing, performance analysis, and deployment.',
-          websiteUrl: 'https://developer.android.com/studio',
+              "Dart framework for server-rendered and client-rendered web experiences.",
+          websiteUrl: "https://jaspr.site",
         ),
         SkillDetail(
-          name: 'Xcode',
+          name: "MIT App Inventor",
           description:
-              'Xcode is Apple\'s integrated development environment (IDE) designed for developing software across all Apple platforms, including macOS, iOS, iPadOS, watchOS, tvOS, and visionOS, offering tools for coding, debugging, and interface design.',
-          websiteUrl: 'https://developer.apple.com/xcode/',
+              "Visual application-development environment used for rapid prototypes.",
+          websiteUrl: "https://appinventor.mit.edu/",
         ),
         SkillDetail(
-          name: 'Helix/Vim',
+          name: "Serverpod",
           description:
-              'Helix is a modern, modal terminal-based text editor inspired by Vim, focusing on efficiency and a customizable editing experience. Vim (Vi IMproved) is a highly configurable text editor built to enable efficient text editing.',
-          websiteUrl: 'https://helix-editor.com/',
+              "Dart backend framework designed for Flutter applications.",
+          websiteUrl: "https://serverpod.dev",
+        ),
+      ],
+    ),
+    SkillCategory(
+      categoryName: "Other Tools",
+      skills: [
+        SkillDetail(
+          name: "VS Code",
+          description: "Source-code editor and debugging environment.",
+          websiteUrl: "https://code.visualstudio.com/",
         ),
         SkillDetail(
-          name: 'Code Magic',
+          name: "Android Studio",
           description:
-              'CodeMagic CI/CD is a cloud-based Continuous Integration/Continuous Delivery platform specifically designed for mobile application development, automating the build, test, and release pipeline for Flutter, React Native, and native apps.',
-          websiteUrl: 'https://codemagic.io/',
+              "Android SDK, emulator, profiler, and native development environment.",
+          websiteUrl: "https://developer.android.com/studio",
         ),
         SkillDetail(
-          name: 'Git',
+          name: "Xcode",
           description:
-              'Git is a free and open-source distributed version control system (DVCS) that efficiently tracks changes to files, commonly used by programmers for collaborative software development.',
-          websiteUrl: 'https://git-scm.com/',
+              "Apple SDK, simulator, signing, and native iOS development environment.",
+          websiteUrl: "https://developer.apple.com/xcode/",
         ),
         SkillDetail(
-          name: 'Github',
+          name: "Helix/Vim/Neovim",
           description:
-              'GitHub is a web-based platform for version control and collaboration, built around Git. It provides hosting for software development and version control using Git, and offers features like issue tracking, pull requests, and project management.',
-          websiteUrl: 'https://github.com/',
+              "Modal terminal editors used in custom development workflows.",
+          websiteUrl: "https://helix-editor.com/",
         ),
         SkillDetail(
-          name: 'Bitbucket',
-          description:
-              'Bitbucket is a Git-based source code repository hosting service owned by Atlassian, providing features for code and code review, continuous delivery, and integration with other Atlassian tools.',
-          websiteUrl: 'https://bitbucket.org/',
+          name: "Codemagic",
+          description: "Mobile CI/CD build and deployment automation.",
+          websiteUrl: "https://codemagic.io/",
         ),
         SkillDetail(
-          name: 'Sourcetree',
-          description:
-              'Sourcetree is a free Git GUI (Graphical User Interface) client for Windows and Mac, developed by Atlassian, simplifying interaction with Git and Mercurial repositories through a visual interface.',
-          websiteUrl: 'https://www.sourcetreeapp.com/',
+          name: "Git",
+          description: "Distributed version control.",
+          websiteUrl: "https://git-scm.com/",
         ),
         SkillDetail(
-          name: 'Google Apps Script',
-          description:
-              'Google Apps Script is a cloud-based scripting platform developed by Google for lightweight application development within the Google Workspace ecosystem, allowing automation and extension of Google apps functionality using JavaScript.',
-          websiteUrl: 'https://developers.google.com/apps-script',
+          name: "GitHub",
+          description: "Git hosting and software collaboration platform.",
+          websiteUrl: "https://github.com/",
         ),
         SkillDetail(
-          name: 'Trello',
-          description:
-              'Trello is a visual project management tool that utilizes boards, lists, and cards to organize tasks and track progress, based on the Kanban board system, facilitating team collaboration and workflow customization.',
-          websiteUrl: 'https://trello.com/',
+          name: "Bitbucket",
+          description: "Atlassian Git hosting and collaboration platform.",
+          websiteUrl: "https://bitbucket.org/",
         ),
         SkillDetail(
-          name: 'Postman',
-          description:
-              'Postman is an API platform for building and using APIs, helping teams collaboratively build APIs that power workflows and intelligent agents. It supports the entire API lifecycle, including development, testing, management, and monitoring.',
-          websiteUrl: 'https://www.postman.com/',
+          name: "Sourcetree",
+          description: "Desktop Git client from Atlassian.",
+          websiteUrl: "https://www.sourcetreeapp.com/",
         ),
         SkillDetail(
-          name: 'Gemini CLI',
+          name: "Google Apps Script",
           description:
-              'A command-line interface for interacting with Google\'s Gemini API, enabling developers to integrate AI capabilities into their workflows.',
-          websiteUrl: 'https://ai.google.dev/gemini-api/docs/reference/rest',
+              "Google Workspace automation and web application platform.",
+          websiteUrl: "https://developers.google.com/apps-script",
         ),
         SkillDetail(
-          name: 'Ollama',
+          name: "Firebase",
           description:
-              'A tool for running large language models locally, providing a simple way to experiment with and deploy open-source models on your own machine.',
-          websiteUrl: 'https://ollama.ai/',
+              "Authentication, Firestore, Cloud Functions, Hosting, Storage, Messaging, AI, and Crashlytics.",
+          websiteUrl: "https://firebase.google.com/",
+        ),
+        SkillDetail(
+          name: "Trello",
+          description: "Kanban-based project and task management.",
+          websiteUrl: "https://trello.com/",
+        ),
+        SkillDetail(
+          name: "Postman",
+          description: "API development and testing platform.",
+          websiteUrl: "https://www.postman.com/",
+        ),
+        SkillDetail(
+          name: "Google Cloud Platform",
+          description: "Google cloud infrastructure and managed services.",
+          websiteUrl: "https://cloud.google.com/",
+        ),
+        SkillDetail(
+          name: "OpenCode",
+          description: "Open-source terminal coding agent.",
+          websiteUrl: "https://opencode.ai/",
+        ),
+        SkillDetail(
+          name: "Gemini CLI",
+          description: "Open-source Gemini coding agent for the terminal.",
+          websiteUrl: "https://github.com/google-gemini/gemini-cli",
+        ),
+        SkillDetail(
+          name: "LM Studio",
+          description:
+              "Local large-language-model runtime and development environment.",
+          websiteUrl: "https://lmstudio.ai/",
+        ),
+        SkillDetail(
+          name: "Google AI Studio",
+          description: "Google interface for prototyping with Gemini models.",
+          websiteUrl: "https://aistudio.google.com/",
+        ),
+        SkillDetail(
+          name: "Ollama",
+          description: "Local model runtime and command-line tooling.",
+          websiteUrl: "https://ollama.com/",
+        ),
+        SkillDetail(
+          name: "Firebase Studio",
+          description:
+              "Cloud development workspace for full-stack AI applications.",
+          websiteUrl: "https://firebase.studio/",
+        ),
+        SkillDetail(
+          name: "Figma",
+          description: "Collaborative interface design and prototyping.",
+          websiteUrl: "https://www.figma.com/",
+        ),
+        SkillDetail(
+          name: "Codex",
+          description:
+              "OpenAI coding agent used for repository-scale development workflows.",
+          websiteUrl: "https://openai.com/codex/",
+        ),
+        SkillDetail(
+          name: "Claude Code",
+          description: "Anthropic coding agent for terminal workflows.",
+          websiteUrl: "https://www.anthropic.com/claude-code",
+        ),
+        SkillDetail(
+          name: "Antigravity 2",
+          description:
+              "Agentic development environment used for AI-assisted engineering workflows.",
+        ),
+        SkillDetail(
+          name: "Bash",
+          description: "Unix shell scripting and build automation.",
+          websiteUrl: "https://www.gnu.org/software/bash/",
+        ),
+        SkillDetail(
+          name: "PowerShell",
+          description: "Cross-platform shell and task automation.",
+          websiteUrl: "https://learn.microsoft.com/powershell/",
         ),
       ],
     ),
   ],
   projects: [
     Project(
-      title: 'KitaKits POS',
-      webLink: 'https://kitakits-pos.web.app/',
+      title: "KitaKits POS",
+      webLink: "https://kitakits-pos.web.app/",
       description:
-          'A modern, secure, and highly efficient Point of Sale (POS) system built with Flutter and Firebase. Designed for store owners with powerful management tools and a simple ordering interface for staff.',
+          "A Flutter and Firebase point-of-sale system for store owners and kiosk staff, with secure access, inventory controls, ordering, and responsive operation.",
       features: [
-        'Dual-Mode Authentication: Store Owner (Admin) and Kiosk Staff accounts',
-        'Advanced Security: Root/Jailbreak detection, 2FA (TOTP), Biometric Lock, and Screen Protection',
-        'Store & Item Management: Item registration with barcode support and SKU tracking',
-        'Ordering & Sales: Real-time cart, responsive UI (Mobile/Tablet/Desktop), and Bluetooth thermal printer integration',
-        'Architecture: Feature-First structure with Hooks Riverpod and GoRouter',
-        'Maintenance: Force update system directly from Firestore',
+        "Store-owner and kiosk-staff authentication modes",
+        "Root/jailbreak detection, TOTP two-factor authentication, biometric lock, and screen protection",
+        "Store and item management with barcode and SKU support",
+        "Responsive ordering and sales workflows with Bluetooth thermal printing",
+        "Feature-first architecture with Hooks Riverpod and GoRouter",
+        "Firestore-backed force-update controls",
       ],
     ),
     Project(
-      title: 'Lapit: Rent Nearby',
-      webLink: 'https://rentsearch-482010.web.app/',
+      title: "Lapit - Apartment and Condo Search",
+      webLink: "https://rentsearch-482010.web.app/",
       description:
-          'A location-based peer-to-peer rental platform that allows users to find and rent items in their immediate vicinity using an interactive map interface.',
+          "An in-progress apartment and condominium listings application that makes it easier to find rental homes near a preferred area or workplace.",
       features: [
-        'Interactive Map: Real-time discovery of rental items using Google Maps SDK and Places API',
-        'Anonymous Authentication: Low-friction entry for users to browse and interact with the platform',
-        'FSA Architecture: Built using the Flutter Simple Architecture pattern for high maintainability and scalability',
-        'Functional Programming: Robust logic implementation using fpdart (Either, Task, Unit)',
-        'State Management: Manual Riverpod Notifiers and AsyncNotifiers with custom ViewBuilder pattern',
-        'Responsive Design: Optimized for seamless performance across mobile and web platforms',
+        "Interactive map-based apartment and condominium discovery",
+        "Nearby search using Google Maps SDK, geolocation, routes, and Places APIs",
+        "Rental listing details organized around location and commute context",
+        "Feature-first Flutter architecture with Riverpod",
+        "Responsive mobile and web interfaces",
       ],
     ),
     Project(
       appstoreLink:
-          'https://apps.apple.com/jp/app/easyorder-selfordersystem/id6446138891?l=en-US',
+          "https://apps.apple.com/jp/app/easyorder-selfordersystem/id6446138891?l=en-US",
       playstoreLink:
-          "https://play.google.com/store/apps/details?id=com.u10ff.easyorder&amp%3Bhl=es_US",
-      title: 'Multi-Store Management & Point-of-Sale System',
+          "https://play.google.com/store/apps/details?id=com.u10ff.easyorder",
+      title: "Restaurant Multi-Store, POS, and Self-Ordering System",
       description:
-          'Developed a mobile application used for multi store management. A combination of point of sales and menu management system.',
+          "A production mobile application combining multi-store management, point-of-sale, menu management, and restaurant self-ordering workflows.",
       features: [
-        'REST API integration',
-        'Thermal printer integration via Bluetooth (Classic and BLE) (used platform channels for printer SDK integration using obj-C in iOS)',
-        'Image and video capturing',
-        'Media editing (image and video viewport cropping with ffmpeg) (used dart isolates to prevent main thread freeze)',
-        'MVVM code structure/architecture with riverpod for state management',
+        "REST API integration",
+        "Bluetooth Classic and BLE thermal printer integration",
+        "StarXpand and Epson ePOS SDK integration through Objective-C and Swift platform channels",
+        "Image and video capture",
+        "Media3 and AVFoundation viewport cropping, with Dart isolates protecting the main thread",
+        "Android native API integration using Kotlin",
+        "MVVM architecture with Riverpod state management",
       ],
       images: [
         ProjectImageFromAsset(
-          asset: 'assets/images/eo1.webp',
-          title: '',
-          description: '',
+          asset: "assets/images/eo1.webp",
+          title: "Restaurant ordering system",
+          description:
+              "Product overview highlighting sales growth, cost reduction, multilingual support, and operational efficiency.",
         ),
         ProjectImageFromAsset(
-          asset: 'assets/images/eo2.webp',
-          title: '',
-          description: '',
+          asset: "assets/images/eo2.webp",
+          title: "Mobile self-ordering",
+          description: "Customer menu and ordering experience on a smartphone.",
         ),
         ProjectImageFromAsset(
-          asset: 'assets/images/eo3.webp',
-          title: '',
-          description: '',
+          asset: "assets/images/eo3.webp",
+          title: "Multi-device ordering",
+          description:
+              "Responsive ordering interface across phone and tablet devices.",
         ),
         ProjectImageFromAsset(
-          asset: 'assets/images/eo4.webp',
-          title: '',
-          description: '',
+          asset: "assets/images/eo4.webp",
+          title: "Tablet menu interface",
+          description:
+              "Restaurant menu and ordering workflow optimized for a tablet.",
         ),
       ],
     ),
     Project(
       appstoreLink:
-          'https://apps.apple.com/jp/app/ev-navi/id6473770215?l=en-US',
+          "https://apps.apple.com/jp/app/ev-navi/id6473770215?l=en-US",
       playstoreLink:
           "https://play.google.com/store/apps/details?id=com.evapp.evms",
-      title: 'Electric Vehicle Charging Station Map',
+      title: "EV Navi - Electric Vehicle Charging Map",
       description:
-          'Developed an electric vehicle charging station map. Includes navigation, account tiers, station comments with media and user based station detail corrections suggestions.',
+          "An EV and PHEV charging-station map with navigation, account tiers, media comments, and user-submitted station-detail corrections.",
       features: [
-        'REST API integration',
-        'Image capturing and cropping',
-        'Google Maps API integration (SDK, Geolocation, Routes and Places)',
-        'Maps application integration (Google, and Apple)',
-        'Firebase Auth Integration',
-        'Device Geolocation',
-        'MVVM code structure/architecture with riverpod for state management',
-        'SWApay payment integration',
+        "REST API integration",
+        "Image capture and cropping",
+        "Google Maps SDK, geolocation, routes, and Places API integration",
+        "Google Maps and Apple Maps application integration",
+        "Firebase Authentication",
+        "Device geolocation",
+        "MVVM architecture with Riverpod state management",
       ],
       images: [
         ProjectImageFromAsset(
-          asset: 'assets/images/ev1.webp',
-          title: '',
-          description: '',
+          asset: "assets/images/ev1.webp",
+          title: "Rapid-charger map",
+          description: "Map mode focused on rapid EV charging stations.",
         ),
         ProjectImageFromAsset(
-          asset: 'assets/images/ev2.webp',
-          title: '',
-          description: '',
+          asset: "assets/images/ev2.webp",
+          title: "High-output charger details",
+          description:
+              "Map and station sheet for quickly identifying charger output.",
         ),
         ProjectImageFromAsset(
-          asset: 'assets/images/ev3.webp',
-          title: '',
-          description: '',
+          asset: "assets/images/ev3.webp",
+          title: "Charger pin comparison",
+          description:
+              "Station pins expose charger characteristics at a glance.",
         ),
       ],
     ),
     Project(
       gitlabLink: "https://gitlab.com/godoytristanh/fsa",
-      title: 'Flutter Simple Architecture (FSA)',
+      title: "Flutter Simple Architecture (FSA)",
       description:
-          'A clean, scalable architectural pattern for Flutter applications emphasizing strict separation of concerns, View-Isolation, and maintainability.',
+          "A CLI application for quickly bootstrapping and scaffolding a batteries-included clean Flutter architecture.",
       features: [
-        'Strict Page Types: Smart (Async/Complex), Simple (Sync/Forms), and Static (Stateless)',
-        'Component Isolation: Logic-heavy (Smart) vs. Pure UI (Dumb) components',
-        'State Management: Riverpod for global state and Flutter Hooks for local state',
-        'Theme Management: Manual theme persistence using shared_preferences',
-        'CLI Tooling: Custom \'fsa generate\' CLI for project scaffolding',
+        "Project bootstrap and feature scaffolding commands",
+        "Feature-first clean architecture defaults",
+        "Riverpod state-management conventions",
+        "Repeatable templates with batteries included",
       ],
-      images: [],
     ),
     Project(
       gitlabLink: "https://gitlab.com/godoytristanh/dart_filetree",
       githubLink: "https://github.com/popodepo123/dart_filetree",
-      title: 'Dart Filetree for Helix',
+      title: "Dart File Tree",
       description:
-          'A terminal-based file tree picker built with Dart and nocterm for integration with editors like Helix.',
+          "A terminal file-tree explorer built with Dart for Helix editor integration.",
       features: [
-        "Interactive file tree navigation in terminal using nocterm UI framework",
-        "File selection and operations with chooser file integration",
-        "Local storage using Hive for settings persistence",
-        "Cross-platform file system operations",
-        "Helix editor integration via zellij for seamless file opening",
+        "Interactive terminal file-tree navigation",
+        "Chooser-file integration for editor handoff",
+        "Persistent settings",
+        "Helix and terminal-multiplexer workflow integration",
       ],
-      images: [],
+    ),
+    Project(
+      gitlabLink:
+          "https://gitlab.com/godoytristanh/dart_filetree/-/tree/main/rust_filetree?ref_type=heads",
+      title: "Rust File Tree",
+      description:
+          "A terminal file-tree explorer built with Rust for Helix editor integration.",
+      features: [
+        "Terminal-native file browsing",
+        "Fast Rust implementation",
+        "Helix editor workflow integration",
+      ],
     ),
     Project(
       gitlabLink: "https://gitlab.com/godoytristanh/flutter_hotreload",
-      title: 'Flutter Hotreload Automation',
+      title: "Flutter Hotreload",
       description:
-          'Enhancing Flutter development cycles with automated hot reload capabilities and custom state preservation hooks.',
+          "A TUI Flutter hot-reload application for terminal IDE integration.",
       features: [
-        'Development Workflow: Reduces iteration time during Flutter development',
-        'State Preservation: Mechanisms to ensure state is maintained or correctly reset during reload',
-        'Integration: Programmatic reload triggers via external events',
+        "Terminal UI for Flutter development sessions",
+        "Hot reload and restart controls",
+        "Terminal editor workflow integration",
       ],
-      images: [],
-    ),
-    Project(
-      gitlabLink: 'https://gitlab.com/godoytristanh/rust-dart-serializer-cli',
-      title: 'Rust Dart Serializer',
-      description:
-          'A high-performance Rust CLI tool that generates immutable, freezed-like Dart classes. It serves as a faster, simpler alternative to build_runner, providing instant code generation without extra dependencies.',
-      features: [
-        'Instant Generation: No more waiting for build_runner to watch or regenerate; results are immediate.',
-        'Zero Configuration: No build_runner, build.yaml, or complex builder setups required.',
-        'No Extra Dependencies: Generate robust serialization and copyWith logic without adding Freezed to your project.',
-        'One-shot Generation: Designed for easy integration into CI pipelines or on-demand usage.',
-        'Immutable Patterns: Automatically implements copyWith, toString, value equality, and hash codes.',
-      ],
-      images: [],
     ),
   ],
   experiences: [
     Experience(
-      role: 'Mobile Application Developer',
-      company: 'Freelance / Individual Contractor',
-      period: 'July 2023 - PRESENT',
+      role: "Mobile Application Developer",
+      company: "DAPL IT Services [Contractor]",
+      period: "January 2026 - Present",
       description:
-          'Spearheaded the end-to-end development of two distinct mobile applications, enhancing operational efficiency and user engagement. For Project 1, designed and implemented a comprehensive multi-store management and point-of-sale system, streamlining inventory and sales processes. For Project 2, engineered an electric vehicle charging station map with advanced features including navigation, tiered accounts, and user-driven data correction, significantly improving user experience and data accuracy. Actively engaged in continuous feature development and project improvement for both applications.',
+          "Mobile online-banking application maintenance and new feature integration. Work includes REST APIs, feature-first clean architecture, BLoC state management, Flutter web mini-app integration, Ping SDK, Dynatrace, AppsFlyer, Thales NFC, push notifications, and developer build-script improvements.",
     ),
     Experience(
-      role: 'Business and Technology Integration Delivery Analyst',
-      company: 'Accenture, Inc. [ Full Time ]',
-      period: 'October 2023 - August 2025',
+      role: "Mobile Application Developer",
+      company: "Freelance",
+      period: "July 2023 - Present",
       description:
-          'Drove digital transformation initiatives by developing robust web applications and automation scripts using SQL, JavaScript, HTML, CSS, and Google Apps Script. Successfully designed and implemented data CRUD operations, cleanup, transformation, and reporting solutions, resulting in enhanced data integrity and streamlined business processes. Created interactive dashboards, optimized data pipelines, and automated critical workflows, significantly improving operational efficiency and decision-making capabilities.',
+          "Developed and maintained two production mobile applications: a multi-store management, point-of-sale, menu, and restaurant ordering system; and an EV charging-station map with navigation, account tiers, media comments, and user-submitted station corrections. Delivered REST APIs, Bluetooth thermal printers, native Android/iOS integrations, media capture and editing, Google Maps services, Firebase Authentication, geolocation, and MVVM/Riverpod architecture.",
     ),
     Experience(
-      role: 'Office Engineer',
-      company: 'Mighty Construction [ Full Time ]',
-      period: 'March 2021 - September 2023',
+      role:
+          "Reports and Measurement Analyst / Business and Technology Integration Analyst",
+      company: "Accenture, Inc. [Full Time]",
+      period: "October 2023 - August 2025",
       description:
-          'Engineered and deployed critical database and system solutions using MS Access and VBA, optimizing processes for payroll, contracts, project expenses, and materials management. Leveraged VBA and MS Excel to conduct comprehensive project analysis, including budget, expense, and profitability assessments, providing key insights for strategic decision-making. Contributed to the successful preparation of detailed project bidding estimates, directly impacting project acquisition.',
+          "Recognized with two A-list awards. Built operations SLA and KPI dashboards, automated ETL data pipelines, custom Google Apps Script web applications, CRUD and reporting tools, and daily/monthly action workflows using SQL, JavaScript, HTML, and CSS. Served as an automation and custom-web-app subject matter expert; one high-utility tool was replicated across other projects.",
+    ),
+    Experience(
+      role: "Office Engineer",
+      company: "Mighty Construction [Full Time]",
+      period: "March 2021 - September 2023",
+      description:
+          "Developed MS Access and VBA systems for payroll, contracts, project expenses, collections, material purchasing, and delivery monitoring. Used Excel and VBA for budget, expense, and profit analysis and assisted with detailed project-bid estimates.",
     ),
   ],
   education: [
     Education(
-      degree: 'BS in Civil Engineering',
-      institution: 'Pamantasan ng Lungsod ng Valenzuela',
-      period: 'June 2014 - April 2019',
+      degree: "BS in Civil Engineering",
+      institution: "Pamantasan ng Lungsod ng Valenzuela",
+      period: "June 2014 - April 2019",
     ),
   ],
   awards: [
     Award(
       name:
-          'Manulife Ureka Innovation Camp 2016 Consultant Developer for ETSI Nexus App (3rd Place) (Ionic Prototype Application)',
-      issuer: 'Manulife',
+          "Manulife Ureka Innovation Camp 2016 Consultant Developer for ETSI Nexus App (3rd Place) (Ionic Prototype Application)",
+      issuer: "Manulife",
     ),
     Award(
-      name: 'PRC Civil Engineering Professional (0176577)',
-      issuer: 'Professional Regulation Commission',
+      name: "PRC Civil Engineering Professional (0176577)",
+      issuer: "Professional Regulation Commission",
     ),
   ],
   inspirations: [
     Inspiration(
       name: 'ThePrimeagen',
       description:
-          'A Vim/Neovim enthusiast and Netflix engineer known for his high-energy educational content on development workflow, tooling, and low-level engineering. His focus on "moving fast" and mastering your editor has heavily influenced my approach to developer productivity.',
+          'A software engineer and Vim/Neovim enthusiast known for high-energy educational content on development workflow, tooling, and low-level engineering. His focus on "moving fast" and mastering your editor has heavily influenced my approach to developer productivity.',
       twitchHandle: 'ThePrimeagen',
       youtubeHandle: '@ThePrimeagen',
     ),
@@ -575,37 +653,32 @@ final portfolio = PortfolioData(
       title: 'Gaming',
       items: [
         HobbyItem(
-          name: 'League of Legends (PC)',
-          imageUrl:
-              'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/League_of_Legends_2019_vector.svg/1200px-League_of_Legends_2019_vector.svg.png',
+          name: "League of Legends (PC)",
+          imageAsset: "assets/images/hobbies/league_of_legends.png",
           description:
               'A highly competitive, team-based strategy game where two teams of five champions face off.',
         ),
         HobbyItem(
-          name: 'WildRift',
-          imageUrl:
-              'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/League_of_Legends_Wild_Rift_logo.png/1200px-League_of_Legends_Wild_Rift_logo.png',
+          name: "League of Legends: Wild Rift",
+          imageAsset: "assets/images/hobbies/wild_rift.png",
           description:
               'The fast-paced mobile and console adaptation of League of Legends.',
         ),
         HobbyItem(
-          name: 'Valorant',
-          imageUrl:
-              'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Valorant_logo_-_pink_color_version.svg/1200px-Valorant_logo_-_pink_color_version.svg.png',
+          name: "VALORANT",
+          imageAsset: "assets/images/hobbies/valorant.png",
           description:
               'A 5v5 character-based tactical shooter blending precise gunplay with unique agent abilities.',
         ),
         HobbyItem(
-          name: 'Gunz the Duel',
-          imageUrl:
-              'https://upload.wikimedia.org/wikipedia/en/2/2a/Gunz_The_Duel_logo.png',
+          name: "GunZ: The Duel",
+          imageAsset: "assets/images/hobbies/gunz_the_duel.png",
           description:
               'A classic, fast-paced third-person shooter known for its acrobatic "K-Style" movement mechanics.',
         ),
         HobbyItem(
-          name: 'Dragon Nest',
-          imageUrl:
-              'https://upload.wikimedia.org/wikipedia/en/d/da/DragonNestLogo.png',
+          name: "Dragon Nest",
+          imageAsset: "assets/images/hobbies/dragon_nest.png",
           description:
               'A dynamic action RPG featuring intense non-targeting combat and epic boss raids.',
         ),
@@ -615,37 +688,32 @@ final portfolio = PortfolioData(
       title: 'Rhythm Games',
       items: [
         HobbyItem(
-          name: 'osu! (Mania)',
-          imageUrl:
-              'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Osu%21_Logo_2016.svg/1200px-Osu%21_Logo_2016.svg.png',
+          name: "osu!mania",
+          imageAsset: "assets/images/hobbies/osu.png",
           description:
               'A competitive, community-driven rhythm game mode hitting falling notes to the beat.',
         ),
         HobbyItem(
-          name: 'Deemo',
-          imageUrl:
-              'https://upload.wikimedia.org/wikipedia/en/b/b3/Deemo_Logo.png',
+          name: "DEEMO",
+          imageAsset: "assets/images/hobbies/deemo.jpg",
           description:
               'A story-driven rhythm game blending beautiful piano melodies with an emotional narrative.',
         ),
         HobbyItem(
-          name: 'Cytus',
-          imageUrl:
-              'https://upload.wikimedia.org/wikipedia/en/c/ca/Cytus_logo.png',
+          name: "Cytus",
+          imageAsset: "assets/images/hobbies/cytus.jpg",
           description:
               'A futuristic rhythm game with a unique Active Scan Line system and electronic music.',
         ),
         HobbyItem(
-          name: 'O2Jam',
-          imageUrl:
-              'https://upload.wikimedia.org/wikipedia/en/thumb/a/a2/O2Jam_logo.jpg/250px-O2Jam_logo.jpg',
+          name: "O2Jam",
+          imageAsset: "assets/images/hobbies/o2jam.jpg",
           description:
               'A classic PC rhythm game known for its challenging chart patterns and nostalgic tracks.',
         ),
         HobbyItem(
-          name: 'DJMax Respect V',
-          imageUrl:
-              'https://cdn.cloudflare.steamstatic.com/steam/apps/960170/logo.png',
+          name: "DJMAX RESPECT V",
+          imageAsset: "assets/images/hobbies/djmax_respect_v.png",
           description:
               'The definitive edition of the legendary DJMax series with an extensive music library.',
         ),
@@ -655,16 +723,14 @@ final portfolio = PortfolioData(
       title: 'Mobile JRPG & Gacha',
       items: [
         HobbyItem(
-          name: 'Soccer Spirits',
-          imageUrl:
-              'https://upload.wikimedia.org/wikipedia/en/5/52/Soccer_Spirits_Logo.png',
+          name: "Soccer Spirits",
+          imageAsset: "assets/images/hobbies/soccer_spirits.jpg",
           description:
               'A fantasy soccer RPG card game featuring dynamic turn-based matches and anime artwork.',
         ),
         HobbyItem(
-          name: 'Seven Knights Rebirth',
-          imageUrl:
-              'https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/Seven_Knights_logo.png/220px-Seven_Knights_logo.png',
+          name: "Seven Knights Re:BIRTH",
+          imageAsset: "assets/images/hobbies/seven_knights_rebirth.png",
           description:
               'The highly anticipated remake of the classic mobile RPG with modernized 3D graphics.',
         ),

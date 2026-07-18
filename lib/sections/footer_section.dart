@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:thgportfolio/portfolio_data.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -7,9 +6,7 @@ class FooterSection extends StatelessWidget {
   const FooterSection({super.key});
 
   Future<void> _launchUrl(String link) async {
-    if (await canLaunchUrl(Uri.parse(link))) {
-      await launchUrl(Uri.parse(link));
-    }
+    await launchUrl(Uri.parse(link));
   }
 
   @override
@@ -25,22 +22,26 @@ class FooterSection extends StatelessWidget {
             style: textTheme.headlineMedium?.copyWith(fontSize: 24),
           ),
           const SizedBox(height: 8),
-          Text(portfolio.email, style: textTheme.bodyMedium),
+          TextButton.icon(
+            onPressed: () => _launchUrl("mailto:${portfolio.email}"),
+            icon: const Icon(Icons.email_outlined),
+            label: Text(portfolio.email, style: textTheme.bodyMedium),
+          ),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (portfolio.githubUrl != null)
-                IconButton(
-                  icon: const FaIcon(FontAwesomeIcons.github),
+                TextButton.icon(
+                  icon: const Icon(Icons.code),
+                  label: const Text("GitHub"),
                   onPressed: () => _launchUrl(portfolio.githubUrl!),
-                  tooltip: 'GitHub',
                 ),
               if (portfolio.gitlabUrl != null)
-                IconButton(
-                  icon: const FaIcon(FontAwesomeIcons.gitlab),
+                TextButton.icon(
+                  icon: const Icon(Icons.source_outlined),
+                  label: const Text("GitLab"),
                   onPressed: () => _launchUrl(portfolio.gitlabUrl!),
-                  tooltip: 'GitLab',
                 ),
             ],
           ),

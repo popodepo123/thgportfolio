@@ -46,13 +46,13 @@ This document outlines the SEO optimizations implemented for the Tristan Harvey 
 
 ### Search Keywords Targeted:
 - Tristan Harvey Godoy
-- Full Stack Developer
+- Mobile Application Developer
 - Flutter Developer
 - Dart Developer
-- React Developer
+- Android and iOS Developer
+- Firebase
 - Portfolio Website
 - Software Engineer
-- Web Development
 - Mobile Development
 
 ## Expected SEO Benefits
@@ -109,7 +109,7 @@ flutter build web --release --base-href "/thgportfolio/"
 
 ### Short Term (1-3 months):
 - Achieve top 10 rankings for "Tristan Harvey Godoy portfolio"
-- Improve search visibility for Flutter/React development keywords
+- Improve search visibility for Flutter and mobile development keywords
 - Increase social media shares and engagement
 
 ### Long Term (3-6 months):
@@ -119,5 +119,5 @@ flutter build web --release --base-href "/thgportfolio/"
 
 ---
 
-**Last Updated:** March 2026
+**Last Updated:** July 18, 2026
 **Portfolio URL:** https://popodepo123.github.io/thgportfolio/

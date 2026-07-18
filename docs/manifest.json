@@ -3,21 +3,12 @@
     "short_name": "THG Portfolio",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#1a1a2e",
-    "theme_color": "#1a1a2e",
-    "description": "Professional portfolio of Tristan Harvey Godoy - Full Stack Developer specializing in Flutter, Dart, React, and modern web technologies.",
-    "orientation": "portrait-primary",
+    "background_color": "#101010",
+    "theme_color": "#101010",
+    "description": "Portfolio of Tristan Harvey Godoy, a mobile application developer specializing in Flutter and Dart.",
     "prefer_related_applications": false,
     "lang": "en",
     "categories": ["portfolio", "developer", "technology"],
-    "screenshots": [
-        {
-            "src": "icons/Icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "form_factor": "wide"
-        }
-    ],
     "icons": [
         {
             "src": "icons/Icon-192.png",

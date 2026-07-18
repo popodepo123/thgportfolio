@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:thgportfolio/contribution_service.dart';
 import 'package:thgportfolio/portfolio_data.dart';
 import 'package:thgportfolio/theme.dart';
@@ -111,8 +111,9 @@ class _DevViewState extends State<DevView> {
         setState(() {
           if (_visibleChars < _typingContent!.length) {
             _visibleChars += 15;
-            if (_visibleChars > _typingContent!.length)
+            if (_visibleChars > _typingContent!.length) {
               _visibleChars = _typingContent!.length;
+            }
           } else {
             timer.cancel();
           }
@@ -1142,19 +1143,21 @@ class _DevViewState extends State<DevView> {
   }
 
   TextSpan _applySearchHighlight(TextSpan span, String query) {
-    if (span.text != null && span.text!.isNotEmpty)
+    if (span.text != null && span.text!.isNotEmpty) {
       return _GenericHighlighter.highlightSearchInText(
         span.text!,
         span.style ?? const TextStyle(),
         query,
       );
-    if (span.children != null)
+    }
+    if (span.children != null) {
       return TextSpan(
         style: span.style,
         children: span.children!
             .map((c) => c is TextSpan ? _applySearchHighlight(c, query) : c)
             .toList(),
       );
+    }
     return span;
   }
 }
@@ -1970,7 +1973,7 @@ class _GenericHighlighter {
           ),
         );
       }
-      if (comment.isNotEmpty)
+      if (comment.isNotEmpty) {
         spans.add(
           highlightSearchInText(
             comment,
@@ -1978,6 +1981,7 @@ class _GenericHighlighter {
             searchQuery,
           ),
         );
+      }
       lines.add(LineData(span: TextSpan(children: spans)));
     }
     return lines;
@@ -2010,10 +2014,11 @@ class _GenericHighlighter {
     List<TextSpan> spans = [];
     int last = 0;
     for (var m in matches) {
-      if (m.start > last)
+      if (m.start > last) {
         spans.add(
           TextSpan(text: text.substring(last, m.start), style: baseStyle),
         );
+      }
       spans.add(
         TextSpan(
           text: text.substring(m.start, m.end),
@@ -2026,8 +2031,9 @@ class _GenericHighlighter {
       );
       last = m.end;
     }
-    if (last < text.length)
+    if (last < text.length) {
       spans.add(TextSpan(text: text.substring(last), style: baseStyle));
+    }
     return TextSpan(children: spans);
   }
 
@@ -2139,7 +2145,7 @@ class _DartHighlighter {
           ),
         );
       }
-      if (comment.isNotEmpty)
+      if (comment.isNotEmpty) {
         spans.add(
           _GenericHighlighter.highlightSearchInText(
             comment,
@@ -2147,6 +2153,7 @@ class _DartHighlighter {
             searchQuery,
           ),
         );
+      }
       lines.add(LineData(span: TextSpan(children: spans)));
     }
     return lines;
@@ -2154,18 +2161,22 @@ class _DartHighlighter {
 
   static TextStyle _getStyle(String t, bool isType, bool clickable) {
     final trimmed = t.trim();
-    if (keywords.contains(trimmed))
+    if (keywords.contains(trimmed)) {
       return const TextStyle(color: gruberYellow, fontWeight: FontWeight.bold);
-    if (isType)
+    }
+    if (isType) {
       return TextStyle(
         color: gruberNiagara,
         decoration: clickable ? TextDecoration.underline : null,
         decorationColor: gruberNiagara.withValues(alpha: 0.5),
       );
-    if (trimmed.startsWith("'") || trimmed.startsWith('"'))
+    }
+    if (trimmed.startsWith("'") || trimmed.startsWith('"')) {
       return const TextStyle(color: gruberGreen);
-    if (RegExp(r'^\d+$').hasMatch(trimmed))
+    }
+    if (RegExp(r'^\d+$').hasMatch(trimmed)) {
       return const TextStyle(color: gruberBrown);
+    }
     return const TextStyle(color: gruberFg);
   }
 }
@@ -2624,7 +2635,7 @@ class _MarkdownHighlighter {
             } else {
               int last = 0;
               for (var m in linkMatches) {
-                if (m.start > last)
+                if (m.start > last) {
                   spans.add(
                     _GenericHighlighter.highlightSearchInText(
                       parts[i].substring(last, m.start),
@@ -2632,6 +2643,7 @@ class _MarkdownHighlighter {
                       searchQuery,
                     ),
                   );
+                }
                 spans.add(
                   const TextSpan(
                     text: '[',
@@ -2674,7 +2686,7 @@ class _MarkdownHighlighter {
                 );
                 last = m.end;
               }
-              if (last < parts[i].length)
+              if (last < parts[i].length) {
                 spans.add(
                   _GenericHighlighter.highlightSearchInText(
                     parts[i].substring(last),
@@ -2682,6 +2694,7 @@ class _MarkdownHighlighter {
                     searchQuery,
                   ),
                 );
+              }
             }
           }
         }

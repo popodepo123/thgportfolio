@@ -1,5 +1,5 @@
 name: thgportfolio
-description: "A new Flutter project."
+description: "Tristan Harvey Godoy's mobile application developer portfolio."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -34,13 +34,12 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  font_awesome_flutter: ^11.0.0
   visibility_detector: ^0.4.0+2
   url_launcher: ^6.2.2
   flutter_svg: ^2.2.3
   web: ^1.1.1
   http: ^1.6.0
-  flutter_markdown: ^0.7.7+1
+  flutter_markdown_plus: ^1.0.12
   google_fonts: ^8.0.2
 
 dev_dependencies:
@@ -73,6 +72,9 @@ flutter:
     - assets/images/eo3.webp
     - assets/images/eo4.webp
     - assets/images/animated_logo.svg
+    - assets/images/thg_logo.svg
+    - assets/images/hobbies/
+    - resume_thg_dev_20260718.pdf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

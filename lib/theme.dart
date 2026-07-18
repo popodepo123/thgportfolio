@@ -26,7 +26,7 @@ final portfolioTheme = ThemeData(
     surfaceContainerHighest: gruberBgLighter,
     onPrimary: Colors.black,
     onSurface: gruberFg,
-    tertiary: gruberBrown,
+    tertiary: gruberYellow,
     secondary: gruberGreen,
     error: gruberRed,
   ),
@@ -88,6 +88,17 @@ final portfolioTheme = ThemeData(
   floatingActionButtonTheme: const FloatingActionButtonThemeData(
     backgroundColor: gruberYellow,
     foregroundColor: Colors.black,
+  ),
+
+  outlinedButtonTheme: OutlinedButtonThemeData(
+    style: OutlinedButton.styleFrom(
+      foregroundColor: gruberYellow,
+      side: const BorderSide(color: gruberYellow),
+    ),
+  ),
+
+  textButtonTheme: TextButtonThemeData(
+    style: TextButton.styleFrom(foregroundColor: gruberYellow),
   ),
 
   // Divider Theme

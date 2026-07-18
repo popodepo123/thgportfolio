@@ -2,7 +2,7 @@
 
 [![Live Site](https://img.shields.io/badge/Live-Portfolio-ffdd33?style=for-the-badge&logo=flutter)](https://popodepo123.github.io/thgportfolio/)
 
-A modern, high-performance personal portfolio built with Flutter, featuring a unique dual-mode interface that bridges the gap between professional presentation and developer-centric technical depth.
+A black-and-yellow Gruber Darker portfolio built with Flutter. Content reflects the July 18, 2026 resume and includes production mobile work, personal projects, verified project media, and a developer-focused alternate view.
 
 ## Key Features
 
@@ -20,8 +20,8 @@ A modern, high-performance personal portfolio built with Flutter, featuring a un
 
 - Framework: [Flutter](https://flutter.dev) (Web)
 - Language: [Dart](https://dart.dev)
-- State Management: ValueNotifiers & StateProvider
-- Icons: [FontAwesome](https://fontawesome.com)
+- State Management: ValueNotifier
+- Icons: Flutter Material Icons
 - Typography: [Google Fonts (Fira Code)](https://fonts.google.com/specimen/Fira+Code)
 - Deployment: GitHub Pages (docs/ directory)
 
@@ -49,7 +49,7 @@ A modern, high-performance personal portfolio built with Flutter, featuring a un
     ```
 2.  Install dependencies:
     ```bash
-    flutter pub get
+    fvm flutter pub get
     ```
 
 ### Running Locally
@@ -57,7 +57,7 @@ A modern, high-performance personal portfolio built with Flutter, featuring a un
 To run the application in Chrome:
 
 ```bash
-flutter run -d chrome
+fvm flutter run -d chrome
 ```
 
 ## Deployment
@@ -65,7 +65,7 @@ flutter run -d chrome
 To build the project for GitHub Pages:
 
 ```bash
-flutter build web --release --base-href "/thgportfolio/"
+fvm flutter build web --release --base-href "/thgportfolio/"
 rm -rf docs/*
 cp -r build/web/* docs/
 touch docs/.nojekyll
@@ -79,6 +79,6 @@ Tristan Harvey Godoy
 - GitLab: [@godoytristanh](https://gitlab.com/godoytristanh)
 
 ---
-*Last Updated: April 2026*
+*Last Updated: July 18, 2026*
 
 *Built with Flutter & Dart.*
