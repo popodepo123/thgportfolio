@@ -377,6 +377,12 @@ final portfolio = PortfolioData(
           websiteUrl: "https://www.figma.com/",
         ),
         SkillDetail(
+          name: "OMP",
+          description:
+              "Oh My Pi terminal coding agent used for repository-scale development workflows.",
+          websiteUrl: "https://github.com/can1357/oh-my-pi",
+        ),
+        SkillDetail(
           name: "Codex",
           description:
               "OpenAI coding agent used for repository-scale development workflows.",
@@ -406,6 +412,19 @@ final portfolio = PortfolioData(
     ),
   ],
   projects: [
+    Project(
+      title: "Felix - Flutter-Helix IDE",
+      gitlabLink: "https://gitlab.com/godoytristanh/custom-ide",
+      description:
+          "An ongoing Flutter desktop IDE that combines the Helix editing engine with an Emacs-inspired, buffer-oriented workbench. Its Flutter interface communicates with pinned Helix Rust sources through a native bridge.",
+      features: [
+        "Flutter desktop workbench backed by a native Rust bridge to the Helix editing engine",
+        "Buffer tabs and panes, project file tree, file pickers, previews, and modal editing workflows",
+        "Language-server features, diagnostics, hover information, integrated terminal, and debugger support",
+        "Upstream Helix keymaps, static and typable commands, syntax themes, and editor semantics",
+        "Desktop targets for macOS, Linux, and Windows",
+      ],
+    ),
     Project(
       title: "KitaKits POS",
       webLink: "https://kitakits-pos.web.app/",

@@ -848,12 +848,12 @@ class CompiledApp {
     };
 
 
-
+    
 
     dartInstance = await WebAssembly.instantiate(this.module, {
       ...baseImports,
       ...additionalImports,
-
+      
       "wasm:js-string": jsStringPolyfill,
     });
     dartInstance.exports.$setThisModule(dartInstance);

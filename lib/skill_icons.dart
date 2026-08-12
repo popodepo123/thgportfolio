@@ -32,6 +32,7 @@ const Map<String, IconData> skillIcons = {
   "Ollama": Icons.smart_toy_outlined,
   "Firebase Studio": Icons.developer_mode,
   "Figma": Icons.design_services_outlined,
+  "OMP": Icons.terminal,
   "Codex": Icons.smart_toy_outlined,
   "Claude Code": Icons.smart_toy,
   "Antigravity 2": Icons.rocket_launch_outlined,
