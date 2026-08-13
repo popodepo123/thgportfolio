@@ -1,6 +1,8 @@
+import "dart:io";
+
 import "package:flutter_test/flutter_test.dart";
 import "package:thgportfolio/portfolio_data.dart";
-import "package:thgportfolio/skill_preview_images.dart";
+import "package:thgportfolio/skill_preview_content.dart";
 
 void main() {
   test("resume-backed portfolio data stays complete", () {
@@ -100,16 +102,19 @@ void main() {
     expect(publishedSkills.toSet(), hasLength(publishedSkills.length));
   });
 
-  test("skill preview content is sourced and renderable", () {
+  test("every skill has a hardcoded summary and bundled image", () {
     final skillsByName = {
       for (final category in portfolio.skills)
         for (final skill in category.skills) skill.name: skill,
     };
 
-    expect(skillPreviewImageUrls.keys, everyElement(isIn(skillsByName.keys)));
-    expect(skillPreviewImageUrls.values, everyElement(startsWith("https://")));
-    for (final skill in skillsByName.values) {
-      expect(skill.description.trim(), isNotEmpty);
+    expect(skillPreviewContentByName.keys, equals(skillsByName.keys));
+    for (final preview in skillPreviewContentByName.values) {
+      expect(preview.summary.trim(), isNotEmpty);
+      expect(preview.summary, isNot(contains("http")));
+      expect(preview.imageAssetPath, startsWith("assets/images/skills/"));
+      expect(preview.imageAssetPath, isNot(contains("http")));
+      expect(File(preview.imageAssetPath).existsSync(), isTrue);
     }
 
     expect(

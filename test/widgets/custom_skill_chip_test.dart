@@ -6,7 +6,7 @@ import "package:thgportfolio/portfolio_data.dart";
 import "package:thgportfolio/theme.dart";
 import "package:thgportfolio/widgets/custom_skill_chip.dart";
 import "package:thgportfolio/widgets/skill_widgets.dart";
-import "package:thgportfolio/widgets/website_preview.dart";
+import "package:thgportfolio/widgets/skill_preview_card.dart";
 
 void main() {
   group("CustomSkillChip", () {
@@ -63,7 +63,7 @@ void main() {
       await gesture.removePointer();
     });
 
-    testWidgets("opens details with artwork and a sourced summary", (
+    testWidgets("opens details with bundled artwork and a hardcoded summary", (
       WidgetTester tester,
     ) async {
       const skillDetail = SkillDetail(
@@ -83,11 +83,16 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(SkillDetailDialog), findsOneWidget);
-      expect(find.text("Cross-platform app development."), findsOneWidget);
+      expect(
+        find.textContaining("Flutter is an open-source UI framework"),
+        findsOneWidget,
+      );
       expect(find.text("Summary"), findsOneWidget);
       expect(find.text("Source: flutter.dev"), findsOneWidget);
-      expect(find.byType(WebsitePreview), findsOneWidget);
+      expect(find.byType(SkillPreviewCard), findsOneWidget);
       expect(find.byType(Image), findsOneWidget);
+      expect(tester.widget<Image>(find.byType(Image)).image, isA<AssetImage>());
+      expect(find.byType(CircularProgressIndicator), findsNothing);
       expect(find.text("Open Website"), findsOneWidget);
     });
   });

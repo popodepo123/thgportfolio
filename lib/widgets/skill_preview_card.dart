@@ -1,23 +1,18 @@
 import "package:flutter/material.dart";
 
-class WebsitePreview extends StatelessWidget {
+class SkillPreviewCard extends StatelessWidget {
   final Uri? uri;
   final String title;
   final String description;
-  final String? imageUrl;
+  final String imageAssetPath;
 
-  const WebsitePreview({
+  const SkillPreviewCard({
     super.key,
     required this.uri,
     required this.title,
     required this.description,
-    this.imageUrl,
+    required this.imageAssetPath,
   });
-
-  String? get _resolvedImageUrl {
-    if (imageUrl != null) return imageUrl;
-    return uri?.resolve("/favicon.ico").toString();
-  }
 
   Widget _fallbackArtwork(BuildContext context) {
     return ColoredBox(
@@ -36,7 +31,6 @@ class WebsitePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolvedImageUrl = _resolvedImageUrl;
     final sourceHost = uri?.host.replaceFirst("www.", "");
 
     return DecoratedBox(
@@ -53,28 +47,14 @@ class WebsitePreview extends StatelessWidget {
           children: [
             AspectRatio(
               aspectRatio: 16 / 9,
-              child: resolvedImageUrl == null
-                  ? _fallbackArtwork(context)
-                  : Image.network(
-                      resolvedImageUrl,
-                      fit: imageUrl == null ? BoxFit.contain : BoxFit.cover,
-                      semanticLabel: "$title website artwork",
-                      webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return ColoredBox(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.surfaceContainerHighest,
-                          child: const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return _fallbackArtwork(context);
-                      },
-                    ),
+              child: Image.asset(
+                imageAssetPath,
+                fit: BoxFit.cover,
+                semanticLabel: "$title artwork",
+                errorBuilder: (context, error, stackTrace) {
+                  return _fallbackArtwork(context);
+                },
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(20),

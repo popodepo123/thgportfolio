@@ -73,6 +73,7 @@ flutter:
     - assets/images/animated_logo.svg
     - assets/images/thg_logo.svg
     - assets/images/hobbies/
+    - assets/images/skills/
     - resume_thg_dev_20260718.pdf
 
   # An image asset can refer to one or more resolution-specific "variants", see

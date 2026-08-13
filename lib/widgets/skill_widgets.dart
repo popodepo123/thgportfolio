@@ -2,8 +2,8 @@ import "package:flutter/material.dart";
 import "package:url_launcher/url_launcher.dart";
 
 import "package:thgportfolio/portfolio_data.dart";
-import "package:thgportfolio/skill_preview_images.dart";
-import "package:thgportfolio/widgets/website_preview.dart";
+import "package:thgportfolio/skill_preview_content.dart";
+import "package:thgportfolio/widgets/skill_preview_card.dart";
 
 class SkillDetailDialog extends StatelessWidget {
   final SkillDetail skill;
@@ -32,6 +32,7 @@ class SkillDetailDialog extends StatelessWidget {
     final websiteUri = websiteUrl == null || websiteUrl.isEmpty
         ? null
         : Uri.tryParse(websiteUrl);
+    final previewContent = skillPreviewContentByName[skill.name]!;
 
     return AlertDialog(
       title: Text(skill.name),
@@ -42,11 +43,11 @@ class SkillDetailDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              WebsitePreview(
+              SkillPreviewCard(
                 uri: websiteUri,
                 title: skill.name,
-                description: skill.description,
-                imageUrl: skillPreviewImageUrls[skill.name],
+                description: previewContent.summary,
+                imageAssetPath: previewContent.imageAssetPath,
               ),
             ],
           ),
