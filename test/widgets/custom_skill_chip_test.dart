@@ -63,7 +63,7 @@ void main() {
       await gesture.removePointer();
     });
 
-    testWidgets("opens details with a website preview", (
+    testWidgets("opens details with artwork and a sourced summary", (
       WidgetTester tester,
     ) async {
       const skillDetail = SkillDetail(
@@ -84,8 +84,10 @@ void main() {
 
       expect(find.byType(SkillDetailDialog), findsOneWidget);
       expect(find.text("Cross-platform app development."), findsOneWidget);
-      expect(find.text("Website preview"), findsOneWidget);
+      expect(find.text("Summary"), findsOneWidget);
+      expect(find.text("Source: flutter.dev"), findsOneWidget);
       expect(find.byType(WebsitePreview), findsOneWidget);
+      expect(find.byType(Image), findsOneWidget);
       expect(find.text("Open Website"), findsOneWidget);
     });
   });

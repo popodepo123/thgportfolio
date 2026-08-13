@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:url_launcher/url_launcher.dart";
 
 import "package:thgportfolio/portfolio_data.dart";
+import "package:thgportfolio/skill_preview_images.dart";
 import "package:thgportfolio/widgets/website_preview.dart";
 
 class SkillDetailDialog extends StatelessWidget {
@@ -41,35 +42,12 @@ class SkillDetailDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(skill.description),
-              if (websiteUri != null) ...[
-                const SizedBox(height: 20),
-                Text(
-                  "Website preview",
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(7),
-                    child: AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: WebsitePreview(uri: websiteUri, title: skill.name),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Some websites block embedded previews. Use Open Website if the preview is unavailable.",
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
+              WebsitePreview(
+                uri: websiteUri,
+                title: skill.name,
+                description: skill.description,
+                imageUrl: skillPreviewImageUrls[skill.name],
+              ),
             ],
           ),
         ),

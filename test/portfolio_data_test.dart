@@ -1,5 +1,6 @@
 import "package:flutter_test/flutter_test.dart";
 import "package:thgportfolio/portfolio_data.dart";
+import "package:thgportfolio/skill_preview_images.dart";
 
 void main() {
   test("resume-backed portfolio data stays complete", () {
@@ -97,6 +98,28 @@ void main() {
         .map((skill) => skill.name)
         .toList();
     expect(publishedSkills.toSet(), hasLength(publishedSkills.length));
+  });
+
+  test("skill preview content is sourced and renderable", () {
+    final skillsByName = {
+      for (final category in portfolio.skills)
+        for (final skill in category.skills) skill.name: skill,
+    };
+
+    expect(skillPreviewImageUrls.keys, everyElement(isIn(skillsByName.keys)));
+    expect(skillPreviewImageUrls.values, everyElement(startsWith("https://")));
+    for (final skill in skillsByName.values) {
+      expect(skill.description.trim(), isNotEmpty);
+    }
+
+    expect(
+      skillsByName["VBA"]?.websiteUrl,
+      "https://learn.microsoft.com/en-us/office/vba/api/overview/",
+    );
+    expect(
+      skillsByName["Antigravity 2"]?.websiteUrl,
+      "https://antigravity.google/",
+    );
   });
 
   test("AI coding agents are published as AI development tools", () {

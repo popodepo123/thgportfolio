@@ -263,7 +263,7 @@ final portfolio = PortfolioData(
           name: "VBA",
           description: "Office automation and MS Access/Excel systems.",
           websiteUrl:
-              "https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba",
+              "https://learn.microsoft.com/en-us/office/vba/api/overview/",
         ),
       ],
     ),
@@ -390,6 +390,7 @@ final portfolio = PortfolioData(
           name: "Antigravity 2",
           description:
               "Agentic development environment used for AI-assisted engineering workflows.",
+          websiteUrl: "https://antigravity.google/",
         ),
         SkillDetail(
           name: "Google AI Studio",
