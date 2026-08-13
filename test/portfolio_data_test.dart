@@ -1,6 +1,5 @@
 import "package:flutter_test/flutter_test.dart";
 import "package:thgportfolio/portfolio_data.dart";
-import "package:thgportfolio/skill_icons.dart";
 
 void main() {
   test("resume-backed portfolio data stays complete", () {
@@ -29,7 +28,6 @@ void main() {
     };
 
     expect(skillNames, containsAll(resumeSkills));
-    expect(skillNames.every(skillIcons.containsKey), isTrue);
     expect(portfolio.resumeAssetPath, "assets/resume_thg_dev_20260718.pdf");
     expect(portfolio.experiences.first.company, contains("DAPL IT Services"));
     expect(portfolio.experiences.first.period, "January 2026 - Present");
@@ -118,7 +116,6 @@ void main() {
       if (agent == null) continue;
       expect(agent.description.trim(), isNotEmpty);
       expect(agent.websiteUrl, startsWith("https://"));
-      expect(skillIcons, contains(agentName));
     }
   });
 

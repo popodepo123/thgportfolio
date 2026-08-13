@@ -1,18 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:thgportfolio/portfolio_data.dart';
+import "package:flutter/material.dart";
 
-import 'package:thgportfolio/widgets/skill_widgets.dart';
+import "package:thgportfolio/portfolio_data.dart";
+import "package:thgportfolio/widgets/skill_widgets.dart";
 
 class CustomSkillChip extends StatefulWidget {
   final SkillDetail skillDetail;
-  final IconData icon;
-  final TextTheme textTheme;
-  const CustomSkillChip({
-    super.key,
-    required this.skillDetail,
-    required this.icon,
-    required this.textTheme,
-  });
+
+  const CustomSkillChip({super.key, required this.skillDetail});
 
   @override
   State<CustomSkillChip> createState() => _CustomSkillChipState();
@@ -56,29 +50,15 @@ class _CustomSkillChipState extends State<CustomSkillChip> {
                   : Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  widget.icon,
-                  size: 16,
+            child: SelectionContainer.disabled(
+              child: Text(
+                widget.skillDetail.name,
+                style: TextStyle(
                   color: _isHovering
                       ? Theme.of(context).colorScheme.onPrimary
                       : Theme.of(context).colorScheme.onSurface,
-                  semanticLabel: widget.skillDetail.name,
                 ),
-                const SizedBox(width: 8),
-                SelectionContainer.disabled(
-                  child: Text(
-                    widget.skillDetail.name,
-                    style: TextStyle(
-                      color: _isHovering
-                          ? Theme.of(context).colorScheme.onPrimary
-                          : Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),

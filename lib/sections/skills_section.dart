@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:thgportfolio/portfolio_data.dart';
-import 'package:thgportfolio/skill_icons.dart';
+import "package:flutter/material.dart";
 
-import 'package:thgportfolio/widgets/custom_skill_chip.dart';
+import "package:thgportfolio/portfolio_data.dart";
+import "package:thgportfolio/widgets/custom_skill_chip.dart";
 
 class SkillsSection extends StatefulWidget {
   const SkillsSection({super.key});
@@ -27,7 +26,7 @@ class _SkillsSectionState extends State<SkillsSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Tech Stack', style: textTheme.headlineMedium),
+          Text("Tech Stack", style: textTheme.headlineMedium),
           const SizedBox(height: 24),
           ...portfolio.skills.map(
             (category) => Padding(
@@ -49,12 +48,7 @@ class _SkillsSectionState extends State<SkillsSection> {
                     spacing: 12,
                     runSpacing: 12,
                     children: category.skills.map((skillDetail) {
-                      final icon = skillIcons[skillDetail.name]!;
-                      return CustomSkillChip(
-                        skillDetail: skillDetail,
-                        icon: icon,
-                        textTheme: textTheme,
-                      );
+                      return CustomSkillChip(skillDetail: skillDetail);
                     }).toList(),
                   ),
                 ],
