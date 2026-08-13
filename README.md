@@ -65,11 +65,16 @@ fvm flutter run -d chrome
 To build the project for GitHub Pages:
 
 ```bash
-fvm flutter build web --release --base-href "/thgportfolio/"
+fvm flutter build web --release --wasm --base-href "/thgportfolio/"
 rm -rf docs/*
 cp -r build/web/* docs/
 touch docs/.nojekyll
 ```
+
+The custom `web/flutter_bootstrap.js` gives `main.dart.js`, `main.dart.mjs`,
+and `main.dart.wasm` the same build-version query parameter. Keep this bootstrap
+when rebuilding so browsers cannot combine entrypoint files from different
+deployments.
 
 ## Contact
 

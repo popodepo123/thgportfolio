@@ -35,8 +35,27 @@ if (!window._flutter) {
 }
 _flutter.buildConfig = {"engineRevision":"42d3d75a56efe1a2e9902f52dc8006099c45d937","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm","jsSupportRuntimePath":"main.dart.mjs"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"}]};
 
+
+const appBuildVersion = "3943234499" /* Flutter's service worker is deprecated and will be removed in a future Flutter release. */;
+const appArtifactKeys = [
+  "mainJsPath",
+  "mainWasmPath",
+  "jsSupportRuntimePath",
+];
+
+for (const build of _flutter.buildConfig.builds) {
+  for (const artifactKey of appArtifactKeys) {
+    const artifactPath = build[artifactKey];
+    if (!artifactPath) continue;
+
+    const separator = artifactPath.includes("?") ? "&" : "?";
+    build[artifactKey] =
+      `${artifactPath}${separator}v=${encodeURIComponent(appBuildVersion)}`;
+  }
+}
+
 _flutter.loader.load({
   serviceWorkerSettings: {
-    serviceWorkerVersion: "507497458" /* Flutter's service worker is deprecated and will be removed in a future Flutter release. */
-  }
+    serviceWorkerVersion: appBuildVersion,
+  },
 });
