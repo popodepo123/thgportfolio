@@ -35,11 +35,81 @@ void main() {
     expect(portfolio.experiences.first.period, "January 2026 - Present");
   });
 
-  test("AI coding agents are published as other tools", () {
-    final otherTools = portfolio.skills
-        .singleWhere((category) => category.categoryName == "Other Tools")
+  test("tech stack groups every skill by capability", () {
+    final skillsByCategory = <String, Set<String>>{
+      for (final category in portfolio.skills)
+        category.categoryName: {
+          for (final skill in category.skills) skill.name,
+        },
+    };
+    const expectedSkillsByCategory = <String, Set<String>>{
+      "Mobile & App Development": {
+        "Dart",
+        "Flutter",
+        "Kotlin",
+        "Swift",
+        "MIT App Inventor",
+      },
+      "Web, Backend & Data": {
+        "Web (JavaScript, HTML, CSS)",
+        "Jaspr (Dart Web Framework)",
+        "Serverpod",
+        "SQL",
+        "Google Apps Script",
+        "VBA",
+      },
+      "Cloud & APIs": {"Firebase", "Google Cloud Platform", "Postman"},
+      "Editors & Native Toolchains": {
+        "VS Code",
+        "Android Studio",
+        "Xcode",
+        "Helix/Vim/Neovim",
+      },
+      "Version Control, CI & Automation": {
+        "Git",
+        "GitHub",
+        "Bitbucket",
+        "Sourcetree",
+        "Codemagic",
+        "Bash",
+        "PowerShell",
+      },
+      "AI Development Tools": {
+        "Codex",
+        "Claude Code",
+        "OMP",
+        "OpenCode",
+        "Gemini CLI",
+        "Antigravity 2",
+        "Google AI Studio",
+        "Ollama",
+        "Firebase Studio",
+        "LM Studio",
+      },
+      "Design & Planning": {"Figma", "Trello"},
+    };
+
+    expect(skillsByCategory.keys, orderedEquals(expectedSkillsByCategory.keys));
+    for (final category in expectedSkillsByCategory.entries) {
+      expect(skillsByCategory[category.key], equals(category.value));
+    }
+
+    final publishedSkills = portfolio.skills
+        .expand((category) => category.skills)
+        .map((skill) => skill.name)
+        .toList();
+    expect(publishedSkills.toSet(), hasLength(publishedSkills.length));
+  });
+
+  test("AI coding agents are published as AI development tools", () {
+    final aiDevelopmentTools = portfolio.skills
+        .singleWhere(
+          (category) => category.categoryName == "AI Development Tools",
+        )
         .skills;
-    final toolsByName = {for (final skill in otherTools) skill.name: skill};
+    final toolsByName = {
+      for (final skill in aiDevelopmentTools) skill.name: skill,
+    };
     const codingAgents = {"OMP", "Codex", "Claude Code"};
 
     expect(toolsByName.keys, containsAll(codingAgents));

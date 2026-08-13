@@ -195,7 +195,7 @@ final portfolio = PortfolioData(
       "Mobile application developer focused on production Flutter systems, maintainable feature-first architecture, native platform integrations, and reliable developer tooling. My recent work includes online banking, restaurant ordering and point-of-sale workflows, EV charging maps, Bluetooth thermal printers, media pipelines, Firebase services, and REST APIs across Android, iOS, and web.",
   skills: [
     SkillCategory(
-      categoryName: "Programming Languages",
+      categoryName: "Mobile & App Development",
       skills: [
         SkillDetail(
           name: "Dart",
@@ -203,21 +203,10 @@ final portfolio = PortfolioData(
           websiteUrl: "https://dart.dev",
         ),
         SkillDetail(
-          name: "Web (JavaScript, HTML, CSS)",
+          name: "Flutter",
           description:
-              "Web technologies used for interfaces, internal tools, and Google Apps Script web applications.",
-          websiteUrl: "https://developer.mozilla.org/en-US/docs/Web",
-        ),
-        SkillDetail(
-          name: "VBA",
-          description: "Office automation and MS Access/Excel systems.",
-          websiteUrl:
-              "https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba",
-        ),
-        SkillDetail(
-          name: "SQL",
-          description:
-              "Relational data querying, transformation, and reporting.",
+              "Cross-platform UI development for Android, iOS, and web.",
+          websiteUrl: "https://flutter.dev",
         ),
         SkillDetail(
           name: "Kotlin",
@@ -230,16 +219,22 @@ final portfolio = PortfolioData(
           description: "iOS-native SDK and platform-channel integrations.",
           websiteUrl: "https://www.swift.org",
         ),
+        SkillDetail(
+          name: "MIT App Inventor",
+          description:
+              "Visual application-development environment used for rapid prototypes.",
+          websiteUrl: "https://appinventor.mit.edu/",
+        ),
       ],
     ),
     SkillCategory(
-      categoryName: "Frameworks",
+      categoryName: "Web, Backend & Data",
       skills: [
         SkillDetail(
-          name: "Flutter",
+          name: "Web (JavaScript, HTML, CSS)",
           description:
-              "Cross-platform UI development for Android, iOS, and web.",
-          websiteUrl: "https://flutter.dev",
+              "Web technologies used for interfaces, internal tools, and Google Apps Script web applications.",
+          websiteUrl: "https://developer.mozilla.org/en-US/docs/Web",
         ),
         SkillDetail(
           name: "Jaspr (Dart Web Framework)",
@@ -248,21 +243,53 @@ final portfolio = PortfolioData(
           websiteUrl: "https://jaspr.site",
         ),
         SkillDetail(
-          name: "MIT App Inventor",
-          description:
-              "Visual application-development environment used for rapid prototypes.",
-          websiteUrl: "https://appinventor.mit.edu/",
-        ),
-        SkillDetail(
           name: "Serverpod",
           description:
               "Dart backend framework designed for Flutter applications.",
           websiteUrl: "https://serverpod.dev",
         ),
+        SkillDetail(
+          name: "SQL",
+          description:
+              "Relational data querying, transformation, and reporting.",
+        ),
+        SkillDetail(
+          name: "Google Apps Script",
+          description:
+              "Google Workspace automation and web application platform.",
+          websiteUrl: "https://developers.google.com/apps-script",
+        ),
+        SkillDetail(
+          name: "VBA",
+          description: "Office automation and MS Access/Excel systems.",
+          websiteUrl:
+              "https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba",
+        ),
       ],
     ),
     SkillCategory(
-      categoryName: "Other Tools",
+      categoryName: "Cloud & APIs",
+      skills: [
+        SkillDetail(
+          name: "Firebase",
+          description:
+              "Authentication, Firestore, Cloud Functions, Hosting, Storage, Messaging, AI, and Crashlytics.",
+          websiteUrl: "https://firebase.google.com/",
+        ),
+        SkillDetail(
+          name: "Google Cloud Platform",
+          description: "Google cloud infrastructure and managed services.",
+          websiteUrl: "https://cloud.google.com/",
+        ),
+        SkillDetail(
+          name: "Postman",
+          description: "API development and testing platform.",
+          websiteUrl: "https://www.postman.com/",
+        ),
+      ],
+    ),
+    SkillCategory(
+      categoryName: "Editors & Native Toolchains",
       skills: [
         SkillDetail(
           name: "VS Code",
@@ -287,11 +314,11 @@ final portfolio = PortfolioData(
               "Modal terminal editors used in custom development workflows.",
           websiteUrl: "https://helix-editor.com/",
         ),
-        SkillDetail(
-          name: "Codemagic",
-          description: "Mobile CI/CD build and deployment automation.",
-          websiteUrl: "https://codemagic.io/",
-        ),
+      ],
+    ),
+    SkillCategory(
+      categoryName: "Version Control, CI & Automation",
+      skills: [
         SkillDetail(
           name: "Git",
           description: "Distributed version control.",
@@ -313,31 +340,41 @@ final portfolio = PortfolioData(
           websiteUrl: "https://www.sourcetreeapp.com/",
         ),
         SkillDetail(
-          name: "Google Apps Script",
+          name: "Codemagic",
+          description: "Mobile CI/CD build and deployment automation.",
+          websiteUrl: "https://codemagic.io/",
+        ),
+        SkillDetail(
+          name: "Bash",
+          description: "Unix shell scripting and build automation.",
+          websiteUrl: "https://www.gnu.org/software/bash/",
+        ),
+        SkillDetail(
+          name: "PowerShell",
+          description: "Cross-platform shell and task automation.",
+          websiteUrl: "https://learn.microsoft.com/powershell/",
+        ),
+      ],
+    ),
+    SkillCategory(
+      categoryName: "AI Development Tools",
+      skills: [
+        SkillDetail(
+          name: "Codex",
           description:
-              "Google Workspace automation and web application platform.",
-          websiteUrl: "https://developers.google.com/apps-script",
+              "OpenAI coding agent used for repository-scale development workflows.",
+          websiteUrl: "https://openai.com/codex/",
         ),
         SkillDetail(
-          name: "Firebase",
+          name: "Claude Code",
+          description: "Anthropic coding agent for terminal workflows.",
+          websiteUrl: "https://www.anthropic.com/claude-code",
+        ),
+        SkillDetail(
+          name: "OMP",
           description:
-              "Authentication, Firestore, Cloud Functions, Hosting, Storage, Messaging, AI, and Crashlytics.",
-          websiteUrl: "https://firebase.google.com/",
-        ),
-        SkillDetail(
-          name: "Trello",
-          description: "Kanban-based project and task management.",
-          websiteUrl: "https://trello.com/",
-        ),
-        SkillDetail(
-          name: "Postman",
-          description: "API development and testing platform.",
-          websiteUrl: "https://www.postman.com/",
-        ),
-        SkillDetail(
-          name: "Google Cloud Platform",
-          description: "Google cloud infrastructure and managed services.",
-          websiteUrl: "https://cloud.google.com/",
+              "Oh My Pi terminal coding agent used for repository-scale development workflows.",
+          websiteUrl: "https://github.com/can1357/oh-my-pi",
         ),
         SkillDetail(
           name: "OpenCode",
@@ -350,10 +387,9 @@ final portfolio = PortfolioData(
           websiteUrl: "https://github.com/google-gemini/gemini-cli",
         ),
         SkillDetail(
-          name: "LM Studio",
+          name: "Antigravity 2",
           description:
-              "Local large-language-model runtime and development environment.",
-          websiteUrl: "https://lmstudio.ai/",
+              "Agentic development environment used for AI-assisted engineering workflows.",
         ),
         SkillDetail(
           name: "Google AI Studio",
@@ -372,41 +408,25 @@ final portfolio = PortfolioData(
           websiteUrl: "https://firebase.studio/",
         ),
         SkillDetail(
+          name: "LM Studio",
+          description:
+              "Local large-language-model runtime and development environment.",
+          websiteUrl: "https://lmstudio.ai/",
+        ),
+      ],
+    ),
+    SkillCategory(
+      categoryName: "Design & Planning",
+      skills: [
+        SkillDetail(
           name: "Figma",
           description: "Collaborative interface design and prototyping.",
           websiteUrl: "https://www.figma.com/",
         ),
         SkillDetail(
-          name: "OMP",
-          description:
-              "Oh My Pi terminal coding agent used for repository-scale development workflows.",
-          websiteUrl: "https://github.com/can1357/oh-my-pi",
-        ),
-        SkillDetail(
-          name: "Codex",
-          description:
-              "OpenAI coding agent used for repository-scale development workflows.",
-          websiteUrl: "https://openai.com/codex/",
-        ),
-        SkillDetail(
-          name: "Claude Code",
-          description: "Anthropic coding agent for terminal workflows.",
-          websiteUrl: "https://www.anthropic.com/claude-code",
-        ),
-        SkillDetail(
-          name: "Antigravity 2",
-          description:
-              "Agentic development environment used for AI-assisted engineering workflows.",
-        ),
-        SkillDetail(
-          name: "Bash",
-          description: "Unix shell scripting and build automation.",
-          websiteUrl: "https://www.gnu.org/software/bash/",
-        ),
-        SkillDetail(
-          name: "PowerShell",
-          description: "Cross-platform shell and task automation.",
-          websiteUrl: "https://learn.microsoft.com/powershell/",
+          name: "Trello",
+          description: "Kanban-based project and task management.",
+          websiteUrl: "https://trello.com/",
         ),
       ],
     ),
