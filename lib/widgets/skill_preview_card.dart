@@ -34,6 +34,19 @@ class SkillPreviewCard extends StatelessWidget {
     );
   }
 
+  Widget _loadingIndicator(BuildContext context, String semanticsLabel) {
+    return Center(
+      child: SizedBox.square(
+        dimension: 32,
+        child: CircularProgressIndicator(
+          color: Theme.of(context).colorScheme.primary,
+          semanticsLabel: semanticsLabel,
+          strokeWidth: 3,
+        ),
+      ),
+    );
+  }
+
   Widget _logoArtwork(BuildContext context) {
     return ColoredBox(
       color: const Color(0xFF171717),
@@ -57,6 +70,10 @@ class SkillPreviewCard extends StatelessWidget {
                           logo.assetPath,
                           fit: BoxFit.contain,
                           semanticsLabel: "${logo.label} logo",
+                          placeholderBuilder: (context) => _loadingIndicator(
+                            context,
+                            "Loading ${logo.label} logo",
+                          ),
                           errorBuilder: (context, error, stackTrace) {
                             return _fallbackArtwork(context);
                           },
@@ -111,6 +128,16 @@ class SkillPreviewCard extends StatelessWidget {
                     imageAssetPath!,
                     fit: BoxFit.cover,
                     semanticLabel: "$title artwork",
+                    frameBuilder:
+                        (context, child, frame, wasSynchronouslyLoaded) {
+                          if (wasSynchronouslyLoaded || frame != null) {
+                            return child;
+                          }
+                          return _loadingIndicator(
+                            context,
+                            "Loading $title artwork",
+                          );
+                        },
                     errorBuilder: (context, error, stackTrace) {
                       return _fallbackArtwork(context);
                     },

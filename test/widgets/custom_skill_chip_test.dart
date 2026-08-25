@@ -81,7 +81,8 @@ void main() {
       );
 
       await tester.tap(find.text("Flutter"));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 250));
 
       expect(find.byType(SkillDetailDialog), findsOneWidget);
       expect(
@@ -92,15 +93,35 @@ void main() {
       expect(find.text("Source: flutter.dev"), findsOneWidget);
       expect(find.byType(SkillPreviewCard), findsOneWidget);
       expect(find.byType(Image), findsOneWidget);
-      expect(tester.widget<Image>(find.byType(Image)).image, isA<AssetImage>());
+      final previewImage = tester.widget<Image>(find.byType(Image));
+      expect(previewImage.image, isA<AssetImage>());
+      expect(previewImage.frameBuilder, isNotNull);
       final previewCard = tester.widget<Container>(
         find.byKey(const ValueKey("skill-preview-card")),
       );
       final foregroundDecoration =
           previewCard.foregroundDecoration as BoxDecoration;
       expect(foregroundDecoration.border, isA<Border>());
-      expect(find.byType(CircularProgressIndicator), findsNothing);
       expect(find.text("Open Website"), findsOneWidget);
+
+      final frameBuilder = previewImage.frameBuilder!;
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: portfolioTheme,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) =>
+                  frameBuilder(context, const SizedBox(), null, false),
+            ),
+          ),
+        ),
+      );
+
+      final loadingIndicator = tester.widget<CircularProgressIndicator>(
+        find.byType(CircularProgressIndicator),
+      );
+      expect(loadingIndicator.semanticsLabel, "Loading Flutter artwork");
     });
 
     testWidgets("shows the correct bundled logo instead of unrelated artwork", (
@@ -120,14 +141,32 @@ void main() {
       );
 
       await tester.tap(find.text("PowerShell"));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 250));
 
       expect(find.byType(SvgPicture), findsOneWidget);
       expect(
         tester.widget<SvgPicture>(find.byType(SvgPicture)).semanticsLabel,
         "PowerShell logo",
       );
+      final previewLogo = tester.widget<SvgPicture>(find.byType(SvgPicture));
+      expect(previewLogo.placeholderBuilder, isNotNull);
       expect(find.byType(Image), findsNothing);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: portfolioTheme,
+          home: Scaffold(
+            body: Builder(builder: previewLogo.placeholderBuilder!),
+          ),
+        ),
+      );
+
+      final loadingIndicator = tester.widget<CircularProgressIndicator>(
+        find.byType(CircularProgressIndicator),
+      );
+      expect(loadingIndicator.semanticsLabel, "Loading PowerShell logo");
     });
   });
 }
