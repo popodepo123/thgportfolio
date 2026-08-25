@@ -88,7 +88,10 @@ class SkillCategory {
   const SkillCategory({required this.categoryName, required this.skills});
 }
 
+enum ProjectCategory { featured, personal }
+
 class Project {
+  final ProjectCategory category;
   final String title;
   final String description;
   final String? playstoreLink;
@@ -100,6 +103,7 @@ class Project {
   final List<ProjectImage>? images;
 
   const Project({
+    this.category = ProjectCategory.featured,
     this.playstoreLink,
     this.appstoreLink,
     this.githubLink,
@@ -554,6 +558,7 @@ final portfolio = PortfolioData(
       ],
     ),
     Project(
+      category: ProjectCategory.personal,
       gitlabLink: "https://gitlab.com/godoytristanh/fsa",
       title: "Flutter Simple Architecture (FSA)",
       description:
@@ -566,6 +571,7 @@ final portfolio = PortfolioData(
       ],
     ),
     Project(
+      category: ProjectCategory.personal,
       gitlabLink: "https://gitlab.com/godoytristanh/dart_filetree",
       githubLink: "https://github.com/popodepo123/dart_filetree",
       title: "Dart File Tree",
@@ -579,6 +585,7 @@ final portfolio = PortfolioData(
       ],
     ),
     Project(
+      category: ProjectCategory.personal,
       gitlabLink:
           "https://gitlab.com/godoytristanh/dart_filetree/-/tree/main/rust_filetree?ref_type=heads",
       title: "Rust File Tree",
@@ -591,6 +598,7 @@ final portfolio = PortfolioData(
       ],
     ),
     Project(
+      category: ProjectCategory.personal,
       gitlabLink: "https://gitlab.com/godoytristanh/flutter_hotreload",
       title: "Flutter Hotreload",
       description:

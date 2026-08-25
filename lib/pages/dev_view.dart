@@ -203,9 +203,11 @@ class _DevViewState extends State<DevView> {
       setState(() => _isLoading = true);
 
       if (isImg) {
-        final rawUrl = '$gitlabUrl/-/raw/main/$remotePath';
         setState(() {
-          _imageUrl = ContributionService.wrapUrl(rawUrl);
+          _imageUrl = ContributionService.gitLabRawFileUrl(
+            gitlabUrl,
+            filePath: remotePath,
+          );
           _isLoading = false;
         });
       } else {

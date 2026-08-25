@@ -102,7 +102,7 @@ void main() {
     expect(publishedSkills.toSet(), hasLength(publishedSkills.length));
   });
 
-  test("every skill has a hardcoded summary and bundled image", () {
+  test("every skill has a hardcoded summary and accurate bundled artwork", () {
     final skillsByName = {
       for (final category in portfolio.skills)
         for (final skill in category.skills) skill.name: skill,
@@ -112,9 +112,16 @@ void main() {
     for (final preview in skillPreviewContentByName.values) {
       expect(preview.summary.trim(), isNotEmpty);
       expect(preview.summary, isNot(contains("http")));
-      expect(preview.imageAssetPath, startsWith("assets/images/skills/"));
-      expect(preview.imageAssetPath, isNot(contains("http")));
-      expect(File(preview.imageAssetPath).existsSync(), isTrue);
+      final artworkPaths = <String>[
+        ?preview.imageAssetPath,
+        ...preview.logos.map((logo) => logo.assetPath),
+      ];
+      expect(artworkPaths, isNotEmpty);
+      for (final artworkPath in artworkPaths) {
+        expect(artworkPath, startsWith("assets/images/skills/"));
+        expect(artworkPath, isNot(contains("http")));
+        expect(File(artworkPath).existsSync(), isTrue);
+      }
     }
 
     expect(
@@ -162,6 +169,35 @@ void main() {
         "Flutter desktop workbench backed by a native Rust bridge to the Helix editing engine",
         "Buffer tabs and panes, project file tree, file pickers, previews, and modal editing workflows",
         "Language-server features, diagnostics, hover information, integrated terminal, and debugger support",
+      ]),
+    );
+  });
+
+  test("featured and personal projects have separate ordered groups", () {
+    final featuredProjects = portfolio.projects
+        .where((project) => project.category == ProjectCategory.featured)
+        .map((project) => project.title);
+    final personalProjects = portfolio.projects
+        .where((project) => project.category == ProjectCategory.personal)
+        .map((project) => project.title);
+
+    expect(
+      featuredProjects,
+      orderedEquals([
+        "Felix - Flutter-Helix IDE",
+        "KitaKits POS",
+        "Lapit - Apartment and Condo Search",
+        "Restaurant Multi-Store, POS, and Self-Ordering System",
+        "EV Navi - Electric Vehicle Charging Map",
+      ]),
+    );
+    expect(
+      personalProjects,
+      orderedEquals([
+        "Flutter Simple Architecture (FSA)",
+        "Dart File Tree",
+        "Rust File Tree",
+        "Flutter Hotreload",
       ]),
     );
   });

@@ -48,6 +48,7 @@ class SkillDetailDialog extends StatelessWidget {
                 title: skill.name,
                 description: previewContent.summary,
                 imageAssetPath: previewContent.imageAssetPath,
+                logos: previewContent.logos,
               ),
             ],
           ),

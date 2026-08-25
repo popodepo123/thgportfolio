@@ -1,5 +1,6 @@
 import "package:flutter/gestures.dart";
 import "package:flutter/material.dart";
+import "package:flutter_svg/flutter_svg.dart";
 import "package:flutter_test/flutter_test.dart";
 
 import "package:thgportfolio/portfolio_data.dart";
@@ -92,8 +93,41 @@ void main() {
       expect(find.byType(SkillPreviewCard), findsOneWidget);
       expect(find.byType(Image), findsOneWidget);
       expect(tester.widget<Image>(find.byType(Image)).image, isA<AssetImage>());
+      final previewCard = tester.widget<Container>(
+        find.byKey(const ValueKey("skill-preview-card")),
+      );
+      final foregroundDecoration =
+          previewCard.foregroundDecoration as BoxDecoration;
+      expect(foregroundDecoration.border, isA<Border>());
       expect(find.byType(CircularProgressIndicator), findsNothing);
       expect(find.text("Open Website"), findsOneWidget);
+    });
+
+    testWidgets("shows the correct bundled logo instead of unrelated artwork", (
+      WidgetTester tester,
+    ) async {
+      const skillDetail = SkillDetail(
+        name: "PowerShell",
+        description: "Cross-platform shell and task automation.",
+        websiteUrl: "https://learn.microsoft.com/powershell/",
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: portfolioTheme,
+          home: const Scaffold(body: CustomSkillChip(skillDetail: skillDetail)),
+        ),
+      );
+
+      await tester.tap(find.text("PowerShell"));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SvgPicture), findsOneWidget);
+      expect(
+        tester.widget<SvgPicture>(find.byType(SvgPicture)).semanticsLabel,
+        "PowerShell logo",
+      );
+      expect(find.byType(Image), findsNothing);
     });
   });
 }

@@ -36,7 +36,7 @@ if (!window._flutter) {
 _flutter.buildConfig = {"engineRevision":"42d3d75a56efe1a2e9902f52dc8006099c45d937","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm","jsSupportRuntimePath":"main.dart.mjs"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"}]};
 
 
-const appBuildVersion = "3943234499" /* Flutter's service worker is deprecated and will be removed in a future Flutter release. */;
+const appBuildVersion = "3960684811" /* Flutter's service worker is deprecated and will be removed in a future Flutter release. */;
 const appArtifactKeys = [
   "mainJsPath",
   "mainWasmPath",

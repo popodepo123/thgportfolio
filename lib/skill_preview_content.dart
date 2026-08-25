@@ -1,11 +1,20 @@
 class SkillPreviewContent {
-  final String imageAssetPath;
+  final String? imageAssetPath;
+  final List<SkillPreviewLogo> logos;
   final String summary;
 
   const SkillPreviewContent({
-    required this.imageAssetPath,
+    this.imageAssetPath,
+    this.logos = const [],
     required this.summary,
   });
+}
+
+class SkillPreviewLogo {
+  final String assetPath;
+  final String label;
+
+  const SkillPreviewLogo({required this.assetPath, required this.label});
 }
 
 const Map<String, SkillPreviewContent> skillPreviewContentByName = {
@@ -60,7 +69,12 @@ const Map<String, SkillPreviewContent> skillPreviewContentByName = {
         "Google Apps Script is a cloud-based JavaScript platform for automating Google Workspace, integrating services, and publishing lightweight web applications.",
   ),
   "VBA": SkillPreviewContent(
-    imageAssetPath: "assets/images/skills/vba.webp",
+    logos: [
+      SkillPreviewLogo(
+        assetPath: "assets/images/skills/visual_basic_logo.svg",
+        label: "VBA",
+      ),
+    ],
     summary:
         "Visual Basic for Applications is Microsoft's event-driven language for extending Office applications and automating repetitive document and data workflows.",
   ),
@@ -85,7 +99,12 @@ const Map<String, SkillPreviewContent> skillPreviewContentByName = {
         "Visual Studio Code is a free, extensible source-code editor with integrated debugging, terminal access, version control, and language tooling.",
   ),
   "Android Studio": SkillPreviewContent(
-    imageAssetPath: "assets/images/skills/android_studio.webp",
+    logos: [
+      SkillPreviewLogo(
+        assetPath: "assets/images/skills/android_studio_logo.svg",
+        label: "Android Studio",
+      ),
+    ],
     summary:
         "Android Studio is Google's official Android IDE, combining code tools, emulators, profilers, build integration, and device debugging.",
   ),
@@ -95,7 +114,20 @@ const Map<String, SkillPreviewContent> skillPreviewContentByName = {
         "Xcode is Apple's development suite for building, testing, profiling, signing, and distributing applications across Apple platforms.",
   ),
   "Helix/Vim/Neovim": SkillPreviewContent(
-    imageAssetPath: "assets/images/skills/helix_vim_neovim.webp",
+    logos: [
+      SkillPreviewLogo(
+        assetPath: "assets/images/skills/helix_logo.svg",
+        label: "Helix",
+      ),
+      SkillPreviewLogo(
+        assetPath: "assets/images/skills/vim_logo.svg",
+        label: "Vim",
+      ),
+      SkillPreviewLogo(
+        assetPath: "assets/images/skills/neovim_logo.svg",
+        label: "Neovim",
+      ),
+    ],
     summary:
         "Helix, Vim, and Neovim are keyboard-driven modal editors built around composable commands, efficient navigation, and highly customizable development workflows.",
   ),
@@ -115,7 +147,12 @@ const Map<String, SkillPreviewContent> skillPreviewContentByName = {
         "Bitbucket is Atlassian's Git hosting and CI/CD platform, with repository collaboration and close integration with Jira-based team workflows.",
   ),
   "Sourcetree": SkillPreviewContent(
-    imageAssetPath: "assets/images/skills/sourcetree.webp",
+    logos: [
+      SkillPreviewLogo(
+        assetPath: "assets/images/skills/sourcetree_logo.svg",
+        label: "Sourcetree",
+      ),
+    ],
     summary:
         "Sourcetree is Atlassian's desktop Git client for visualizing repository history and managing commits, branches, merges, and remote workflows.",
   ),
@@ -130,7 +167,12 @@ const Map<String, SkillPreviewContent> skillPreviewContentByName = {
         "Bash is the GNU project's command shell and scripting language, widely used for interactive Unix workflows, build scripts, and task automation.",
   ),
   "PowerShell": SkillPreviewContent(
-    imageAssetPath: "assets/images/skills/powershell.webp",
+    logos: [
+      SkillPreviewLogo(
+        assetPath: "assets/images/skills/powershell_logo.svg",
+        label: "PowerShell",
+      ),
+    ],
     summary:
         "PowerShell is a cross-platform command shell and automation language built around structured objects, reusable modules, and system-management tooling.",
   ),

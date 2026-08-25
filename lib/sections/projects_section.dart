@@ -40,7 +40,12 @@ class _ProjectsSectionState extends State<ProjectsSection> {
           ...portfolio.projects.asMap().entries.map((entry) {
             final index = entry.key;
             final project = entry.value;
-            return Card(
+            final startsPersonalProjects =
+                project.category == ProjectCategory.personal &&
+                (index == 0 ||
+                    portfolio.projects[index - 1].category !=
+                        ProjectCategory.personal);
+            final card = Card(
               margin: const EdgeInsets.only(bottom: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -375,6 +380,16 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                   ),
                 ],
               ),
+            );
+            if (!startsPersonalProjects) return card;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                Text('Personal Projects', style: textTheme.headlineMedium),
+                const SizedBox(height: 16),
+                card,
+              ],
             );
           }),
           const SizedBox(height: 24),
